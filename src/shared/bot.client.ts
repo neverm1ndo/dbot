@@ -17,7 +17,7 @@ export class Bot {
         username: process.env.BOT_NICKNAME,
         password: process.env.BOT_OAUTH_TOKEN
       },
-      channels: ['neverm1nd_o']
+      channels: [process.env.BOT_CHANNEL!]
     });;
   announcer: Announcer;
 
