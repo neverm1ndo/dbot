@@ -1,0 +1,10 @@
+/node_modules
+/src/pre-start/env/development.env
+/src/pre-start/env/production.env
+/dist
+*.key
+*.key.json
+*.mp3
+*.ogg
+*.log
+/src/public/.well-known/*

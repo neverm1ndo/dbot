@@ -1,0 +1,21 @@
+body {
+  padding: 100px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+@keyframes logo {
+  from { transform: rotate(0deg);}
+  to { transform: rotate(360deg);}
+}
+body #logo {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-left: -20px;
+  margin-top: -20px;
+  animation-duration: 3s;
+  animation-name: logo;
+  animation-iteration-count: infinite;
+  animation-direction: normal;
+  animation-play-state: running;
+  animation-timing-function: linear;
+}
