@@ -1,0 +1,14 @@
+doctype html
+html
+    head
+        meta(charset="UTF-8")
+        title="neverm1nd_o apps"
+        link(rel="stylesheet" type="text/css" href="/stylesheets/style.css")
+        link(rel="shortcut icon" href="/tank2.png")
+    body
+      img#logo(src="/tank2.png" alt="")
+      if !session.passport
+        a.btn(href="/auth/twitch") Авторизация Twitch
+      else
+        img#avatar(src= session.passport.user.data[0].profile_image_url)
+        pre= "id " + session.passport.user.data[0].id + '\n' + "login " + session.passport.user.data[0].login + '\n' + "at " + session.passport.user.accessToken + '\n'

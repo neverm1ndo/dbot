@@ -1,0 +1,30 @@
+doctype html
+html
+  head
+    title= 'Speaker OHMYDOG'
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
+    meta(name="viewport" content="width=device-width")
+    link(rel="shortcut icon" href="/tank2.png")
+
+
+    link(rel="stylesheet" href="/stylesheets/speaker.css")
+    <!--[if IE 8]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  body
+    div.container
+      button#accept(type="button" name="button") Разрешить управление спикером
+      div.imps
+        div
+          label#vol_label(for="volume1")
+            span(style={float: 'left', 'margin-left': '75px'}) Speaker
+            span#sp_vol(style={float: 'right', 'margin-right': '15px'}) 100
+          input#volume.slider(type="range" min="0" max="100" name="volume" value="35")
+        div
+          label#vol_label2(for="volume2")
+            span(style="float: left; margin-left: 75px") Sounds
+            span#sou_vol(style={float: 'right', 'margin-right': '15px'}) 100
+          input#volume2.slider(type="range" min="0" max="100" name="volume2" value="35")
+    script(type="text/javascript" src="/scripts/speaker.js")

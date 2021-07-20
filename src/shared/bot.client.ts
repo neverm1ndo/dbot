@@ -36,7 +36,7 @@ export class Bot {
 
     	const args = message.slice(1).split(' ');
     	const command = args.shift()!.toLowerCase();
-      this.readChattersMessage(channel, tags, command)
+      this.readChattersMessage(channel, tags, command);
     });
     this.announcer._announcer.subscribe((announce: string) => {
       this.client.say(this.client.getChannels()[0], announce);

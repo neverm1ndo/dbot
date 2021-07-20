@@ -19,3 +19,22 @@ body #logo {
   animation-play-state: running;
   animation-timing-function: linear;
 }
+body pre {
+  white-space: pre-wrap;
+}
+.btn {
+  padding: 15px;
+  border-radius: 4px;
+  text-decoration: none;
+  background-color: #9146FF;
+  color: #fff;
+}
+#avatar {
+  position: relative;
+  top: 15px;
+  margin-right: 15px;
+  width: 32px;
+  height: auto;
+  float: left;
+  border-radius: 100%;
+}

@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const OPN_DOTA = 'https://api.opendota.com/api/';
-const STEAM = 'https://api.opendota.com/api/';
 
 export interface Dota2Ratings {
   account_id: number;
