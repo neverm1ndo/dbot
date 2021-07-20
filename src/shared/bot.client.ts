@@ -6,9 +6,11 @@ import { Chatter } from '@interfaces/chatter';
 import { Media } from '@shared/media';
 import { Schedule } from '@shared/bot.schedule';
 import { Dota2 } from '@shared/dota2';
+import { Twitch } from '@shared/twitch';
 
 export class Bot {
   opts: any;
+  $announcer: any;
   media: Media = new Media();
   client: Client = new Client({
       options: { debug: true, messagesLogLevel: 'info'  },
@@ -27,6 +29,19 @@ export class Bot {
   constructor(opts: { schedule: Schedule }) {
     this.opts = opts.schedule;
     this.announcer = new Announcer(900000, this.opts.automessages);
+    Twitch.getAppAccessToken().then((body: any) => {
+      Twitch.streamChanges('stream.online', 144668618, body.access_token).catch((err) => { logger.err(err) });
+    }).catch((err) => logger.err(err));
+  }
+
+  public shutdown(): void {
+    this.$announcer.unsubscribe();
+  }
+
+  public wakeup(): void {
+    this.$announcer.subscribe((announce: string) => {
+      this.client.say(this.client.getChannels()[0], announce);
+    });;
   }
 
   public init(): void {
@@ -38,9 +53,8 @@ export class Bot {
     	const command = args.shift()!.toLowerCase();
       this.readChattersMessage(channel, tags, command);
     });
-    this.announcer._announcer.subscribe((announce: string) => {
-      this.client.say(this.client.getChannels()[0], announce);
-    });
+    this.$announcer = this.announcer._announcer;
+    this.wakeup();
   }
   /**
   * @param {ChatUserstate} chatter Chat user info

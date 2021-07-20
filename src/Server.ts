@@ -114,6 +114,10 @@ app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }))
 // Set route for OAuth redirect
 app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/', failureRedirect: '/' }));
 
+// Set route for webhooks
+app.post('/webhooks/callback/streams', express.json(), (req: Request, res: Response) => {
+  console.log(req.body);
+});
 // Print API errors
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
