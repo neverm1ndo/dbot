@@ -20,7 +20,7 @@ export class Bot {
         password: process.env.BOT_OAUTH_TOKEN
       },
       channels: [process.env.BOT_CHANNEL!]
-    });;
+    });
   announcer: Announcer;
 
   state = { status: 'works' }

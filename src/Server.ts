@@ -17,6 +17,7 @@ import { Bot } from '@shared/bot.client';
 import { Schedule } from '@shared/bot.schedule';
 
 import BaseRouter from './routes';
+import APIRouter from './routes/api.routes';
 import logger from '@shared/Logger';
 import axios from 'axios';
 
@@ -82,12 +83,13 @@ passport.use('twitch',  new OAuth2Strategy({
     profile.accessToken = accessToken;
     profile.refreshToken = refreshToken;
 
-    const user = new USER({
+    USER.updateOne({ 'user.id': profile.data[0].id }, {
       user: profile.data[0],
       accessToken: accessToken,
       refreshToken: accessToken,
+    }, { upsert: true, setDefaultsOnInsert: true }, (err: any, user: any) => {
+      if (err) return logger.err(err);
     });
-    user.save();
 
     done(null, profile);
   }
@@ -108,6 +110,8 @@ if (process.env.NODE_ENV === 'production') {
 
 // Add APIs
 app.use('/controls', BaseRouter);
+app.use('/api', express.json(), APIRouter);
+
 // Set route to start OAuth link, this is where you define scopes to request
 app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }));
 
@@ -115,7 +119,8 @@ app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }))
 app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/', failureRedirect: '/' }));
 
 // Set route for webhooks
-app.post('/webhooks/callback/streams', express.json(), (req: Request, res: Response) => {
+app.use('/webhooks/callback', express.json());
+app.post('/webhooks/callback/streams', (req: Request, res: Response) => {
   console.log(req.body);
 });
 // Print API errors

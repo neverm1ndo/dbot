@@ -1,0 +1,35 @@
+doctype html
+html
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
+        meta(http-equiv="Content-Security-Policy" content="default-src *; img-src * 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *")
+        if session.passport
+          title=session.passport.user.data[0].login + ' dashboard'
+        else
+          title="neverm1nd_o apps"
+        link(rel="stylesheet" type="text/css" href="/stylesheets/dashboard.css")
+        link(rel="shortcut icon" href="/tank2.png")
+    body
+      if session.passport
+        div.alert
+        div.container
+          aside.side
+            div.logo
+              img(src="/tank2.png")
+            div.list
+              ul#list
+                li КБ
+                li АС
+                li НФ
+                li СЗ
+                li API
+                li БС
+          main
+            div.form#gen-config
+              h1 Конфигурация бота
+              hrd
+            div.form#avt-msg-form
+            div.form#filter-form
+            div.form#sounds-form
+        script(src="/scripts/dashboard.js" charset="utf-8")

@@ -2,6 +2,7 @@
 /src/pre-start/env/development.env
 /src/pre-start/env/production.env
 /dist
+/src/etc/*
 *.key
 *.key.json
 *.mp3
