@@ -1,17 +1,23 @@
-import { readFileSync } from 'fs';
+import { USER } from '../schemas/user.schema';
+
+interface UserSettings {
+  automessages: string[];
+  banwords: string[];
+  sounds: any[];
+}
+
 
 export class Schedule {
-  schedules: {
-    dictionary: string[];
-    sounds: string[];
-    automessages: string[];
-  }
-  constructor() {
-    this.schedules = {
-      dictionary: JSON.parse(readFileSync(process.env.DICTIONARY_PATH!, 'utf-8')),
-      sounds: JSON.parse(readFileSync(process.env.SOUNDS_PATH!, 'utf-8')),
-      automessages: JSON.parse(readFileSync(process.env.AUTOMESSAGES_PATH!, 'utf-8')).m,
-    };
+  schedules: UserSettings = {
+    automessages: [],
+    banwords: [],
+    sounds: []
+  };
+  constructor(username: string) {
+    USER.findOne({'user.login': username}, (err: any, user: any) => {
+      if (err || !user) return;
+      this.schedules = user.settings;
+    })
   }
 
   get sounds(): string[] {
@@ -19,11 +25,11 @@ export class Schedule {
   }
 
   get dictionary(): string[] {
-    return this.schedules.dictionary;
+    return this.schedules.banwords;
   }
 
   set dictionary(newdict) {
-    this.schedules.dictionary = newdict;
+    this.schedules.banwords = newdict;
   }
 
   get automessages(): string[] {

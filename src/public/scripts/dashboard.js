@@ -9,26 +9,28 @@ class Alert {
 
   success(message) {
     this.box.innerHTML = message;
-    this.box.style.background = '#43A047';
+    this.box.classList.add('alert-success');
     this.box.style.display = 'block';
     setTimeout(() => {
+      this.box.classList.remove('alert-success');
       this.closeAlert();
     }, 2000);
   }
 
   error(message) {
     this.box.innerHTML = `<span>Произошла ошибка: ${message}</span>`;
-    this.box.style.background = '#B71C1C';
     this.box.style.display = 'block';
+    this.box.classList.add('alert-danger');
     setTimeout(() => {
+      this.box.classList.remove('alert-danger');
       this.closeAlert();
     }, 2000);
   }
 
   warn(message) {
     this.box.innerHTML = `<span>Обрыв соединения: ${message}</span>`;
-    this.box.style.background = '#F57F17';
     this.box.style.display = 'block';
+    this.box.classList.add('alert-warning');
   }
 
   closeAlert() {
@@ -85,23 +87,20 @@ const alert = new Alert();
 class FormItem {
   constructor(options) {
     this.item = document.createElement('div');
-    this.item.classList.add('form-item');
-    this.label = document.createElement('label');
-    this.label.innerHTML = '#1';
-    if (options.labeltext) this.label.innerHTML = options.labeltext;
+    this.item.classList.add('mb-3');
     this.input = document.createElement('textarea');
+    this.input.classList.add("form-control")
     this.input.value = '';
     if (options.value) this.input.value = options.value;
     this.close = document.createElement('button');
-    this.close.innerHTML = 'X';
-    this.close.classList.add('btn-close');
+    this.close.classList.add('btn-close', 'btn', 'btn-dark');
 
     this.close.addEventListener('click', (e) => {
       e.stopPropagation();
       this.item.remove();
     });
 
-    this.item.append(this.label, this.input, this.close);
+    this.item.append(this.input, this.close);
   }
 
   set text(text) {
@@ -134,24 +133,27 @@ class FormItemDouble extends FormItem {
 
 class Form {
   constructor(options) {
-    this.form = document.createElement('div');
+    this.form = document.createElement('form');
     this.form.id = options.name;
-    this.form.classList.add('form');
 
-    this.title = document.createElement('h1');
+    this.title = document.createElement('label');
+    this.title.classList.add('form-label');
     this.title.innerHTML = options.title;
 
     this.submit = document.createElement('button');
     this.submit.classList.add('btn');
+    this.submit.classList.add('btn-dark');
+    
 
     this.box = document.createElement('div');
-    this.box.classList.add('input-box');
+    this.box.classList.add('mb-3');
 
     this.submit.innerHTML = 'submit';
     if (options.adds) {
       this.addItem = document.createElement('button');
       this.addItem.classList.add('btn');
-      this.addItem.innerHTML = '+ Добавить';
+      this.addItem.classList.add('btn-dark');
+      this.addItem.innerHTML = '+';
       this.addItem.addEventListener('click', (e) => {
         e.preventDefault();
         this.box.append(new FormItem({ type: 'text', labeltext: `#${this.box.childNodes.length}` }).add());
@@ -161,13 +163,9 @@ class Form {
     }
     this.submit.innerHTML = 'Сохранить';
 
-    if (options.items && options.items.length > 0) {
-      options.items.forEach((item) => {
-        this.box.append(item);
-      });
-    } else {
-      this.items = document.createElement('hr');
-    }
+    options.items.forEach((item) => {
+      this.box.append(item);
+    });
 
     this.submit.addEventListener('click', (e) => {
       e.preventDefault();
@@ -177,7 +175,13 @@ class Form {
       for (let i = 0; i < areas.length; i += 1) {
         messages.push(areas[i].value);
       }
-      ws.send(JSON.stringify({ event: options.name, message: messages }));
+      fetch('https://localhost:8443/api/user/update-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: '144668618', settings: { automessages: messages }}) // body data type must match "Content-Type" header
+      });
     });
 
     this.box.append(this.items);
@@ -197,76 +201,40 @@ class Form {
 
 class Configurator {
   constructor() {
-    this.dlinks = document.querySelector('#dlinks');
-    this.prefix = document.querySelector('#prefix');
-    this.qcd = document.querySelector('#qcd');
-    this.mmr = document.querySelector('#mmr');
-    this.media = {
-      vk: document.querySelector('#media-link-vk'),
-      db: document.querySelector('#media-link-db'),
-      da: document.querySelector('#media-link-da'),
-    };
     this.amsg = document.querySelector('#avt-msg-form');
     this.amsgForm = new Form({
       name: 'amsg-reconf', title: 'Автоматические сообщения', items: [], adds: true,
     });
     this.amsg.append(this.amsgForm.add());
-    this.filter = document.querySelector('#filter-form');
-    this.filterForm = new Form({
-      name: 'filter-reconf', title: 'Нежелательные фразы', items: [], adds: false,
-    });
-    this.filter.append(this.filterForm.add());
-    this.sounds = document.querySelector('#sounds-form');
-    this.soundsForm = new Form({
-      name: 'sounds-reconf', title: 'Список звуков', items: [], adds: false,
-    });
-    this.sounds.append(this.soundsForm.add());
-    this.saveconf = document.querySelector('#saveconf');
-    this.saveconf.addEventListener('click', () => {
-      ws.send(JSON.stringify({ event: 'save-conf', message: this.configure() }));
-    });
-  }
-
-  configure() {
-    return {
-      delay: this.dlinks.value,
-      prefix: this.prefix.value,
-      queueCD: this.qcd.value,
-      manual: false,
-      chat: true,
-      mmr: this.mmr.value,
-      links: {
-        vk: this.media.vk.value,
-        donationalerts: this.media.da.value,
-        dotabuff: this.media.db.value,
-      },
-    };
+    // this.filter = document.querySelector('#filter-form');
+    // this.filterForm = new Form({
+    //   name: 'filter-reconf', title: 'Нежелательные фразы', items: [], adds: false,
+    // });
+    // this.filter.append(this.filterForm.add());
+    // this.sounds = document.querySelector('#sounds-form');
+    // this.soundsForm = new Form({
+    //   name: 'sounds-reconf', title: 'Список звуков', items: [], adds: false,
+    // });
+    // this.sounds.append(this.soundsForm.add());
   }
 
   async getConfiguration() {
     console.log(window.location.pathname);
-    this.response = await fetch(`https://${window.location.hostname}/user?id=${window.location.pathname.substr(1)}`);
+    this.response = await fetch(`https://${window.location.hostname}:8443/api/user?id=144668618`);
     if (this.response.ok) {
       this.conf = await this.response.json();
+      console.log(this.conf);
     } else {
       alert(`Ошибка HTTP: ${this.response.status}`);
     }
-    this.dlinks.value = this.conf.config.delay;
-    this.prefix.value = this.conf.config.prefix;
-    this.qcd.value = this.conf.config.queueCD;
-    this.mmr.value = this.conf.config.mmr;
-    this.media.vk.value = this.conf.config.links.vk;
-    this.media.da.value = this.conf.config.links.donationalerts;
-    this.media.db.value = this.conf.config.links.dotabuff;
-    this.conf.amsg.m.forEach((message, index) => {
+    this.conf.settings.automessages.forEach((message, index) => {
       this.amsgForm.appendItem(new FormItem({ type: 'text', labeltext: `#${index + 1}`, value: message }));
     });
-    this.filterForm.appendItem(new FormItem({ type: 'text', labeltext: 'Фильтр Бан', value: this.conf.filter.words }));
-    this.filterForm.appendItem(new FormItem({ type: 'text', labeltext: 'Фильтр Таймаут', value: this.conf.filter.timeout }));
+    // this.filterForm.appendItem(new FormItem({ type: 'text', labeltext: 'Фильтр Бан', value: this.conf.settings.banwords }));
 
-    Object.keys(this.conf.sounds).forEach((command) => {
-      this.soundsForm.appendItem(new FormItemDouble({ type: 'text', value: { label: command, input: this.conf.sounds[command].path } }));
-    });
+    // Object.keys(this.conf.settings.sounds).forEach((command) => {
+    //   this.soundsForm.appendItem(new FormItemDouble({ type: 'text', value: { label: command, input: this.conf.settings.sounds[command].path } }));
+    // });
     (function addMenuEvents() {
       const main = document.getElementsByTagName('main')[0];
       const mainChildren = main.children;

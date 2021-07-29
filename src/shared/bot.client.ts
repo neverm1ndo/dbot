@@ -6,7 +6,7 @@ import { Chatter } from '@interfaces/chatter';
 import { Media } from '@shared/media';
 import { Schedule } from '@shared/bot.schedule';
 import { Dota2 } from '@shared/dota2';
-import { Twitch } from '@shared/twitch';
+// import { Twitch } from '@shared/twitch';
 
 export class Bot {
   opts: any;
@@ -29,9 +29,9 @@ export class Bot {
   constructor(opts: { schedule: Schedule }) {
     this.opts = opts.schedule;
     this.announcer = new Announcer(900000, this.opts.automessages);
-    Twitch.getAppAccessToken().then((body: any) => {
-      Twitch.streamChanges('stream.online', 144668618, body.access_token).catch((err) => { logger.err(err) });
-    }).catch((err) => logger.err(err));
+    // Twitch.getAppAccessToken().then((body: any) => {
+    //   Twitch.streamChanges('stream.online', 144668618, body.access_token).catch((err) => { logger.err(err) });
+    // }).catch((err) => logger.err(err));
   }
 
   public shutdown(): void {
@@ -41,7 +41,7 @@ export class Bot {
   public wakeup(): void {
     this.$announcer.subscribe((announce: string) => {
       this.client.say(this.client.getChannels()[0], announce);
-    });;
+    });
   }
 
   public init(): void {
@@ -62,7 +62,7 @@ export class Bot {
   private isPrevileged(chatter: Chatter | ChatUserstate) {
     return (chatter.mod || (chatter.username === this.client.getChannels()[0]));
   }
-  private CheckSub(chatter: Chatter | ChatUserstate) {
+  private сheckSub(chatter: Chatter | ChatUserstate) {
     if (!chatter.badges) {
       return false;
     }
@@ -72,22 +72,17 @@ export class Bot {
     if (!tags.username) return;
     if (this.state.status === 'works') {
       if (command) {
-        Object.keys(this.opts.sounds).forEach((soundCommand: string) => {
-          if (command === soundCommand) {
-            this.media.playSound(tags, this.opts.sounds[soundCommand].path);
-          }
-        });
+        // Object.keys(this.opts.sounds).forEach((soundCommand: string) => {
+        //   if (command === soundCommand) {
+        //     this.media.playSound(tags, this.opts.sounds[soundCommand].path);
+        //   }
+        // });
         // BANHAMMER
         if (!this.isPrevileged(tags)) {
-          for (let i = 0; i < this.opts.dictionary.words.lenght; i+=1) {
-            if (command.includes(this.opts.dictionary.words[i])) {
+          for (let i = 0; i < this.opts.banwords.lenght; i+=1) {
+            if (command.includes(this.opts.banwords[i])) {
               logger.warn(`Catched banned word ${this.opts.dictionary.words[i]} ──> Banned user ${tags.username}`);
               this.client.ban(channel, tags.username!);
-            }
-          };
-          for (let i = 0; i < this.opts.dictionary.timeouts.lenght; i+=1) {
-            if (command.includes(this.opts.dictionary.timeouts[i])) {
-              logger.warn(`Catched banned word ${this.opts.dictionary.timeouts[i]}\x1b[0m! ──> Banned user ${tags.username}`);
             }
           };
         }

@@ -27,7 +27,7 @@ import { USER } from './schemas/user.schema';
 const app = express();
 const { BAD_REQUEST } = StatusCodes;
 
-const bot = new Bot({ schedule: new Schedule() });
+// const bot = new Bot({ schedule: new Schedule('neverm1nd_o') });
 
 
 
@@ -116,7 +116,7 @@ app.use('/api', express.json(), APIRouter);
 app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }));
 
 // Set route for OAuth redirect
-app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/', failureRedirect: '/' }));
+app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/controls/dash', failureRedirect: '/' }));
 
 // Set route for webhooks
 app.use('/webhooks/callback', express.json());
@@ -133,7 +133,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 
-bot.init();
+// bot.init();
 
 
 
