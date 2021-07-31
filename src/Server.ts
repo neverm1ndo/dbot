@@ -22,9 +22,10 @@ import axios from 'axios';
 
 import { USER } from './schemas/user.schema';
 
+import { verifySignature } from '@shared/functions';
 
 const app = express();
-const { BAD_REQUEST } = StatusCodes;
+const { BAD_REQUEST, OK } = StatusCodes;
 
 export const bot = new Bot();
 
@@ -118,9 +119,22 @@ app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }))
 app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/controls/dash', failureRedirect: '/' }));
 
 // Set route for webhooks
-app.use('/webhooks/callback', express.json());
-app.post('/webhooks/callback/streams', (req: Request, res: Response) => {
-  console.log(req.body);
+app.post('/webhooks/callback/streams', express.json(), (req: Request, res: Response) => {
+  if (!verifySignature(req.header("Twitch-Eventsub-Message-Signature"),
+            req.header("Twitch-Eventsub-Message-Id"),
+            req.header("Twitch-Eventsub-Message-Timestamp"),
+            req.body.rawBody)) {
+        res.status(403).send("Forbidden") // Reject requests with invalid signatures
+    } else {
+        if (req.header("Twitch-Eventsub-Message-Type") === "webhook_callback_verification") {
+            console.log(req.body.challenge)
+            res.send(req.body.challenge) // Returning a 200 status with the received challenge to complete webhook creation flow
+
+        } else if (req.header("Twitch-Eventsub-Message-Type") === "notification") {
+            console.log(req.body.event) // Implement your own use case with the event data at this block
+            res.sendStatus(OK);
+        }
+    }
 });
 // Print API errors
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
