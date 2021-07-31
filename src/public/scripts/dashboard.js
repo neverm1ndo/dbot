@@ -1,6 +1,6 @@
 /* eslint max-classes-per-file: ["error", 10] */
-
 let ws;
+const userId = document.querySelector('#user').dataset.id;
 
 class Alert {
   constructor() {
@@ -85,7 +85,7 @@ const alert = new Alert();
 }());
 
 (async function getSettings() {
-  this.res = await fetch(`https://${window.location.hostname}/api/user?id=144668618`)
+  this.res = await fetch(`https://${window.location.hostname}/api/user?id=${userId}`)
     if (this.res.ok) {
     this.conf = await res.json();
     console.log(this.conf);
@@ -104,7 +104,7 @@ async function saveSettings() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        id: 144668618,
+        id: userId,
         settings: {
           automessages: JSON.parse(document.querySelector('#automessages').value.toString()),
           sounds: JSON.parse(document.querySelector('#sounds').value.toString()),

@@ -22,7 +22,7 @@ html(lang="en")
                   img.logo(src="/tank2.png")
                   button.save.btn.btn-dark.ml-3(name="save") Сохранить
                 div
-                  p=session.passport.user.data[0].login
+                  p#user(data-id=session.passport.user.data[0].id)=session.passport.user.data[0].login
           main.d-flex.w-100.flex-fill.pb-4
             div.container.h-100
               form.row.h-100
