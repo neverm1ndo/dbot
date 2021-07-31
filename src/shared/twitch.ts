@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-const TWITCH_EVENTS_STREAMS = 'https://api.twitch.tv/helix/webhooks/hub';
+const TWITCH_EVENTS_STREAMS = 'https://api.twitch.tv/helix/eventsub/subscriptions';
 const TWITCH_APP_TOKEN = 'https://id.twitch.tv/oauth2/token';
 
 export class Twitch {
   static streamChanges(type: 'stream.online' | 'stream.offline', id: number, accessToken: string) {
     return axios({
       method: 'post',
-      url: TWITCH_EVENTS_STREAMS,
+      url: TWITCH_EVENTS_STREAMS + id,
       headers: {
         'Client-ID': process.env.TWITCH_CLIENT_ID,
         'Authorization': 'Bearer ' + accessToken,
