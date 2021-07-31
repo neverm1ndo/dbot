@@ -22,7 +22,7 @@ export class Twitch {
         transport: {
             method: "webhook",
             callback: "https://apps.nmnd.ru/webhooks/callback/streams",
-            secret: process.env.SESSION_SECRET
+            secret: process.env.TWITCH_CLIENT_SECRET
         }
       }
     });
