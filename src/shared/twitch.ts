@@ -14,15 +14,15 @@ export class Twitch {
         'Content-Type': 'application/json'
       },
       data: {
-        type: type,
-        version: 1,
-        condition: {
-            broadcaster_user_id: id
+        "type": type,
+        "version": 1,
+        "condition": {
+            "broadcaster_user_id": id
         },
-        transport: {
-            method: "webhook",
-            callback: "https://apps.nmnd.ru/webhooks/callback/streams",
-            secret: process.env.TWITCH_CLIENT_SECRET
+        "transport": {
+            "method": "webhook",
+            "callback": "https://apps.nmnd.ru/webhooks/callback/streams",
+            "secret": process.env.TWITCH_CLIENT_SECRET
         }
       }
     });
