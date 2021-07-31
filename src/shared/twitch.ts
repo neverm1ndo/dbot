@@ -7,7 +7,7 @@ export class Twitch {
   static streamChanges(type: 'stream.online' | 'stream.offline', id: number, accessToken: string) {
     return axios({
       method: 'post',
-      url: TWITCH_EVENTS_STREAMS + id,
+      url: TWITCH_EVENTS_STREAMS,
       headers: {
         'Client-ID': process.env.TWITCH_CLIENT_ID,
         'Authorization': 'Bearer ' + accessToken,
