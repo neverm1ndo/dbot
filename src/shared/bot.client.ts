@@ -6,7 +6,7 @@ import { Chatter } from '@interfaces/chatter';
 import { Media } from '@shared/media';
 import { Schedule } from '@shared/bot.schedule';
 import { Dota2 } from '@shared/dota2';
-// import { Twitch } from '@shared/twitch';
+import { Twitch } from '@shared/twitch';
 
 export class Bot {
   opts: any;
@@ -26,12 +26,12 @@ export class Bot {
   state = { status: 'works' }
   userconf = { silent: false, prefix: '!' }
 
-  constructor(opts: { schedule: Schedule }) {
-    this.opts = opts.schedule;
-    this.announcer = new Announcer(900000, this.opts.automessages);
-    // Twitch.getAppAccessToken().then((body: any) => {
-    //   Twitch.streamChanges('stream.online', 144668618, body.access_token).catch((err) => { logger.err(err) });
-    // }).catch((err) => logger.err(err));
+  constructor() {
+    this.opts = new Schedule('neverm1nd_o');
+    this.announcer = new Announcer(900000);
+    Twitch.getAppAccessToken().then((body: any) => {
+      Twitch.streamChanges('stream.online', 144668618, body.access_token).catch((err) => { logger.err(err) });
+    }).catch((err) => logger.err(err));
   }
 
   public shutdown(): void {
@@ -72,15 +72,15 @@ export class Bot {
     if (!tags.username) return;
     if (this.state.status === 'works') {
       if (command) {
-        this.opts.sounds.forEach((sound: { command: string, path: string }) => {
+        this.opts.schedules.sounds.forEach((sound: { command: string, path: string }) => {
           if (command === sound.command) {
             this.media.playSound(tags, sound.path);
           }
         });
         // BANHAMMER
         if (!this.isPrevileged(tags)) {
-          for (let i = 0; i < this.opts.dictionary.length; i+=1) {
-            if (command.includes(this.opts.dictionary[i])) {
+          for (let i = 0; i < this.opts.schedules.dictionary.length; i+=1) {
+            if (command.includes(this.opts.schedules.dictionary[i])) {
               this.client.ban(channel, tags.username!);
             }
           };

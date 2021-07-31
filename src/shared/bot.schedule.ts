@@ -1,5 +1,4 @@
 import { USER } from '../schemas/user.schema';
-
 interface UserSettings {
   automessages: string[];
   banwords: string[];

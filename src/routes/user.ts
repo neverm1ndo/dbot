@@ -3,6 +3,7 @@ import logger from '@shared/Logger';
 import { USER } from '../schemas/user.schema';
 import StatusCodes from 'http-status-codes';
 import { json } from 'express';
+import { bot } from '@server';
 
 const { BAD_REQUEST, OK } = StatusCodes;
 
@@ -22,6 +23,7 @@ router.post('/update-settings', json(), (req: Request, res: Response) => {
   USER.updateOne({'user.id': req.body.id }, { settings: req.body.settings }, { upsert: true, setDefaultsOnInsert: true } ,(err: any, user: any) => {
     if (err) return res.send;
     res.sendStatus(OK);
+    bot.opts.schedules = req.body.settings;
   });
 });
 

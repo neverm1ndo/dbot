@@ -14,7 +14,6 @@ import StatusCodes from 'http-status-codes';
 import 'express-async-errors';
 
 import { Bot } from '@shared/bot.client';
-import { Schedule } from '@shared/bot.schedule';
 
 import BaseRouter from './routes';
 import APIRouter from './routes/api.routes';
@@ -27,7 +26,7 @@ import { USER } from './schemas/user.schema';
 const app = express();
 const { BAD_REQUEST } = StatusCodes;
 
-const bot = new Bot({ schedule: new Schedule('neverm1nd_o') });
+export const bot = new Bot();
 
 
 
