@@ -15,7 +15,7 @@ export class Twitch {
       },
       data: {
         type: type,
-        version: "1",
+        version: 1,
         condition: {
             broadcaster_user_id: id
         },
