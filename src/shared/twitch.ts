@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const TWITCH_EVENTS_STREAMS = 'https://api.twitch.tv/helix/eventsub/streams';
+const TWITCH_EVENTS_STREAMS = 'https://api.twitch.tv/helix/webhooks/hub';
 const TWITCH_APP_TOKEN = 'https://id.twitch.tv/oauth2/token';
 
 export class Twitch {
