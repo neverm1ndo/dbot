@@ -30,8 +30,7 @@ export class Bot {
     this.opts = new Schedule('neverm1nd_o');
     this.announcer = new Announcer(900000);
     Twitch.getAppAccessToken().then((body: any) => {
-      console.log(body);
-      Twitch.streamChanges('stream.online', 144668618, body.access_token).then(() => logger.info('Subbed to twitch events: ' + body.access_token)).catch((err) => { logger.err(err) });
+      Twitch.streamChanges('stream.online', 144668618, body.data.access_token).then(() => logger.info('Subbed to twitch events: ' + body.data.access_token)).catch((err) => { logger.err(err) });
     }).catch((err) => logger.err(err));
   }
 
