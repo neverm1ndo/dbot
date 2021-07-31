@@ -27,6 +27,16 @@ export class Twitch {
       }
     });
   }
+  static getSubs(accessToken: string) {
+    return axios({
+      method: 'get',
+      url: TWITCH_APP_TOKEN,
+      headers: {
+        'Client-ID': process.env.TWITCH_CLIENT_ID,
+        'Authorization': 'Bearer ' + accessToken
+      }
+    })
+  }
   static getAppAccessToken() {
     return axios({
       method: 'post',
