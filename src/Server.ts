@@ -27,7 +27,7 @@ import { USER } from './schemas/user.schema';
 const app = express();
 const { BAD_REQUEST } = StatusCodes;
 
-// const bot = new Bot({ schedule: new Schedule('neverm1nd_o') });
+const bot = new Bot({ schedule: new Schedule('neverm1nd_o') });
 
 
 
@@ -133,7 +133,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 
-// bot.init();
+bot.init();
 
 
 

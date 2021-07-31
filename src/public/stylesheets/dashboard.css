@@ -1,7 +1,10 @@
-html {}
+html {
+  height: 100vh;
+}
 body, textarea, button {
   font-family: 'Arial', sans;
-  font-size: 12px!important;
+  font-size: 14px!important;
+  height: 100vh;
 }
 body .logo {
   width: 32px;
@@ -11,4 +14,8 @@ body .logo {
   position: fixed;
   right: 20px;
   bottom: 20px;
+}
+.save {
+  margin-left: 30px;
+  max-height: 32px;
 }

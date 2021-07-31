@@ -72,16 +72,15 @@ export class Bot {
     if (!tags.username) return;
     if (this.state.status === 'works') {
       if (command) {
-        // Object.keys(this.opts.sounds).forEach((soundCommand: string) => {
-        //   if (command === soundCommand) {
-        //     this.media.playSound(tags, this.opts.sounds[soundCommand].path);
-        //   }
-        // });
+        this.opts.sounds.forEach((sound: { command: string, path: string }) => {
+          if (command === sound.command) {
+            this.media.playSound(tags, sound.path);
+          }
+        });
         // BANHAMMER
         if (!this.isPrevileged(tags)) {
-          for (let i = 0; i < this.opts.banwords.lenght; i+=1) {
-            if (command.includes(this.opts.banwords[i])) {
-              logger.warn(`Catched banned word ${this.opts.dictionary.words[i]} ──> Banned user ${tags.username}`);
+          for (let i = 0; i < this.opts.dictionary.length; i+=1) {
+            if (command.includes(this.opts.dictionary[i])) {
               this.client.ban(channel, tags.username!);
             }
           };
@@ -102,6 +101,8 @@ export class Bot {
           case 'хелп': {
             this.client.say(channel, 'Вся помощь по командам в описаннии под стримом! OhMyDog');
             break;
+          }
+          case 'нуждики': {
           }
           default: { break; }
         }

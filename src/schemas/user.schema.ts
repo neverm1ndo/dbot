@@ -20,6 +20,12 @@ export const USER = model('User', new Schema ({
     automessages: [String],
     banwords: [String],
     announcer_delay: Number,
-    sounds: []
+    sounds: [
+      {
+        _id : false,
+        command: { type: String },
+        path: { type: String }
+      }
+    ]
   }
 }));
