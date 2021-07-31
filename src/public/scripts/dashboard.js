@@ -85,7 +85,7 @@ const alert = new Alert();
 }());
 
 (async function getSettings() {
-  this.res = await fetch(`https://${window.location.hostname}/api/user?id=${userId}`)
+  this.res = await fetch(`/api/user?id=${userId}`)
     if (this.res.ok) {
     this.conf = await res.json();
     console.log(this.conf);
@@ -97,7 +97,7 @@ const alert = new Alert();
   document.querySelector('#banwords').value = JSON.stringify(this.conf.settings.banwords);
 })();
 async function saveSettings() {
-  this.res = await fetch(`https://${window.location.hostname}/api/user/update-settings`,
+  this.res = await fetch(`/api/user/update-settings`,
     {
       method: 'POST',
       headers: {
