@@ -14,18 +14,31 @@ export class Twitch {
         'Content-Type': 'application/json'
       },
       data: {
-        "type": type,
-        "version": 1,
-        "condition": {
-            "broadcaster_user_id": id
+        type: type,
+        version: "1",
+        condition: {
+            broadcaster_user_id: id.toString()
         },
-        "transport": {
-            "method": "webhook",
-            "callback": "https://apps.nmnd.ru/webhooks/callback/streams",
-            "secret": process.env.TWITCH_CLIENT_SECRET
+        transport: {
+            method: "webhook",
+            callback: "https://a67da03820eb.ngrok.io/webhooks/callback/streams",
+            secret: process.env.TWITCH_EVENTSUB_SECRET
         }
       }
     });
+  }
+  static deleteSub(id: string | number, accessToken: string) {
+    return axios({
+      method: 'delete',
+      url: TWITCH_EVENTS_STREAMS,
+      headers: {
+        'Client-ID': process.env.TWITCH_CLIENT_ID,
+        'Authorization': 'Bearer ' + accessToken
+      },
+      params: {
+        id: id
+      }
+    })
   }
   static getSubs(accessToken: string) {
     return axios({

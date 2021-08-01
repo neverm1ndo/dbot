@@ -30,18 +30,32 @@ export class Bot {
     this.opts = new Schedule('neverm1nd_o');
     this.announcer = new Announcer(900000);
     Twitch.getAppAccessToken().then((body: any) => {
-      Twitch.streamChanges('stream.online', 144668618, body.data.access_token)
-      .then(() => { Twitch.getSubs(body.data.access_token).then((body: any) => { console.log(body.data) })})
-      .catch((err) => { logger.err(err) });
-    }).catch((err) => logger.err(err));
+      Twitch.getSubs(body.data.access_token).then((subsBody: any) => {
+        // subsBody.data.data.forEach(async (sub: any) => {
+        //   await Twitch.deleteSub(sub.id, body.data.access_token).then((bodyd) => {console.log(bodyd.data)});
+        // });
+        if (subsBody.data.total >= 2) {
+          logger.info('All subs already existing')
+        } else {
+          Twitch.streamChanges('stream.online', Number(process.env.TWITCH_USER_ID), body.data.access_token)
+          .then(() => { logger.info('Subbed to stream.online event')})
+          .catch((err) => { logger.err(err, true) });
+          Twitch.streamChanges('stream.offline', Number(process.env.TWITCH_USER_ID), body.data.access_token)
+          .then(() => { logger.info('Subbed to stream.offline event')})
+          .catch((err) => { logger.err(err, true) });
+        }
+      })
+    }).catch((err) => logger.err(err, true));
   }
 
   public shutdown(): void {
-    this.$announcer.unsubscribe();
+    if (this.$announcer) {
+      this.$announcer.unsubscribe();
+    }
   }
 
   public wakeup(): void {
-    this.$announcer.subscribe((announce: string) => {
+    this.$announcer = this.announcer._announcer.subscribe((announce: string) => {
       this.client.say(this.client.getChannels()[0], announce);
     });
   }

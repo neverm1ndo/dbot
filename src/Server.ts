@@ -19,10 +19,11 @@ import BaseRouter from './routes';
 import APIRouter from './routes/api.routes';
 import logger from '@shared/Logger';
 import axios from 'axios';
+import bodyParser from 'body-parser';
 
 import { USER } from './schemas/user.schema';
 
-import { verifySignature } from '@shared/functions';
+import { verifySignature, rawBody } from '@shared/functions';
 
 const app = express();
 const { BAD_REQUEST, OK } = StatusCodes;
@@ -87,7 +88,7 @@ passport.use('twitch',  new OAuth2Strategy({
       user: profile.data[0],
       accessToken: accessToken,
       refreshToken: accessToken,
-    }, { upsert: true, setDefaultsOnInsert: true }, (err: any, user: any) => {
+    }, { upsert: true, setDefaultsOnInsert: true }, (err: any) => {
       if (err) return logger.err(err);
     });
 
@@ -119,22 +120,16 @@ app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }))
 app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/controls/dash', failureRedirect: '/' }));
 
 // Set route for webhooks
-app.post('/webhooks/callback/streams', express.json(), (req: Request, res: Response) => {
-  if (!verifySignature(req.header("Twitch-Eventsub-Message-Signature"),
-            req.header("Twitch-Eventsub-Message-Id"),
-            req.header("Twitch-Eventsub-Message-Timestamp"),
-            req.body.rawBody)) {
-        res.status(403).send("Forbidden") // Reject requests with invalid signatures
-    } else {
-        if (req.header("Twitch-Eventsub-Message-Type") === "webhook_callback_verification") {
-            console.log(req.body.challenge)
-            res.send(req.body.challenge) // Returning a 200 status with the received challenge to complete webhook creation flow
-
-        } else if (req.header("Twitch-Eventsub-Message-Type") === "notification") {
-            console.log(req.body.event) // Implement your own use case with the event data at this block
-            res.sendStatus(OK);
-        }
+app.post('/webhooks/callback/streams', bodyParser.json({ verify: (req: any, res: any, buf: any) => { req.rawBody = buf; console.log(req.rawBody) }}), (req: any, res: Response) => {
+    if (req.header("Twitch-Eventsub-Message-Type") === "webhook_callback_verification") {
+        console.log(req.body.challenge)
+        res.send(req.body.challenge) // Returning a 200 status with the received challenge to complete webhook creation flow
+    } else if (req.header("Twitch-Eventsub-Message-Type") === "notification") {
+        console.log(req.body.event) // Implement your own use case with the event data at this block
+        res.status(OK).end(); // Default .send is a 200 status
     }
+    if (req.body.subscription.type == 'stream.online') bot.wakeup();
+    if (req.body.subscription.type == 'stream.offline') bot.shutdown();
 });
 // Print API errors
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
