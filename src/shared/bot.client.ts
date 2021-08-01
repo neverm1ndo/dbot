@@ -70,7 +70,6 @@ export class Bot {
       this.readChattersMessage(channel, tags, command);
     });
     this.$announcer = this.announcer._announcer;
-    this.wakeup();
   }
   /**
   * @param {ChatUserstate} chatter Chat user info
