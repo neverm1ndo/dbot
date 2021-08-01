@@ -21,7 +21,7 @@ export class Twitch {
         },
         transport: {
             method: "webhook",
-            callback: "https://a67da03820eb.ngrok.io/webhooks/callback/streams",
+            callback: process.env.TWITCH_EVENTSUB_CALLBACK_URL,
             secret: process.env.TWITCH_EVENTSUB_SECRET
         }
       }
