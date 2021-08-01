@@ -10,7 +10,7 @@ export const getRandomInt = () => {
     return Math.floor(Math.random() * 1_000_000_000_000);
 };
 export const checkSession = ( req: any, res: any, next: any ) => {
-    if (req.session.passport) next();
+    if (req.session.passport && req.session.passport.user.data[0].login == JSON.parse(process.env.WHITELIST!)[0]) next();
     else {
       res.redirect('/');
     }

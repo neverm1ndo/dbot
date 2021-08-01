@@ -120,7 +120,7 @@ app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }))
 app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/controls/dash', failureRedirect: '/' }));
 
 // Set route for webhooks
-app.post('/webhooks/callback/streams', bodyParser.json({ verify: (req: any, res: any, buf: any) => { req.rawBody = buf; console.log(req.rawBody) }}), (req: any, res: Response) => {
+app.post('/webhooks/callback/streams', express.json({ verify: (req: any, res: any, buf: any) => { req.rawBody = buf; console.log(req.rawBody) }}), (req: any, res: Response) => {
     if (req.header("Twitch-Eventsub-Message-Type") === "webhook_callback_verification") {
         console.log(req.body.challenge)
         res.send(req.body.challenge) // Returning a 200 status with the received challenge to complete webhook creation flow
