@@ -7,10 +7,11 @@ import { Media } from '@shared/media';
 import { Schedule } from '@shared/bot.schedule';
 import { Dota2 } from '@shared/dota2';
 import { Twitch } from '@shared/twitch';
+import { Subscription } from 'rxjs';
 
 export class Bot {
   opts: any;
-  $announcer: any;
+  $announcer: Subscription | undefined;
   media: Media = new Media();
   client: Client = new Client({
       options: { debug: true, messagesLogLevel: 'info'  },
@@ -49,9 +50,8 @@ export class Bot {
   }
 
   public shutdown(): void {
-    if (this.$announcer) {
-      this.$announcer.unsubscribe();
-    }
+    if (!this.$announcer) return;
+    this.$announcer.unsubscribe();
   }
 
   public wakeup(): void {
@@ -64,12 +64,10 @@ export class Bot {
     this.client.connect();
     this.client.on('message', (channel, tags: ChatUserstate, message: string, self: boolean) => {
       if(self || !message.startsWith(this.userconf.prefix)) return;
-
     	const args = message.slice(1).split(' ');
     	const command = args.shift()!.toLowerCase();
       this.readChattersMessage(channel, tags, command);
     });
-    this.$announcer = this.announcer._announcer;
   }
   /**
   * @param {ChatUserstate} chatter Chat user info
