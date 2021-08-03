@@ -8,7 +8,7 @@ export class Nuzhdiki {
          if (err) {
            reject(`Unable to scan directory: ${err}`);
          } else {
-           resolve(process.env.NUZHDIKI_PATH + files[RNG.randomize(0, 318)]);
+           resolve('/NuzhdikiSound/' + files[RNG.randomize(0, 318)]);
          }
        });
      });
