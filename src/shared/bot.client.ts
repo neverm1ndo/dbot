@@ -7,6 +7,7 @@ import { Media } from '@shared/media';
 import { Schedule } from '@shared/bot.schedule';
 import { Dota2 } from '@shared/dota2';
 import { Twitch } from '@shared/twitch';
+import { Nuzhdiki } from '@shared/nuzhdiki';
 import { Subscription } from 'rxjs';
 
 export class Bot {
@@ -116,6 +117,9 @@ export class Bot {
             break;
           }
           case 'нуждики': {
+            Nuzhdiki.getOne().then((path: string) => {
+              this.media.playSound(tags, path);
+            });
           }
           default: { break; }
         }
