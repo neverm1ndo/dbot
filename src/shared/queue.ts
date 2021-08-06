@@ -15,6 +15,7 @@ export class Queue {
   static whitelist: string[] = JSON.parse(process.env.WHITELIST!);
   queue: QueueChatUserstate[] = [];
   options: QueueOptions = { cooldown: 0, global: false };
+  global: boolean = false;
   constructor(options: QueueOptions) {
     this.options = options;
   }
@@ -49,15 +50,24 @@ export class Queue {
     }
     return false;
   }
-  addTime(user: ChatUserstate, time: number) {
+  addTime(user: ChatUserstate, time: number): void {
+    if (this.global) return;
     for (let i = 0; i <= this.queue.length; i+=1 ) {
        if (this.queue[i].username === user.username) {
          this.queue[i].start = (Date.now() - (time * 60000));
          console.log('> ', user.username, ' added to queue for ', time, ' minutes');
+         break;
        }
+    }
+    if (this.options.global) {
+      this.global = true;
+      setTimeout(() => {
+        this.global = false;
+      }, 90000)
     }
   }
   toTimeout(user: ChatUserstate) {
+    if (this.global) return;
     if (user.username) {
       if (!Queue.whitelist.includes(user.username)) {
         const now = Date.now();
