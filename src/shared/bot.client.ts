@@ -90,7 +90,7 @@ export class Bot {
     return chatter.badges.broadcaster || chatter.badges.founder || chatter.badges.subscriber;
   }
   readChattersMessage(channel: any, tags: ChatUserstate, command?: string, args?: string[]) {
-    if (!tags.username || this.state.status === 'sleeps') return;
+    if (!tags.username || (this.state.status === 'sleeps')) return;
     if (command) {
       this.opts.schedules.sounds.forEach((sound: { command: string, path: string }) => {
         if (command === sound.command) {
