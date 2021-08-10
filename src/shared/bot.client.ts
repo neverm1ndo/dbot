@@ -51,11 +51,13 @@ export class Bot {
   }
 
   public shutdown(): void {
+    this.state.status = 'sleeps';
     if (!this.$announcer) return;
     this.$announcer.unsubscribe();
   }
 
   public wakeup(): void {
+    this.state.status = 'works';
     this.$announcer = this.announcer._announcer.subscribe((announce: string) => {
       this.client.say(this.client.getChannels()[0], announce);
     });
@@ -70,7 +72,7 @@ export class Bot {
       this.readChattersMessage(channel, tags, command);
     });
     this.client.on('join', (channel: string, username: string, self: boolean) => {
-      if (self || (username === process.env.BOT_CHANNEL)) return;
+      if (self || (username === process.env.BOT_CHANNEL) || (this.state.status === 'sleeps')) return;
       logger.info(`${username} connected to the channel ` + channel)
       this.client.say(channel, `${username}, HeyGuys !`)
     });
@@ -88,46 +90,44 @@ export class Bot {
     return chatter.badges.broadcaster || chatter.badges.founder || chatter.badges.subscriber;
   }
   readChattersMessage(channel: any, tags: ChatUserstate, command?: string, args?: string[]) {
-    if (!tags.username) return;
-    if (this.state.status === 'works') {
-      if (command) {
-        this.opts.schedules.sounds.forEach((sound: { command: string, path: string }) => {
-          if (command === sound.command) {
-            this.media.playSound(tags, sound.path);
-          }
-        });
-        // BANHAMMER
-        if (!this.isPrevileged(tags)) {
-          for (let i = 0; i < this.opts.dictionary.length; i+=1) {
-            if (command.includes(this.opts.dictionary[i])) {
-              this.client.ban(channel, tags.username!);
-            }
-          };
+    if (!tags.username || this.state.status === 'sleeps') return;
+    if (command) {
+      this.opts.schedules.sounds.forEach((sound: { command: string, path: string }) => {
+        if (command === sound.command) {
+          this.media.playSound(tags, sound.path);
         }
-        // COMMANDS
-        if (this.userconf.silent) return;
-        switch (command) {
-          case 'ранг': {
-            Dota2.getRatings(120494497).then((ratings: any) => {
-              this.client.say(channel, `Ранг ${channel}: ${ratings.data.leaderboard_rank} Immortal`);
-            }).catch((err) => logger.err(err));
-            break;
+      });
+      // BANHAMMER
+      if (!this.isPrevileged(tags)) {
+        for (let i = 0; i < this.opts.dictionary.length; i+=1) {
+          if (command.includes(this.opts.dictionary[i])) {
+            this.client.ban(channel, tags.username!);
           }
-          case 'ролл': {
-            this.client.say(channel, `${tags.username} нароллил: ${RNG.randomize(0, 101)} BlessRNG`);
-            break;
-          }
-          case 'хелп': {
-            this.client.say(channel, 'Вся помощь по командам в описаннии под стримом! OhMyDog');
-            break;
-          }
-          case 'нуждики': {
-            Nuzhdiki.getOne().then((path: string) => {
-              this.media.playSound(tags, path);
-            });
-          }
-          default: { break; }
+        };
+      }
+      // COMMANDS
+      if (this.userconf.silent) return;
+      switch (command) {
+        case 'ранг': {
+          Dota2.getRatings(120494497).then((ratings: any) => {
+            this.client.say(channel, `Ранг ${channel}: ${ratings.data.leaderboard_rank} Immortal`);
+          }).catch((err) => logger.err(err));
+          break;
         }
+        case 'ролл': {
+          this.client.say(channel, `${tags.username} нароллил: ${RNG.randomize(0, 101)} BlessRNG`);
+          break;
+        }
+        case 'хелп': {
+          this.client.say(channel, 'Вся помощь по командам в описаннии под стримом! OhMyDog');
+          break;
+        }
+        case 'нуждики': {
+          Nuzhdiki.getOne().then((path: string) => {
+            this.media.playSound(tags, path);
+          });
+        }
+        default: { break; }
       }
     }
   }
