@@ -11,7 +11,7 @@ import { Nuzhdiki } from '@shared/nuzhdiki';
 import { Subscription } from 'rxjs';
 
 export class Bot {
-  opts: any;
+  opts: Schedule;
   $announcer: Subscription | undefined;
   media: Media = new Media();
   client: Client = new Client({
@@ -63,11 +63,16 @@ export class Bot {
 
   public init(): void {
     this.client.connect();
-    this.client.on('message', (channel, tags: ChatUserstate, message: string, self: boolean) => {
+    this.client.on('message', (channel: string, tags: ChatUserstate, message: string, self: boolean) => {
       if(self || !message.startsWith(this.userconf.prefix)) return;
     	const args = message.slice(1).split(' ');
     	const command = args.shift()!.toLowerCase();
       this.readChattersMessage(channel, tags, command);
+    });
+    this.client.on('join', (channel: string, username: string, self: boolean) => {
+      if (self || (username === process.env.BOT_CHANNEL)) return;
+      logger.info(`${username} connected to the channel ` + channel)
+      this.client.say(channel, `${username}, HeyGuys !`)
     });
   }
   /**
@@ -93,8 +98,8 @@ export class Bot {
         });
         // BANHAMMER
         if (!this.isPrevileged(tags)) {
-          for (let i = 0; i < this.opts.schedules.dictionary.length; i+=1) {
-            if (command.includes(this.opts.schedules.dictionary[i])) {
+          for (let i = 0; i < this.opts.dictionary.length; i+=1) {
+            if (command.includes(this.opts.dictionary[i])) {
               this.client.ban(channel, tags.username!);
             }
           };

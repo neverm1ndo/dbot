@@ -19,11 +19,10 @@ import BaseRouter from './routes';
 import APIRouter from './routes/api.routes';
 import logger from '@shared/Logger';
 import axios from 'axios';
-import bodyParser from 'body-parser';
 
 import { USER } from './schemas/user.schema';
 
-import { verifySignature, rawBody } from '@shared/functions';
+// import { verifySignature, rawBody } from '@shared/functions';
 
 const app = express();
 const { BAD_REQUEST, OK } = StatusCodes;
@@ -120,16 +119,14 @@ app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }))
 app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/controls/dash', failureRedirect: '/' }));
 
 // Set route for webhooks
-app.post('/webhooks/callback/streams', express.json({ verify: (req: any, res: any, buf: any) => { req.rawBody = buf; console.log(req.rawBody) }}), (req: any, res: Response) => {
+app.post('/webhooks/callback/streams', express.json({ verify: (req: any, res: any, buf: any) => { req.rawBody = buf }}), (req: any, res: Response) => {
     if (req.header("Twitch-Eventsub-Message-Type") === "webhook_callback_verification") {
-        console.log(req.body.challenge)
-        res.send(req.body.challenge) // Returning a 200 status with the received challenge to complete webhook creation flow
+      res.send(req.body.challenge) // Returning a 200 status with the received challenge to complete webhook creation flow
     } else if (req.header("Twitch-Eventsub-Message-Type") === "notification") {
-        console.log(req.body.event) // Implement your own use case with the event data at this block
-        res.status(OK).end(); // Default .send is a 200 status
+      if (req.body.subscription.type == 'stream.online') bot.wakeup();
+      if (req.body.subscription.type == 'stream.offline') bot.shutdown();
+      res.status(OK).end();
     }
-    if (req.body.subscription.type == 'stream.online') bot.wakeup();
-    if (req.body.subscription.type == 'stream.offline') bot.shutdown();
 });
 // Print API errors
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
