@@ -25,7 +25,7 @@ export class Bot {
     });
   announcer: Announcer;
 
-  state = { status: 'works' }
+  state = { status: 'sleeps' }
   userconf = { silent: false, prefix: '!' }
 
   constructor() {
@@ -72,8 +72,8 @@ export class Bot {
       this.readChattersMessage(channel, tags, command);
     });
     this.client.on('join', (channel: string, username: string, self: boolean) => {
-      if (self || (username === process.env.BOT_CHANNEL) || (this.state.status === 'sleeps')) return;
-      logger.info(`${username} connected to the channel ` + channel)
+      if (self || (username === process.env.BOT_CHANNEL) || (this.state.status === 'sleeps') || (this.opts.blacklist.includes(username))) return;
+      logger.info(`${username} connected to the channel ` + channel);
       this.client.say(channel, `${username}, HeyGuys !`)
     });
   }
