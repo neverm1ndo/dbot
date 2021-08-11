@@ -4,6 +4,12 @@ const TWITCH_EVENTS_STREAMS = 'https://api.twitch.tv/helix/eventsub/subscription
 const TWITCH_APP_TOKEN = 'https://id.twitch.tv/oauth2/token';
 
 export class Twitch {
+  /**
+  (POST) Subscribe to stream events to get notifications
+  * @param {string} type EventSub type
+  * @param {number} id Twitch user id
+  * @param {string} accessToken App access token
+  **/
   static streamChanges(type: 'stream.online' | 'stream.offline', id: number, accessToken: string) {
     return axios({
       method: 'post',
@@ -27,6 +33,11 @@ export class Twitch {
       }
     });
   }
+  /**
+  (DELETE) Delete subscription
+  * @param {number} id Twitch user id
+  * @param {string} accessToken App access token
+  **/
   static deleteSub(id: string | number, accessToken: string) {
     return axios({
       method: 'delete',
@@ -40,6 +51,10 @@ export class Twitch {
       }
     })
   }
+  /**
+  (GET) Get subscriptions list
+  * @param {string} accessToken App access token
+  **/
   static getSubs(accessToken: string) {
     return axios({
       method: 'get',
@@ -50,6 +65,9 @@ export class Twitch {
       }
     })
   }
+  /**
+  (POST) Get applications access token
+  **/
   static getAppAccessToken() {
     return axios({
       method: 'post',

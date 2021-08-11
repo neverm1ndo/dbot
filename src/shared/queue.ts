@@ -1,6 +1,7 @@
 import { ChatUserstate } from 'tmi.js';
 import { Timestamp } from '@shared/timestamp';
 import logger from '@shared/Logger';
+
 interface QueueOptions {
   cooldown: number,
   global: boolean

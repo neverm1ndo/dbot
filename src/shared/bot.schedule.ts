@@ -1,10 +1,10 @@
 import { USER } from '../schemas/user.schema';
+
 interface UserSettings {
   automessages: string[];
   banwords: string[];
   sounds: any[];
 }
-
 
 export class Schedule {
   schedules: UserSettings = {
@@ -20,7 +20,7 @@ export class Schedule {
     "socialfriends11",
     "fixloven",
     "chat_fantastic"
-  ]
+  ];
   constructor(username: string) {
     USER.findOne({'user.login': username}, (err: any, user: any) => {
       if (err || !user) return;
