@@ -19,7 +19,8 @@ export class Schedule {
     "anotherttvviewer",
     "socialfriends11",
     "fixloven",
-    "chat_fantastic"
+    "chat_fantastic",
+    "ftopayr"
   ];
   constructor(username: string) {
     USER.findOne({'user.login': username}, (err: any, user: any) => {
