@@ -8,6 +8,7 @@ import { connect } from 'mongoose';
 import express, { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 import passport from 'passport';
+import cors from 'cors';
 import OAuth2Strategy from 'passport-oauth2';
 
 import StatusCodes from 'http-status-codes';
@@ -46,6 +47,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cors({
+  origin: process.env.CORS_ORIGINS,
+  methods: ["GET", "POST", "PUT", "HEAD", "DELETE"]
+}));
 
 // Override passport profile function to get user profile from Twitch API
 OAuth2Strategy.prototype.userProfile = function(accessToken, done) {

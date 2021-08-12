@@ -4,6 +4,7 @@ import { bot } from '@server';
 const router = Router();
 
 router.get('/', (req: Request, res: Response,) => {
+  res.set("Content-Security-Policy", "default-src *");
   res.render('chat', { session: req.session });
 });
 router.get('/lurkers', (req: Request, res: Response,) => {
