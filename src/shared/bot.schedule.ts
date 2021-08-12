@@ -1,9 +1,18 @@
 import { USER } from '../schemas/user.schema';
+import { CHATTER } from '../schemas/chatters.schema';
 
 interface UserSettings {
   automessages: string[];
   banwords: string[];
   sounds: any[];
+}
+interface Chatter {
+  username: string;
+  joins_count: number;
+}
+interface Chatters {
+  regulars: Chatter[];
+  lurkers: Chatter[];
 }
 
 export class Schedule {
@@ -12,7 +21,12 @@ export class Schedule {
     banwords: [],
     sounds: []
   };
+  chatters: Chatters = {
+    regulars: [],
+    lurkers: []
+  };
   blacklist: string[] = [  // FIXME: hardcoded
+    "diktorbot",
     "9kmmrbot",
     "fragilitys",
     "007_bad_girl",
@@ -20,13 +34,21 @@ export class Schedule {
     "socialfriends11",
     "fixloven",
     "chat_fantastic",
-    "ftopayr"
+    "ftopayr",
+    "2020",
+    "restreambot",
+    "jointeffortt",
+    "violets_tv"
   ];
   constructor(username: string) {
     USER.findOne({'user.login': username}, (err: any, user: any) => {
       if (err || !user) return;
       this.schedules = user.settings;
-    })
+    });
+    CHATTER.find({}, (err: any, chatters: any) => {
+      if (err || !chatters) return;
+      this.chatters = chatters;
+    });
   }
 
   get sounds(): string[] {

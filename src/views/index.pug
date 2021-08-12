@@ -13,3 +13,4 @@ html
       else
         img#avatar(src= session.passport.user.data[0].profile_image_url)
         pre= "id " + session.passport.user.data[0].id + '\n' + "login " + session.passport.user.data[0].login + '\n' + "at " + session.passport.user.accessToken + '\n'
+        pre=JSON.stringify(session.passport)

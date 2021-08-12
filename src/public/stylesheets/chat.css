@@ -1,0 +1,101 @@
+html, body {
+  height: 100vh;
+  background-color: #18181b;
+  color: var(--bs-light)
+}
+body, textarea, button {
+  font-family: 'Arial', sans;
+  font-size: 14px!important;
+}
+body p, body h5 {
+  margin-bottom: 0px;
+}
+body h5 {
+  font-size: 16px;
+  line-height: 32px;
+  font-weight: bold;
+}
+body .head {
+  border-bottom: 1px solid var(--bs-gray-dark);
+  line-height: 32px;
+}
+.nickname {
+  font-weight: bold;
+  margin-right: 10px;
+}
+body .card .card-body {
+  padding: 5px;
+  border: none;
+  word-wrap: break-word;
+}
+body .card .card-body::before {
+  content: attr(data-date);
+  font-size: 9px;
+  color: var(--bs-gray);
+  position: absolute;
+  margin-top: -10px;
+}
+@keyframes logo {
+  from { transform: rotate(0deg);}
+  to { transform: rotate(360deg);}
+}
+body #logo {
+  animation-duration: 3s;
+  animation-name: logo;
+  animation-iteration-count: infinite;
+  animation-direction: normal;
+  animation-play-state: running;
+  animation-timing-function: linear;
+}
+.btn-twitch {
+  padding: 15px;
+  border-radius: 4px;
+  text-decoration: none;
+  background-color: #9146FF;
+  color: #fff;
+}
+body .card {
+  border: none;
+  background: none;
+}
+.notice {
+  background-color: var(--bs-light);
+  color: var(--bs-gray-dark);
+  padding: 5px;
+}
+.badge-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  margin-right: 5px;
+}
+.badge-icon-img {
+  width: 16px;
+  height: 16px;
+}
+.avatar {
+  position: relative;
+  margin-right: 15px;
+  width: 32px;
+  height: auto;
+  float: left;
+  border-radius: 100%;
+  border: 2px solid #9146FF;
+}
+#text:focus {
+  box-shadow: 0 0 0 0.25rem #9146ff30;
+}
+#text {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px!important;
+  padding-right: 10px!important;
+  box-sizing: border-box!important;
+  background-color: var(--bs-gray-dark);
+  color: var(--bs-light);
+  border: none;
+}
+body .logo {
+  width: 32px;
+  height: 32px;
+}

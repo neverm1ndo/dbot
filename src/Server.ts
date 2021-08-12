@@ -113,10 +113,10 @@ app.use('/controls', BaseRouter);
 app.use('/api', express.json(), APIRouter);
 
 // Set route to start OAuth link, this is where you define scopes to request
-app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }));
+app.get('/auth/twitch', passport.authenticate('twitch', { scope: ['user_read', 'chat:read', 'chat:edit'] }));
 
 // Set route for OAuth redirect
-app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/controls/dash', failureRedirect: '/' }));
+app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/controls/chat', failureRedirect: '/controls/chat' }));
 
 // Set route for webhooks
 app.post('/webhooks/callback/streams', express.json({ verify: (req: any, res: any, buf: any) => { req.rawBody = buf }}), (req: any, res: Response) => {

@@ -8,7 +8,9 @@ import { Schedule } from '@shared/bot.schedule';
 import { Dota2, Dota2Ratings } from '@shared/dota2';
 import { Twitch } from '@shared/twitch';
 import { Nuzhdiki } from '@shared/nuzhdiki';
+import { Aneki } from '@shared/aneki';
 import { Subscription } from 'rxjs';
+import { CHATTER } from '../schemas/chatters.schema';
 
 type BotStatus = 'works' | 'sleeps';
 
@@ -27,29 +29,31 @@ export class Bot {
     });
   announcer: Announcer;
 
-  private status: BotStatus = 'sleeps';
+  private status: BotStatus = process.env.NODE_ENV === 'development'?'works':'sleeps';
   private prefix: string = '!';
 
   constructor() {
     this.opts = new Schedule('neverm1nd_o');
     this.announcer = new Announcer(900000);
-    Twitch.getAppAccessToken().then((body: any) => {
-      Twitch.getSubs(body.data.access_token).then((subsBody: any) => {
-        // subsBody.data.data.forEach(async (sub: any) => {
-        //   await Twitch.deleteSub(sub.id, body.data.access_token).then((bodyd) => {console.log(bodyd.data)});
-        // });
-        if (subsBody.data.total >= 2) { // FIXME: fix algorithm for checking existing subscribers
-          logger.info('All subs already existing')
-        } else {
-          Twitch.streamChanges('stream.online', Number(process.env.TWITCH_USER_ID), body.data.access_token)
-          .then(() => { logger.info('Subbed to stream.online event')})
-          .catch((err) => { logger.err(err, true) });
-          Twitch.streamChanges('stream.offline', Number(process.env.TWITCH_USER_ID), body.data.access_token)
-          .then(() => { logger.info('Subbed to stream.offline event')})
-          .catch((err) => { logger.err(err, true) });
-        }
-      })
-    }).catch((err) => logger.err(err, true));
+    if (process.env.NODE_ENV !== 'development') {
+      Twitch.getAppAccessToken().then((body: any) => {
+        Twitch.getSubs(body.data.access_token).then((subsBody: any) => {
+          // subsBody.data.data.forEach(async (sub: any) => {
+            //   await Twitch.deleteSub(sub.id, body.data.access_token).then((bodyd) => {console.log(bodyd.data)});
+            // });
+            if (subsBody.data.total >= 2) { // FIXME: fix algorithm for checking existing subscribers
+              logger.info('All subs already existing')
+            } else {
+              Twitch.streamChanges('stream.online', Number(process.env.TWITCH_USER_ID), body.data.access_token)
+              .then(() => { logger.info('Subbed to stream.online event')})
+              .catch((err) => { logger.err(err, true) });
+              Twitch.streamChanges('stream.offline', Number(process.env.TWITCH_USER_ID), body.data.access_token)
+              .then(() => { logger.info('Subbed to stream.offline event')})
+              .catch((err) => { logger.err(err, true) });
+            }
+          })
+        }).catch((err) => logger.err(err, true));
+    }
   }
 
   public shutdown(): void {
@@ -66,6 +70,7 @@ export class Bot {
   }
 
   public init(): void {
+    logger.info('Bot status: ' + this.status);
     this.client.connect();
     this.client.on('message', (channel: string, tags: ChatUserstate, message: string, self: boolean) => {
       if(self || !message.startsWith(this.prefix)) return;
@@ -75,8 +80,12 @@ export class Bot {
     });
     this.client.on('join', (channel: string, username: string, self: boolean) => {
       if (self || (username === process.env.BOT_CHANNEL) || (this.status === 'sleeps') || (this.opts.blacklist.includes(username))) return;
-      logger.info(`${username} connected to the channel ` + channel);
-      this.client.say(channel, `${username}, HeyGuys !`)
+      CHATTER.updateOne({ username: username }, { $inc: { joins_count: 1 }}, { upsert: true, setDefaultsOnInsert: true }, (err: any, res: any) => {
+        if (err) return;
+        if (res.joins_count < 2) {
+          this.client.say(channel, `${username}, HeyGuys !`);
+        };
+      });
     });
   }
   /**
@@ -132,6 +141,11 @@ export class Bot {
       case 'нуждики': {
         Nuzhdiki.getOne().then((path: string) => {
           this.media.playSound(tags, path);
+        });
+      }
+      case 'анек': {
+        Aneki.getOne().then((anek: string) => {
+          this.client.say(channel, anek);
         });
       }
       default: { break; }
