@@ -48,14 +48,28 @@ app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors({
-  origin: process.env.CORS_ORIGINS,
-  methods: ["GET", "POST", "PUT", "HEAD", "DELETE"],
   allowedHeaders: [
     'Access-Control-Allow-Origin',
     'Access-Control-Allow-Methods',
     'Access-Control-Max-Age',
-    'Content-Security-Policy'
-  ]
+    'Content-Security-Policy',
+    'Origin',
+    'X-Requested-With',
+    'Content-Type',
+    'Accept',
+    'X-Access-Token',
+    'Authorization'
+  ],
+  credentials: true,
+  methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
+  origin: (origin: any, callback: any) => {
+    if (JSON.parse(process.env.CORS_ORIGINS!).indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  preflightContinue: false,
 }));
 
 // Override passport profile function to get user profile from Twitch API
