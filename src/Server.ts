@@ -8,7 +8,7 @@ import { connect } from 'mongoose';
 import express, { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 import passport from 'passport';
-import cors from 'cors';
+// import cors from 'cors';
 import OAuth2Strategy from 'passport-oauth2';
 
 import StatusCodes from 'http-status-codes';
@@ -30,7 +30,7 @@ const { BAD_REQUEST, OK } = StatusCodes;
 
 export const bot = new Bot();
 
-
+// const useCors = cors();
 
 /************************************************************************************
  *                              Set basic express settings
@@ -47,30 +47,28 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(cors({
-  allowedHeaders: [
-    'Access-Control-Allow-Origin',
-    'Access-Control-Allow-Methods',
-    'Access-Control-Max-Age',
-    'Content-Security-Policy',
-    'Origin',
-    'X-Requested-With',
-    'Content-Type',
-    'Accept',
-    'X-Access-Token',
-    'Authorization'
-  ],
-  credentials: true,
-  methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
-  origin: (origin: any, callback: any) => {
-    if (JSON.parse(process.env.CORS_ORIGINS!).indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  },
-  preflightContinue: false,
-}));
+// app.options('*', useCors);
+// app.use(cors({
+//   allowedHeaders: [
+//     'Origin',
+//     'X-Requested-With',
+//     'Content-Type',
+//     'Accept',
+//     'X-Access-Token',
+//     'Authorization'
+//   ],
+//   credentials: true,
+//   methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
+//   origin: (origin: any, callback: any) => {
+//     console.log(JSON.parse(process.env.CORS_ORIGINS!));
+//     if (JSON.parse(process.env.CORS_ORIGINS!).indexOf(origin) !== -1) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error('Not allowed by CORS'))
+//     }
+//   },
+//   preflightContinue: false,
+// }));
 
 // Override passport profile function to get user profile from Twitch API
 OAuth2Strategy.prototype.userProfile = function(accessToken, done) {
