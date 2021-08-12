@@ -139,7 +139,7 @@ client.on('join', (channel, username, self) => {
   chat.alert(`<b>${username}</b> подключился к чату`, 'success');
 });
 client.on('part', (channel, username, self) => {
-  if (self) return;
+  if (self || lurkers.includes(username)) return;
   setTimeout(() => {
     connected.pop(username);
   }, 900000);
