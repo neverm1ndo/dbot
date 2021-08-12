@@ -104,7 +104,7 @@ customElements.define('chat-alert', ChatAlert, { extends: 'div' });
 const chat = new ChatController('#chat');
 
 const client = new tmi.Client({
-  connection: { reconnect: true },
+  connection: { reconnect: true, secure: true },
   identity: {
     username: user.username,
     password: 'oauth:' + user.token
