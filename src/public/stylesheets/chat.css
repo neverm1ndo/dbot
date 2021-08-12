@@ -22,6 +22,7 @@ body .head {
 .nickname {
   font-weight: bold;
   margin-right: 10px;
+  margin-left: 5px;
 }
 body .card .card-body {
   padding: 5px;
@@ -30,10 +31,10 @@ body .card .card-body {
 }
 body .card .card-body::before {
   content: attr(data-date);
-  font-size: 9px;
+  font-size: 10px;
   color: var(--bs-gray);
   position: absolute;
-  margin-top: -10px;
+  margin-top: -11px;
 }
 @keyframes logo {
   from { transform: rotate(0deg);}
@@ -63,11 +64,23 @@ body .card {
   color: var(--bs-gray-dark);
   padding: 5px;
 }
-.badge-icon {
-  width: 16px;
-  height: 16px;
+.chatters-counter {
   display: inline-block;
-  margin-right: 5px;
+  color: #ff8280;
+  margin-left: 10px;
+  font-weight: bold;
+}
+.chatters-counter span {
+  margin-left: 3px;
+}
+.chatters-counter svg path {
+  fill: #ff8280;
+}
+.badge-icon {
+  max-width: 16px;
+  max-height: 16px;
+  display: inline-block;
+  margin-right: 2px;
 }
 .badge-icon-img {
   width: 16px;
