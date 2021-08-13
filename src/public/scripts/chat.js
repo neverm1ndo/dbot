@@ -57,10 +57,12 @@ class ChatMessage extends HTMLDivElement {
     if (message.includes(user.username)) message = message.replace(user.username, '<span class="notice">' + user.username + '</span>')
     body.innerHTML = message;
     body.prepend(nickname);
-    const badges = Object.keys(tags.badges);
-    if (tags.username === 'diktorbot') badges.push('diktorbot');
-    for (let i = 0; i < badges.length; i+=1) {
-      body.prepend(new ChatMessageBadge(badges[i]));
+    if (tags.badges) {
+      const badges = Object.keys(tags.badges);
+      if (tags.username === 'diktorbot') badges.push('diktorbot');
+      for (let i = 0; i < badges.length; i+=1) {
+        body.prepend(new ChatMessageBadge(badges[i]));
+      }
     }
     this.append(body);
   }
@@ -95,12 +97,38 @@ class ChatAlert extends HTMLDivElement {
       default:
         this.classList.add('text-muted');
     }
-    if (type === 'default')
-    if (type === 'success')
-    if (type === 'success') this.classList.add('bg-success', 'text-light');
-    if (type === 'danger') this.classList.add('bg-danger', 'text-light');
     this.innerHTML = message;
     this.append(body);
+  }
+}
+
+class ChattersListController {
+  constructor() {
+    this.box = document.querySelector('#chatters-list');
+    this.list = document.querySelector('#list');
+    this.buttons = {
+      open: document.querySelector('#open-chatters-list'),
+      close: document.querySelector('#close')
+    }
+    this.buttons.close.addEventListener('click', () => {
+      this.close();
+    });
+    this.buttons.open.addEventListener('click', () => {
+      console.log('dd');
+      this.open();
+      this.list.innerHTML = '';
+      for (let i = 0; i < connected.length; i+=1) {
+        const li = document.createElement('li');
+        li.innerHTML = connected[i];
+        this.list.append(li);
+      }
+    });
+  }
+  open() {
+    this.box.style.display = 'block';
+  }
+  close() {
+    this.box.style.display = 'none';
   }
 }
 
@@ -110,6 +138,7 @@ class ChatController {
     this.connected = false;
     this.text = document.querySelector('#text');
     this.submit = document.querySelector('#send');
+
     this.submit.addEventListener('click', () => {
       if (this.connected) this.send();
     });
@@ -135,6 +164,7 @@ customElements.define('chat-alert', ChatAlert, { extends: 'div' });
 
 
 const chat = new ChatController('#chat');
+const chatterList = new ChattersListController();
 
 const counter = document.querySelector('#chatters-counter');
 

@@ -11,9 +11,10 @@ body p, body h5 {
   margin-bottom: 0px;
 }
 body h5 {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 32px;
   font-weight: bold;
+  text-transform: uppercase;
 }
 body .head {
   border-bottom: 1px solid var(--bs-gray-dark);
@@ -23,6 +24,18 @@ body .head {
   font-weight: bold;
   margin-right: 10px;
   margin-left: 5px;
+}
+ul li {
+  list-style-type: none;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+body .chatters-list {
+  background-color: #18181b;
+  z-index: 10;
+  position: fixed;
+  top: 49px;
+  display: none;
 }
 body .card .card-body {
   padding: 5px;
@@ -58,6 +71,25 @@ body #logo {
 body .card {
   border: none;
   background: none;
+}
+.btn-small {
+  width: 30px;
+  height: 30px;
+  padding: 3px;
+  display: inline-block;
+}
+.btn-small {
+  background: transparent;
+  border: none;
+}
+.btn-small:hover {
+  background: var(--bs-gray-dark);
+}
+.btn-small:active {
+  background: var(--bs-gray);
+}
+.btn-small svg path {
+  fill: var(--bs-light);
 }
 .notice {
   background-color: var(--bs-light);
@@ -109,6 +141,8 @@ body .card {
   border: none;
 }
 body .logo {
-  width: 32px;
-  height: 32px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  width: 20px;
+  height: 20px;
 }
