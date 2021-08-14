@@ -87,6 +87,7 @@ export class Bot {
         };
       });
     });
+    this.client.on('raw_message', () => {})
   }
   /**
   * @param {ChatUserstate} chatter Chat user info
@@ -142,11 +143,13 @@ export class Bot {
         Nuzhdiki.getOne().then((path: string) => {
           this.media.playSound(tags, path);
         });
+        break;
       }
       case 'анек': {
         Aneki.getOne().then((anek: string) => {
           this.client.say(channel, anek);
         });
+        break;
       }
       default: { break; }
     }
