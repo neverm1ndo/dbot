@@ -165,9 +165,14 @@ class ChatController {
   }
   add(tags, message, self) {
     this.chat.append(new ChatMessage(tags, message, self));
+    this.autoscroll();
   }
   alert(message, type) {
     this.chat.append(new ChatAlert(message, type));
+    this.autoscroll();
+  }
+  autoscroll () {
+    this.chat.parentElement.scrollTop = this.chat.parentElement.scrollHeight;
   }
   pseudoDelete(username) {
     const childs = this.chat.childNodes;
