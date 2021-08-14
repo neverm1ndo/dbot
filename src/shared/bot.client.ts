@@ -29,7 +29,8 @@ export class Bot {
     });
   announcer: Announcer;
 
-  private status: BotStatus = process.env.NODE_ENV === 'development'?'works':'sleeps';
+  // private status: BotStatus = process.env.NODE_ENV === 'development'?'works':'sleeps';
+  private status: BotStatus = 'works';
   private prefix: string = '!';
 
   constructor() {
