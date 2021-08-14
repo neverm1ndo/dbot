@@ -1,7 +1,30 @@
+:root {
+  --twitch-main: #9146FF;
+}
 html, body {
   height: 100vh;
   background-color: #18181b;
   color: var(--bs-light)
+}
+html body div::-webkit-scrollbar {
+ background: var(--bs-gray-dark);
+ width: 7px;
+ border-radius: 3px;
+}
+html body div::-webkit-scrollbar-corner {
+  background:var(--bs-gray-dark);
+}
+html body div::-webkit-scrollbar-thumb {
+  background: var(--bs-gray);
+  cursor: default!important;
+  transition: 1s ease-in-out;
+  border-radius: 3px;
+}
+html body div::-webkit-scrollbar-thumb:hover {
+  background: var(--twitch-main);
+}
+html body div::-webkit-scrollbar-thumb:active, html body div::-webkit-scrollbar-thumb:active:focus {
+  opacity: 0.5;
 }
 body, textarea, button {
   font-family: 'Arial', sans;
@@ -65,7 +88,7 @@ body #logo {
   padding: 15px;
   border-radius: 4px;
   text-decoration: none;
-  background-color: #9146FF;
+  background-color: var(--twitch-main);
   color: #fff;
 }
 body .card {

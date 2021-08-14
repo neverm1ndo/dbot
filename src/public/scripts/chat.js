@@ -59,25 +59,27 @@ class ChatMessage extends HTMLDivElement {
     const body = document.createElement('div');
     const nickname = document.createElement('span');
     const ban = document.createElement('button');
+    this.tags = tags;
+    this.body = body;
     nickname.classList.add('nickname');
     nickname.innerHTML = tags.username;
     nickname.style.color = tags.color
     this.classList.add('card');
-    body.classList.add('card-body');
+    this.body.classList.add('card-body');
     if (tags['message-type'] === "action") body.style.color = tags.color;
-    body.dataset.date = (this.timestamp(Date.now()));
+    this.body.dataset.date = (this.timestamp(Date.now()));
     if (message.includes(user.username)) message = message.replace(user.username, '<span class="notice">' + user.username + '</span>')
-    body.innerHTML = message;
-    body.prepend(nickname);
+    this.body.innerHTML = message;
+    this.body.prepend(nickname);
     if (tags.badges) {
       const badges = Object.keys(tags.badges);
       if (tags.username === 'diktorbot') badges.push('diktorbot');
       for (let i = 0; i < badges.length; i+=1) {
-        body.prepend(new ChatMessageBadge(badges[i]));
+        this.body.prepend(new ChatMessageBadge(badges[i]));
       }
     }
-    if (!self) body.prepend(new MessageControlButton(tags));
-    this.append(body);
+    if (!self) this.body.prepend(new MessageControlButton(tags));
+    this.append(this.body);
   }
 
   timestamp (unix) {
@@ -130,7 +132,6 @@ class ChattersListController {
       this.close();
     });
     this.buttons.open.addEventListener('click', () => {
-      console.log('dd');
       this.open();
       this.list.innerHTML = '';
       for (let i = 0; i < connected.length; i+=1) {
@@ -167,6 +168,16 @@ class ChatController {
   }
   alert(message, type) {
     this.chat.append(new ChatAlert(message, type));
+  }
+  pseudoDelete(username) {
+    const childs = this.chat.childNodes;
+    for (let i = 0; i < childs.length; i += 1) {
+      if (childs[i].className === 'card') {
+        if (childs[i].tags.username === username) {
+          childs[i].body.classList.add('text-decoration-line-through');
+        }
+      }
+    }
   }
   send() {
     client.say(user.username, this.text.value);
@@ -230,6 +241,7 @@ client.on('join', (channel, username, self) => {
 });
 client.on('ban', (channel, username, reason) => {
   chat.alert(`<b>${username}</b> забанен`, 'warning');
+  chat.pseudoDelete(username);
 });
 client.on('part', (channel, username, self) => {
   if (self || lurkers.includes(username)) return;
