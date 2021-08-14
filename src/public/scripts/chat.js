@@ -43,16 +43,28 @@ class ChatMessageBadge extends HTMLDivElement {
     }
   }
 }
+class MessageControlButton extends HTMLButtonElement {
+  constructor(tags) {
+    super();
+    this.type = 'button';
+    this.classList.add('btn', 'btn-control');
+    this.addEventListener('click', () => {
+      client.ban(user.username, tags.username)
+    });
+  }
+}
 class ChatMessage extends HTMLDivElement {
-  constructor(tags, message) {
+  constructor(tags, message, self) {
     super();
     const body = document.createElement('div');
     const nickname = document.createElement('span');
+    const ban = document.createElement('button');
     nickname.classList.add('nickname');
     nickname.innerHTML = tags.username;
     nickname.style.color = tags.color
     this.classList.add('card');
     body.classList.add('card-body');
+    if (tags['message-type'] === "action") body.style.color = tags.color;
     body.dataset.date = (this.timestamp(Date.now()));
     if (message.includes(user.username)) message = message.replace(user.username, '<span class="notice">' + user.username + '</span>')
     body.innerHTML = message;
@@ -64,6 +76,7 @@ class ChatMessage extends HTMLDivElement {
         body.prepend(new ChatMessageBadge(badges[i]));
       }
     }
+    if (!self) body.prepend(new MessageControlButton(tags));
     this.append(body);
   }
 
@@ -87,6 +100,9 @@ class ChatAlert extends HTMLDivElement {
         break;
       case 'danger':
         this.classList.add('bg-danger', 'text-light');
+        break;
+      case 'siren':
+        this.classList.add('bg-danger', 'text-light', 'siren');
         break;
       case 'warning':
         this.classList.add('bg-warning', 'text-dark');
@@ -146,8 +162,8 @@ class ChatController {
       if (event.code === 'Enter') this.send();
     })
   }
-  add(tags, message) {
-    this.chat.append(new ChatMessage(tags, message));
+  add(tags, message, self) {
+    this.chat.append(new ChatMessage(tags, message, self));
   }
   alert(message, type) {
     this.chat.append(new ChatAlert(message, type));
@@ -161,6 +177,7 @@ class ChatController {
 customElements.define('twitch-badge', ChatMessageBadge, { extends: 'div' });
 customElements.define('chat-message', ChatMessage, { extends: 'div' });
 customElements.define('chat-alert', ChatAlert, { extends: 'div' });
+customElements.define('control-button', MessageControlButton, { extends: 'button' });
 
 
 const chat = new ChatController('#chat');
@@ -169,6 +186,7 @@ const chatterList = new ChattersListController();
 const counter = document.querySelector('#chatters-counter');
 
 const client = new tmi.Client({
+  options: { debug: true, messagesLogLevel: "info" },
   connection: { reconnect: true, secure: true },
   identity: {
     username: user.username,
@@ -183,6 +201,11 @@ client.on('connected', (channel, self) => {
   chat.alert('Добро пожаловать в чат!');
   chat.connected = true;
   chat.submit.disabled = false;
+});
+client.on('disconnected', (channel, self) => {
+  chat.alert('Вы отсоединенны от чата', 'siren');
+  chat.connected = false;
+  chat.submit.disabled = true;
 });
 
 const connected = [];
@@ -206,7 +229,7 @@ client.on('join', (channel, username, self) => {
   chat.alert(`<b>${username}</b> подключился к чату`, 'success');
 });
 client.on('ban', (channel, username, reason) => {
-  chat.alert(`<b>${username}</b> забанен ${reason}`, 'warning');
+  chat.alert(`<b>${username}</b> забанен`, 'warning');
 });
 client.on('part', (channel, username, self) => {
   if (self || lurkers.includes(username)) return;
@@ -218,5 +241,8 @@ client.on('part', (channel, username, self) => {
 });
 
 client.on('message', (channel, tags, message, self) => {
-  chat.add(tags, message);
+  chat.add(tags, message, self);
+});
+client.on('whisper', (channel, tags, message, self) => {
+  chat.add(tags, message, self);
 });

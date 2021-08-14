@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { bot } from '@server';
+import { corsOpt } from '@shared/constants';
 
 const router = Router();
 
-router.get('/', (req: Request, res: Response,) => {
+router.get('/', corsOpt, (req: Request, res: Response,) => {
   res.set("Content-Security-Policy", "default-src *");
   res.render('chat', { session: req.session });
 });
