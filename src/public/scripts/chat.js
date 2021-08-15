@@ -1,4 +1,20 @@
-const user = { username: document.querySelector('#chatjs').dataset.username, token: document.querySelector('#chatjs').dataset.token};
+const user = {
+  username: document.querySelector('#chatjs').dataset.username,
+  token: document.querySelector('#chatjs').dataset.token,
+  id: document.querySelector('#chatjs').dataset.id,
+  client: document.querySelector('#chatjs').dataset.client
+};
+
+class Http {
+  static async get(url, headers) {
+    const res = await fetch(url, { headers })
+      if (res.ok) {
+       return await res.json();
+    } else {
+      alert.error(`Ошибка HTTP: ${this.res.status}`);
+    }
+  }
+}
 
 class ChatMessageBadge extends HTMLDivElement {
   constructor(type) {
@@ -62,14 +78,13 @@ class ChatMessage extends HTMLDivElement {
     this.tags = tags;
     this.body = body;
     nickname.classList.add('nickname');
-    nickname.innerHTML = tags.username;
+    nickname.innerHTML = tags['display-name'];
     nickname.style.color = tags.color
     this.classList.add('card');
     this.body.classList.add('card-body');
     if (tags['message-type'] === "action") body.style.color = tags.color;
     this.body.dataset.date = (this.timestamp(Date.now()));
-    if (message.includes(user.username)) message = message.replace(user.username, '<span class="notice">' + user.username + '</span>')
-    this.body.innerHTML = message;
+    this.body.innerHTML = this.getMessageHTML(message.replace(/(<([^>]+)>)/gi, ''), tags.emotes);
     this.body.prepend(nickname);
     if (tags.badges) {
       const badges = Object.keys(tags.badges);
@@ -78,7 +93,7 @@ class ChatMessage extends HTMLDivElement {
         this.body.prepend(new ChatMessageBadge(badges[i]));
       }
     }
-    if (!self) this.body.prepend(new MessageControlButton(tags));
+    if (!self && (tags.username !== user.username)) this.body.prepend(new MessageControlButton(tags));
     this.append(this.body);
   }
 
@@ -88,6 +103,25 @@ class ChatMessage extends HTMLDivElement {
     let minutes = "0" + date.getMinutes();
     let seconds = "0" + date.getSeconds();
     return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+  }
+  getMessageHTML(message, emotes) {
+    if (!emotes) return message;
+    const stringReplacements = [];
+    Object.entries(emotes).forEach(([id, positions]) => {
+      const position = positions[0];
+      const [start, end] = position.split("-");
+      const stringToReplace = message.substring(parseInt(start, 10), parseInt(end, 10) + 1);
+      stringReplacements.push({
+        stringToReplace: stringToReplace,
+        replacement: `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/dark/2.0">`,
+      });
+    });
+    const messageHTML = stringReplacements.reduce(
+      (acc, { stringToReplace, replacement }) => {
+        return acc.split(stringToReplace).join(replacement);
+      }, message);
+    if (messageHTML.includes(user.username)) messageHTML = messageHTML.replace(user.username, '<span class="notice">' + user.username + '</span>')
+    return messageHTML;
   }
 }
 
@@ -155,12 +189,42 @@ class ChatController {
     this.connected = false;
     this.text = document.querySelector('#text');
     this.submit = document.querySelector('#send');
-
+    this.emotes = document.querySelector("#emotes-list");
     this.submit.addEventListener('click', () => {
       if (this.connected) this.send();
     });
     this.text.addEventListener('keydown', (event) => {
       if (event.code === 'Enter') this.send();
+    });
+    Http.get(
+      'https://api.twitch.tv/helix/chat/emotes/global',
+      {
+        'Authorization': 'Bearer ' + user.token,
+        'Client-ID': 'ezap2dblocyxqnsjhl9dpyw1jpn8c7'
+      }
+    )
+    .then(data => { this.addEmotes(data.data, 'Twitch') });
+    Http.get(
+      'https://api.twitch.tv/helix/chat/emotes?broadcaster_id=' + user.id,
+      {
+        'Authorization': 'Bearer ' + user.token,
+        'Client-ID': 'ezap2dblocyxqnsjhl9dpyw1jpn8c7'
+      }
+    )
+    .then(data => { this.addEmotes(data.data, user.username) });
+  }
+  addEmotes(emotes, type) {
+    const title = document.createElement('h6');
+    title.innerHTML = type;
+    this.emotes.append(title);
+    emotes.forEach(emote => {
+      const img = document.createElement('img');
+      img.src = `https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/${emote.format}/dark/3.0`;
+      img.dataset.name = emote.name;
+      img.addEventListener('click', () => {
+        this.text.value = this.text.value + ' ' + emote.name + ' ';
+      });
+      this.emotes.append(img);
     })
   }
   add(tags, message, self) {
@@ -200,9 +264,19 @@ const chat = new ChatController('#chat');
 const chatterList = new ChattersListController();
 
 const counter = document.querySelector('#chatters-counter');
+const connected = [];
+
+
+let lurkers;
+Http.get('/controls/chat/lurkers').then(data => { lurkers = data });
 
 const client = new tmi.Client({
-  options: { debug: true, messagesLogLevel: "info" },
+  options: {
+    debug: true,
+    messagesLogLevel: "info",
+    clientId: user.client,
+    skipUpdatingEmotesets: true
+  },
   connection: { reconnect: true, secure: true },
   identity: {
     username: user.username,
@@ -224,20 +298,6 @@ client.on('disconnected', (channel, self) => {
   chat.submit.disabled = true;
 });
 
-const connected = [];
-
-async function getLurkers() {
-  const res = await fetch(`/controls/chat/lurkers`)
-    if (res.ok) {
-     return await res.json();
-  } else {
-    alert.error(`Ошибка HTTP: ${this.res.status}`);
-  }
-};
-
-let lurkers;
-getLurkers().then(data => { lurkers = data });
-
 client.on('join', (channel, username, self) => {
   if (self || connected.includes(username) || lurkers.includes(username)) return;
   connected.push(username);
@@ -256,9 +316,20 @@ client.on('part', (channel, username, self) => {
     chat.alert(`<b>${username}</b> отключился`, 'danger');
   }, 300000);
 });
-
 client.on('message', (channel, tags, message, self) => {
   chat.add(tags, message, self);
+});
+client.on('subscription', (channel, username, methods, message, userstate) => {
+  alert.add(`<b>${username}</b> оформил подписку<br><small>${message}</small>`, 'info');
+});
+client.on('subgift', (channel, username, streakMonths, recepient, methods, userstate) => {
+  alert.add(`<b>${username}</b> подарил подписку <u>${recepient}</u>`, 'info');
+});
+client.on('raided', (channel, username, viewers) => {
+  alert.add(`<b>${username}</b> зарейдил канал на <b>${viewers}</b> зрителей`, 'info');
+});
+client.on('follow', (channel, tags, message, self) => {
+  alert.add(tags, message, self);
 });
 client.on('whisper', (channel, tags, message, self) => {
   chat.add(tags, message, self);

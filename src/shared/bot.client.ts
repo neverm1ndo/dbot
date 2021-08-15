@@ -29,8 +29,7 @@ export class Bot {
     });
   announcer: Announcer;
 
-  // private status: BotStatus = process.env.NODE_ENV === 'development'?'works':'sleeps';
-  private status: BotStatus = 'works';
+  private status: BotStatus = process.env.NODE_ENV === 'development'?'works':'sleeps';
   private prefix: string = '!';
 
   constructor() {
@@ -79,16 +78,6 @@ export class Bot {
     	const command = args.shift()!.toLowerCase();
       this.readChattersMessage(channel, tags, command);
     });
-    this.client.on('join', (channel: string, username: string, self: boolean) => {
-      if (self || (username === process.env.BOT_CHANNEL) || (this.status === 'sleeps') || (this.opts.blacklist.includes(username))) return;
-      CHATTER.updateOne({ username: username }, { $inc: { joins_count: 1 }}, { upsert: true, setDefaultsOnInsert: true }, (err: any, res: any) => {
-        if (err) return;
-        if (res.joins_count < 2) {
-          this.client.say(channel, `${username}, HeyGuys !`);
-        };
-      });
-    });
-    this.client.on('raw_message', () => {})
   }
   /**
   * @param {ChatUserstate} chatter Chat user info

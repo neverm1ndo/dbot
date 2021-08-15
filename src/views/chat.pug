@@ -48,9 +48,18 @@ html(lang="en")
           div.container-fluid
             div.col-12.mb-3
               div.input-group.w-100
+                div.btn-group.dropup.emotes
+                  button.btn.btn-small#emotes(type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside")
+                    svg(width="100%" height="100%" version="1.1" viewBox="0 0 20 20" x="0px" y="0px")
+                      g
+                        path(d="M7 11a1 1 0 100-2 1 1 0 000 2zM14 10a1 1 0 11-2 0 1 1 0 012 0zM10 14a2 2 0 002-2H8a2 2 0 002 2z")
+                        path(fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0a6 6 0 11-12 0 6 6 0 0112 0z" clip-rule="evenodd")
+                  div.dropdown-menu.dropdown-menu-dark.p-2.mb-3
+                    div#emotes-list.emotes-list
                 input.form-control#text(type="text" placeholder="Отправить сообщение")
                 button.btn.btn-dark#send(type="button" disabled) Чат
-      script(id="chatjs" type="text/javascript" data-username=session.passport.user.data[0].login data-token=session.passport.user.accessToken src="/scripts/chat.js")
+      script(id="chatjs" type="text/javascript" data-id=session.passport.user.data[0].id data-username=session.passport.user.data[0].login data-token=session.passport.user.accessToken src="/scripts/chat.js" data-client=clientid)
+      script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous")
     else
       div.d-flex.flex-column.flex-nowrap.h-100.align-items-center.justify-content-center
         img#logo.mb-4(src="/tank2.png" alt="")
