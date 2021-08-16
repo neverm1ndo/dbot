@@ -108,7 +108,6 @@ class ChatMessage extends HTMLDivElement {
   formatLinks(text) {
     const urlPattern = new RegExp("(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$", 'gm')
     text.match(urlPattern).forEach((link) => {
-      console.log(link);
       text = text.replace(link, '<a target="_blank" href="' + link + '">'+ link +'</a>');
     });
     return text;
