@@ -176,7 +176,8 @@ app.use(express.static(staticDir));
 
 app.use('/.well-known/acme-challenge', express.static(join(__dirname, 'public/.well-known/acme-challenge')));
 app.get('*', (req: Request, res: Response) => {
-    res.render('index', { session: req.session });
+  res.set("Content-Security-Policy", "default-src *");
+  res.render('index', { session: req.session });
 });
 // Export express instance
 export default app;

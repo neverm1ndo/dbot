@@ -84,7 +84,7 @@ class ChatMessage extends HTMLDivElement {
     this.body.classList.add('card-body');
     if (tags['message-type'] === "action") body.style.color = tags.color;
     this.body.dataset.date = (this.timestamp(Date.now()));
-    this.body.innerHTML = this.getMessageHTML(message.replace(/(<([^>]+)>)/gi, ''), tags.emotes);
+    this.body.innerHTML = this.formatEmotes(message.replace(/(<([^>]+)>)/gi, ''), tags.emotes);
     this.body.prepend(nickname);
     if (tags.badges) {
       const badges = Object.keys(tags.badges);
@@ -104,25 +104,27 @@ class ChatMessage extends HTMLDivElement {
     let seconds = "0" + date.getSeconds();
     return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
   }
-  getMessageHTML(message, emotes) {
-    if (!emotes) return message;
-    const stringReplacements = [];
-    Object.entries(emotes).forEach(([id, positions]) => {
-      const position = positions[0];
-      const [start, end] = position.split("-");
-      const stringToReplace = message.substring(parseInt(start, 10), parseInt(end, 10) + 1);
-      stringReplacements.push({
-        stringToReplace: stringToReplace,
-        replacement: `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/dark/2.0">`,
-      });
-    });
-    const messageHTML = stringReplacements.reduce(
-      (acc, { stringToReplace, replacement }) => {
-        return acc.split(stringToReplace).join(replacement);
-      }, message);
-    if (messageHTML.includes(user.username)) messageHTML = messageHTML.replace(user.username, '<span class="notice">' + user.username + '</span>')
-    return messageHTML;
+  parseSelfEmotes() {
+
   }
+  formatEmotes(text, emotes) {
+        var splitText = text.split('');
+        for(let i in emotes) {
+            let e = emotes[i];
+            for(let j in e) {
+                let mote = e[j];
+                if(typeof mote == 'string') {
+                    mote = mote.split('-');
+                    mote = [parseInt(mote[0]), parseInt(mote[1])];
+                    let length =  mote[1] - mote[0],
+                        empty = Array.apply(null, new Array(length + 1)).map(() => { return '' });
+                    splitText = splitText.slice(0, mote[0]).concat(empty).concat(splitText.slice(mote[1] + 1, splitText.length));
+                    splitText.splice(mote[0], 1, '<img class="emoticon" src="https://static-cdn.jtvnw.net/emoticons/v2/' + i + '/static/dark/3.0">');
+                }
+            }
+        }
+        return splitText.join('');
+    }
 }
 
 class ChatAlert extends HTMLDivElement {
@@ -187,6 +189,7 @@ class ChatController {
   constructor(selector) {
     this.chat = document.querySelector(selector);
     this.connected = false;
+    this.selfEmotes = {};
     this.text = document.querySelector('#text');
     this.submit = document.querySelector('#send');
     this.emotes = document.querySelector("#emotes-list");
@@ -222,6 +225,10 @@ class ChatController {
       img.src = `https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/${emote.format}/dark/3.0`;
       img.dataset.name = emote.name;
       img.addEventListener('click', () => {
+        if (typeof this.selfEmotes[emote.id] !== 'object') {
+          this.selfEmotes[emote.id] = [];
+        }
+        this.selfEmotes[emote.id].push(`${this.text.value.length}-${this.text.value.length + emote.name.length}`);
         this.text.value = this.text.value + ' ' + emote.name + ' ';
       });
       this.emotes.append(img);
@@ -251,6 +258,7 @@ class ChatController {
   send() {
     client.say(user.username, this.text.value);
     this.text.value = '';
+    this.selfEmotes = {};
   }
 }
 
@@ -317,6 +325,12 @@ client.on('part', (channel, username, self) => {
   }, 300000);
 });
 client.on('message', (channel, tags, message, self) => {
+  if (self) {
+    tags.emotes = chat.selfEmotes;
+    chat.add(tags, message, self);
+    return;
+  }
+  console.log(tags);
   chat.add(tags, message, self);
 });
 client.on('subscription', (channel, username, methods, message, userstate) => {
