@@ -84,7 +84,8 @@ class ChatMessage extends HTMLDivElement {
     this.body.classList.add('card-body');
     if (tags['message-type'] === "action") body.style.color = tags.color;
     this.body.dataset.date = (this.timestamp(Date.now()));
-    this.body.innerHTML = this.formatEmotes(message.replace(/(<([^>]+)>)/gi, ''), tags.emotes);
+    message = this.formatLinks(message);
+    this.body.innerHTML = this.formatEmotes(message, tags.emotes);
     this.body.prepend(nickname);
     if (tags.badges) {
       const badges = Object.keys(tags.badges);
@@ -104,8 +105,13 @@ class ChatMessage extends HTMLDivElement {
     let seconds = "0" + date.getSeconds();
     return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
   }
-  parseSelfEmotes() {
-
+  formatLinks(text) {
+    const urlPattern = new RegExp("(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$", 'gm')
+    text.match(urlPattern).forEach((link) => {
+      console.log(link);
+      text = text.replace(link, '<a target="_blank" href="' + link + '">'+ link +'</a>');
+    });
+    return text;
   }
   formatEmotes(text, emotes) {
         var splitText = text.split('');

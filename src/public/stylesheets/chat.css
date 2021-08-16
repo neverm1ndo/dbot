@@ -39,6 +39,13 @@ body h5 {
   font-weight: bold;
   text-transform: uppercase;
 }
+body a {
+  color: var(--twitch-main);
+  transition: .1s linear;
+}
+body a:hover {
+  color: #9146FF80;
+}
 body .head {
   border-bottom: 1px solid var(--bs-gray-dark);
   line-height: 32px;
