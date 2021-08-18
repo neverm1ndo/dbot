@@ -1,0 +1,11 @@
+{
+  "name": "neverm1nd_o chat",
+  "short_name": "nchat",
+  "start_url": ".",
+  "url": "https://apps.nmnd.ru/",
+  "display": "standalone",
+  "background_color": "#fff",
+  "description": "Custom Twitch chat",
+  "permissions": ["browser", "tabs"],
+  "platform": "web"
+}

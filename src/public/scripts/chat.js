@@ -5,6 +5,8 @@ const user = {
   client: document.querySelector('#chatjs').dataset.client
 };
 
+const parser = new DOMParser();
+
 class Http {
   static async get(url, headers) {
     const res = await fetch(url, { headers })
@@ -84,7 +86,16 @@ class ChatMessage extends HTMLDivElement {
     this.body.classList.add('card-body');
     if (tags['message-type'] === "action") body.style.color = tags.color;
     this.body.dataset.date = (this.timestamp(Date.now()));
-    message = this.formatLinks(message);
+    // if (Array.isArray(this.haveLinks(message))) {
+    //   // console.log('klk');
+    //   // message = this.linkify(message);
+    //   this.body.addEventListener('click', (event) => {
+    //     event.stopPropagation();
+    //     if (event.target.tagName !== 'A') return;
+    //     window.open('googlechrome://navigate?url=' + event.target.href, '_system');
+    //     event.preventDefault();
+    //   })
+    // }
     this.body.innerHTML = this.formatEmotes(message, tags.emotes);
     this.body.prepend(nickname);
     if (tags.badges) {
@@ -105,12 +116,23 @@ class ChatMessage extends HTMLDivElement {
     let seconds = "0" + date.getSeconds();
     return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
   }
-  formatLinks(text) {
-    const urlPattern = new RegExp("(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$", 'gm')
-    text.match(urlPattern).forEach((link) => {
-      text = text.replace(link, '<a target="_blank" href="' + link + '">'+ link +'</a>');
-    });
-    return text;
+  haveLinks(text) {
+    return text.match(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig);
+  }
+  linkify(text) {
+    //URLs starting with http://, https://, or ftp://
+    var replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+    var replacedText = text.replace(replacePattern1, '<a href="$1">$1</a>');
+
+    //URLs starting with www. (without // before it, or it'd re-link the ones done above)
+    var replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+    var replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2">$2</a>');
+
+    //Change email addresses to mailto:: links
+    var replacePattern3 = /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/gim;
+    var replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
+
+    return replacedText;
   }
   formatEmotes(text, emotes) {
         var splitText = text.split('');
@@ -220,6 +242,15 @@ class ChatController {
       }
     )
     .then(data => { this.addEmotes(data.data, user.username) });
+    this.emotes.addEventListener('click', (event) => {
+      console.log(event.target.tagName)
+      if (event.target.tagName !== 'IMG') return;
+      if (typeof this.selfEmotes[event.target.dataset.id] !== 'object') {
+        this.selfEmotes[event.target.dataset.id] = [];
+      }
+      this.selfEmotes[event.target.dataset.id].push(`${this.text.value.length}-${this.text.value.length + event.target.dataset.name.length}`);
+      this.text.value = this.text.value + ' ' + event.target.dataset.name + ' ';
+    });
   }
   addEmotes(emotes, type) {
     const title = document.createElement('h6');
@@ -229,13 +260,7 @@ class ChatController {
       const img = document.createElement('img');
       img.src = `https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/${emote.format}/dark/3.0`;
       img.dataset.name = emote.name;
-      img.addEventListener('click', () => {
-        if (typeof this.selfEmotes[emote.id] !== 'object') {
-          this.selfEmotes[emote.id] = [];
-        }
-        this.selfEmotes[emote.id].push(`${this.text.value.length}-${this.text.value.length + emote.name.length}`);
-        this.text.value = this.text.value + ' ' + emote.name + ' ';
-      });
+      img.dataset.id = emote.id;
       this.emotes.append(img);
     })
   }
