@@ -16,7 +16,7 @@ type BotStatus = 'works' | 'sleeps';
 
 export class Bot {
   opts: Schedule;
-  $announcer: Subscription | undefined;
+  announceSub: Subscription = new Subscription();
   media: Media = new Media();
   client: Client = new Client({
       options: { debug: true, messagesLogLevel: 'info'  },
@@ -58,15 +58,15 @@ export class Bot {
 
   public shutdown(): void {
     this.status = 'sleeps';
-    if (!this.$announcer) return;
-    this.$announcer.unsubscribe();
+    if (!this.announceSub) return;
+    this.announceSub.unsubscribe();
   }
 
   public wakeup(): void {
     this.status = 'works';
-    this.$announcer = this.announcer._announcer.subscribe((announce: string) => {
+    this.announceSub.add(this.announcer._announcer.subscribe((announce: string) => {
       this.client.say(this.client.getChannels()[0], announce);
-    });
+    }));
   }
 
   public init(): void {
