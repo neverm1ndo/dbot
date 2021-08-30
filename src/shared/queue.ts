@@ -64,19 +64,17 @@ export class Queue {
       this.global = true;
       setTimeout(() => {
         this.global = false;
-      }, 90000)
+      }, 30000)
     }
   }
   toTimeout(user: ChatUserstate) {
     if (this.global) return;
     if (user.username) {
-      if (!Queue.whitelist.includes(user.username)) {
-        const now = Date.now();
-        this.queue.push({ username: user.username, start: now });
-        setTimeout(() => {
-          this.removeFromQueue(user);
-        }, this.options.cooldown * 60000);
-      }
+      const now = Date.now();
+      this.queue.push({ username: user.username, start: now });
+      setTimeout(() => {
+        this.removeFromQueue(user);
+      }, this.options.cooldown);
     }
   }
   removeFromQueue(user: ChatUserstate) {
