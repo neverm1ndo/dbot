@@ -308,6 +308,7 @@ const connected = [];
 
 let lurkers;
 Http.get('/controls/chat/lurkers').then(data => { lurkers = data });
+const params = new URLSearchParams(window.location.search);
 
 const client = new tmi.Client({
   options: {
@@ -321,7 +322,7 @@ const client = new tmi.Client({
     username: user.username,
     password: 'oauth:' + user.token
   },
-  channels: [user.username]
+  channels: [params.get('channel')?params.get('channel'):user.username]
 });
 
 client.connect();
