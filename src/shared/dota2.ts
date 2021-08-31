@@ -18,4 +18,15 @@ export class Dota2 {
   public static refreshPlayer(id: number) {
     return axios.post(OPN_DOTA + `players/${id}/refresh`);
   }
+  public static parseRankTier(tier: number): string {
+    const tiers: any = {
+      80: 'Immortal',
+      70: 'Divine',
+      60: 'Ancient',
+      50: 'Legend',
+      40: 'Hero'
+    }
+    if (!tiers[tier]) return 'Low Rank';
+    return tiers[tier];
+  }
 }

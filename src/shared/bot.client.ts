@@ -115,9 +115,18 @@ export class Bot {
     // COMMANDS
     switch (command) {
       case 'ранг': {
-        Dota2.getRatings(120494497).then((ratings: any) => {
-          const rating: Dota2Ratings = ratings.data;
-          this.client.say(channel, `Ранг ${channel}: ${rating.leaderboard_rank} Immortal`);
+        Promise.all([
+          Dota2.getRatings(120494497),
+          Dota2.getRatings(350421994)
+        ]).then((ratings: any[]) => {
+          let message: string = '';
+          ratings.forEach((rating, index) => {
+            message = message + `${rating.data.profile.personaname}: ${rating.data.leaderboard_rank} ${Dota2.parseRankTier(rating.data.rank_tier)}`
+            if (index !== ratings.length - 1) {
+              message = message + ', ';
+            }
+          });
+          this.client.say(channel, `Ранг ${channel}: (${message})`);
         }).catch((err) => logger.err(err));
         break;
       }
