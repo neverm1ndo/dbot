@@ -11,7 +11,6 @@ import { Nuzhdiki } from '@shared/nuzhdiki';
 import { Aneki } from '@shared/aneki';
 import { Subscription } from 'rxjs';
 // import { CHATTER } from '../schemas/chatters.schema';
-import StartOptions from '../pre-start/index';
 
 type BotStatus = 'works' | 'sleeps';
 
@@ -34,7 +33,6 @@ export class Bot {
   private prefix: string = '!';
 
   constructor() {
-    if (StartOptions.works) this.wakeup();
     this.opts = new Schedule('neverm1nd_o');
     this.announcer = new Announcer(900000);
     if (process.env.NODE_ENV !== 'development') {
