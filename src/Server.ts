@@ -17,6 +17,7 @@ import 'express-async-errors';
 import { Bot } from '@shared/bot.client';
 
 import BaseRouter from './routes';
+import CommandsRouter from './routes/landings';
 import APIRouter from './routes/api.routes';
 import logger from '@shared/Logger';
 import axios from 'axios';
@@ -133,6 +134,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Add APIs
 app.use('/controls', BaseRouter);
+app.use('/commands', CommandsRouter);
 app.use('/api', express.json(), APIRouter);
 
 // Set route to start OAuth link, this is where you define scopes to request

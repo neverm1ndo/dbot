@@ -135,7 +135,11 @@ export class Bot {
         break;
       }
       case 'хелп': {
-        this.client.say(channel, 'Вся помощь по командам в описаннии под стримом! OhMyDog');
+        this.client.say(channel, `Список команд тут: https://apps.nmnd.ru/commands OhMyDog`);
+        break;
+      }
+      case 'help': {
+        this.client.say(channel, `Список команд тут: https://apps.nmnd.ru/commands OhMyDog`);
         break;
       }
       case 'нуждики': {

@@ -7,7 +7,6 @@ export class Media {
   constructor() {}
 
   playSound(chatter: ChatUserstate, path: string) {
-    console.log(this.queue.list)
     if (this.queue.check(chatter)) return;
     this.queue.toTimeout(chatter);
     cm.sendall({ event: 'play-sound', msg: path });
