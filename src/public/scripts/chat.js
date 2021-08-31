@@ -322,7 +322,7 @@ const client = new tmi.Client({
     username: user.username,
     password: 'oauth:' + user.token
   },
-  channels: [params.get('channel')?params.get('channel'):user.username]
+  channels: [params.has('channel')?params.get('channel'):user.username]
 });
 
 client.connect();
