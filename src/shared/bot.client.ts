@@ -11,7 +11,7 @@ import { Nuzhdiki } from '@shared/nuzhdiki';
 import { Aneki } from '@shared/aneki';
 import { Subscription } from 'rxjs';
 // import { CHATTER } from '../schemas/chatters.schema';
-
+import StartOptions from '../pre-start';
 type BotStatus = 'works' | 'sleeps';
 
 export class Bot {
@@ -29,7 +29,7 @@ export class Bot {
     });
   announcer: Announcer;
 
-  private status: BotStatus = process.env.NODE_ENV === 'development'?'works':'sleeps';
+  private status: BotStatus = 'sleeps';
   private prefix: string = '!';
 
   constructor() {
@@ -54,15 +54,20 @@ export class Bot {
           })
         }).catch((err) => logger.err(err, true));
     }
+    if (StartOptions.works) {
+      this.wakeup();
+    }
   }
 
   public shutdown(): void {
+    if (this.status === 'sleeps') return;
     this.status = 'sleeps';
     if (!this.announceSub) return;
     this.announceSub.unsubscribe();
   }
 
   public wakeup(): void {
+    if (this.status === 'works') return;
     this.status = 'works';
     this.announceSub.add(this.announcer._announcer.subscribe((announce: string) => {
       this.client.say(this.client.getChannels()[0], announce);

@@ -16,7 +16,7 @@ const options = commandLineArgs([
     defaultValue: 'development',
     type: String,
   },
-  { name: 'works', alias: 'w', type: Boolean}
+  { name: 'works', defaultValue: false, alias: 'w', type: Boolean}
 ]);
 
 export default options;
