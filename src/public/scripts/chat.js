@@ -342,7 +342,7 @@ class ChatController {
   }
   send() {
     if (!this.text.value) return;
-    client.say(user.username, this.text.value);
+    client.say(params.has('channel')?params.get('channel'):user.username, this.text.value);
     this.text.value = '';
     this.selfEmotes = {};
   }
