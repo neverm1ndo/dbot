@@ -39,7 +39,10 @@ export class Schedule {
     "restreambot",
     "jointeffortt",
     "violets_tv",
-    "janenv"
+    "janenv",
+    "aiexiaxo",
+    "feet",
+    "communityshowcase"
   ];
   constructor(username: string) {
     USER.findOne({'user.login': username}, (err: any, user: any) => {

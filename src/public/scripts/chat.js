@@ -214,7 +214,7 @@ class ChatAlert extends HTMLDivElement {
   constructor(message, type = 'default') {
     super();
     const body = document.createElement('div');
-    this.classList.add('alert', 'mb-2');
+    this.classList.add('alert', 'mb-1');
     switch (type) {
       case 'success':
         this.classList.add('bg-success', 'text-light');
