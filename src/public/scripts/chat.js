@@ -5,6 +5,22 @@ const user = {
   client: document.querySelector('#chatjs').dataset.client
 };
 
+const tag = document.createElement('script');
+tag.src = 'https://www.youtube.com/player_api';
+const firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+String.prototype.hashCode = function() {
+  var hash = 0, i, chr;
+  if (this.length === 0) return hash;
+  for (i = 0; i < this.length; i++) {
+    chr   = this.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
+
 const parser = new DOMParser();
 
 class Http {
@@ -61,6 +77,39 @@ class ChatMessageBadge extends HTMLDivElement {
     }
   }
 }
+class YTFrame extends HTMLDivElement {
+  constructor(url) {
+    super();
+    this.player;
+    this.replace(url)
+  }
+  replace(url) {
+    const rep = document.createElement('div');
+    rep.id = String(url + Date.now()).hashCode();
+    this.append(rep);
+    setTimeout(() => {
+      new Promise((resolve) => {
+        this.player = new YT.Player(rep.id, {
+          videoId: YTFrame.getVideoID(url),
+          height: '100%',
+          width: '100%',
+          playerVars: { autoplay: 0, controls: 1 },
+          events: {
+            onReady: resolve
+          },
+        });
+      }).then((event) => {
+        event.target.setVolume(15);
+        chat.autoscroll();
+      });
+    }, 2000);
+  }
+  static getVideoID(url) {
+    const regExp = new RegExp(/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/);
+    const match = url.match(regExp);
+    return (match && match[7].length === 11) ? match[7] : console.error('NO videoID');
+  }
+}
 class MessageControlButton extends HTMLButtonElement {
   constructor(tags) {
     super();
@@ -79,6 +128,7 @@ class ChatMessage extends HTMLDivElement {
     const ban = document.createElement('button');
     this.tags = tags;
     this.body = body;
+    this.links = [];
     nickname.classList.add('nickname');
     nickname.innerHTML = tags['display-name'];
     nickname.style.color = tags.color
@@ -86,16 +136,14 @@ class ChatMessage extends HTMLDivElement {
     this.body.classList.add('card-body');
     if (tags['message-type'] === "action") body.style.color = tags.color;
     this.body.dataset.date = (this.timestamp(Date.now()));
-    // if (Array.isArray(this.haveLinks(message))) {
-    //   // console.log('klk');
-    //   // message = this.linkify(message);
-    //   this.body.addEventListener('click', (event) => {
-    //     event.stopPropagation();
-    //     if (event.target.tagName !== 'A') return;
-    //     window.open('googlechrome://navigate?url=' + event.target.href, '_system');
-    //     event.preventDefault();
-    //   })
-    // }
+    if (Array.isArray(this.haveLinks(message))) {
+      message = this.linkify(message);
+      this.body.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (event.target.tagName !== 'A') return;
+        event.preventDefault();
+      })
+    }
     this.body.innerHTML = this.formatEmotes(message, tags.emotes);
     this.body.prepend(nickname);
     if (tags.badges) {
@@ -107,6 +155,13 @@ class ChatMessage extends HTMLDivElement {
     }
     if (!self && (tags.username !== user.username)) this.body.prepend(new MessageControlButton(tags));
     this.append(this.body);
+    if (Array.isArray(this.haveLinks(message))) {
+      this.links.forEach(link => {
+        if (YTFrame.getVideoID(link)) {
+          this.body.appendChild(new YTFrame(link));
+        }
+      })
+    }
   }
 
   timestamp (unix) {
@@ -117,7 +172,8 @@ class ChatMessage extends HTMLDivElement {
     return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
   }
   haveLinks(text) {
-    return text.match(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig);
+    this.links = text.match(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig);
+    return this.links
   }
   linkify(text) {
     //URLs starting with http://, https://, or ftp://
@@ -296,6 +352,7 @@ class ChatController {
 customElements.define('twitch-badge', ChatMessageBadge, { extends: 'div' });
 customElements.define('chat-message', ChatMessage, { extends: 'div' });
 customElements.define('chat-alert', ChatAlert, { extends: 'div' });
+customElements.define('yt-player', YTFrame, { extends: 'div' });
 customElements.define('control-button', MessageControlButton, { extends: 'button' });
 
 

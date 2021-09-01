@@ -50,6 +50,11 @@ body .head {
   border-bottom: 1px solid var(--bs-gray-dark);
   line-height: 32px;
 }
+body iframe {
+  border-radius: 5px;
+  position: sticky;
+  max-height: 120px;
+}
 .nickname {
   font-weight: bold;
   margin-right: 10px;
@@ -178,6 +183,7 @@ body .card .card-body img {
   max-width: 16px;
   max-height: 16px;
   display: inline-block;
+  float: left;
   margin-right: 2px;
 }
 .badge-icon-img {
@@ -188,6 +194,7 @@ body .card .card-body img {
   width: 16px;
   height: 16px;
   padding: 0px;
+  float: left;
 }
 .btn-control::after {
   width: 15px;

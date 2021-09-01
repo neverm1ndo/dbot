@@ -138,7 +138,7 @@ app.use('/commands', CommandsRouter);
 app.use('/api', express.json(), APIRouter);
 
 // Set route to start OAuth link, this is where you define scopes to request
-app.get('/auth/twitch', passport.authenticate('twitch', { scope: ['user_read', 'chat:read', 'chat:edit', 'channel:moderate'] }));
+app.get('/auth/twitch', passport.authenticate('twitch', { scope: ['user_read', 'user_subscriptions', 'chat:read', 'chat:edit', 'channel:moderate'] }));
 
 // Set route for OAuth redirect
 app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/controls/chat', failureRedirect: '/controls/chat' }));
