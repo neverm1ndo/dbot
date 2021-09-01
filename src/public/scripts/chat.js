@@ -299,7 +299,6 @@ class ChatController {
     )
     .then(data => { this.addEmotes(data.data, user.username) });
     this.emotes.addEventListener('click', (event) => {
-      console.log(event.target.tagName)
       if (event.target.tagName !== 'IMG') return;
       if (typeof this.selfEmotes[event.target.dataset.id] !== 'object') {
         this.selfEmotes[event.target.dataset.id] = [];
@@ -411,7 +410,7 @@ client.on('part', (channel, username, self) => {
     connected.pop(username);
     counter.innerHTML = connected.length;
     chat.alert(`<b>${username}</b> отключился`, 'danger');
-  }, 300000);
+  }, 180000);
 });
 client.on('message', (channel, tags, message, self) => {
   if (self) {
