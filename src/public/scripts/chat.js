@@ -131,10 +131,10 @@ class ChatMessage extends HTMLDivElement {
     this.links = [];
     nickname.classList.add('nickname');
     nickname.innerHTML = tags['display-name'];
-    nickname.style.color = tags.color
+    nickname.style.color = tags.color === '#000000'?'#707070':tags.color;
     this.classList.add('card');
     this.body.classList.add('card-body');
-    if (tags['message-type'] === "action") body.style.color = tags.color;
+    if (tags['message-type'] === "action") body.style.color = nickname.style.color;
     this.body.dataset.date = (this.timestamp(Date.now()));
     if (Array.isArray(this.haveLinks(message))) {
       message = this.linkify(message);
