@@ -51,9 +51,11 @@ body .head {
   line-height: 32px;
 }
 body iframe {
-  border-radius: 5px;
+  border-radius: .25rem;
   position: sticky;
-  max-height: 120px;
+  max-height: 95px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 .nickname {
   font-weight: bold;
@@ -127,6 +129,9 @@ body #logo {
 body .card {
   border: none;
   background: none;
+}
+body .card:last-child {
+  margin-bottom: 5px;
 }
 body .card .card-body img {
   max-width: 26px;
