@@ -422,16 +422,17 @@ client.on('message', (channel, tags, message, self) => {
   chat.add(tags, message, self);
 });
 client.on('subscription', (channel, username, methods, message, userstate) => {
-  alert.add(`<b>${username}</b> оформил подписку<br><small>${message}</small>`, 'info');
+  chat.alert(`<b>${username}</b> оформил подписку<br><small>${message}</small>`, 'info');
 });
 client.on('subgift', (channel, username, streakMonths, recepient, methods, userstate) => {
-  alert.add(`<b>${username}</b> подарил подписку <u>${recepient}</u>`, 'info');
+  chat.alert(`<b>${username}</b> подарил подписку <u>${recepient}</u>`, 'info');
 });
 client.on('raided', (channel, username, viewers) => {
-  alert.add(`<b>${username}</b> зарейдил канал на <b>${viewers}</b> зрителей`, 'info');
+  console.log(channel, username, viewers);
+  chat.alert(`<b>${username}</b> зарейдил канал на <b>${viewers}</b> зрителей`, 'info');
 });
 client.on('follow', (channel, tags, message, self) => {
-  alert.add(tags, message, self);
+  chat.alert(tags, message, self);
 });
 client.on('whisper', (channel, tags, message, self) => {
   chat.add(tags, message, self);
