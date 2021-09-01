@@ -83,6 +83,7 @@ body .card .card-body::before {
   color: var(--bs-gray);
   position: absolute;
   margin-top: -11px;
+  margin-left: -20px;
 }
 @keyframes logo {
   from { transform: rotate(0deg);}
@@ -201,8 +202,8 @@ body .card .card-body img {
   height: 15px;
   content: '';
   position: absolute;
-  margin-top: -8px;
-  margin-left: -8px;
+  margin-top: -5px;
+  margin-left: -10px;
   border: 2px solid var(--bs-gray-dark);
   border-radius: 100%;
   transition: .2s ease-in-out;
@@ -212,9 +213,9 @@ body .card .card-body img {
   height: 2px;
   content: '';
   position: absolute;
-  margin-top: -2px;
+  margin-top: 2px;
   transform: rotate(45deg);
-  margin-left: -8px;
+  margin-left: -10px;
   background-color: var(--bs-gray-dark);
   transition: .2s ease-in-out;
 }
