@@ -93,12 +93,13 @@ class YTFrame extends HTMLDivElement {
           videoId: YTFrame.getVideoID(url),
           height: '100%',
           width: '100%',
-          playerVars: { autoplay: 0, controls: 1 },
+          playerVars: { autoplay: 0, controls: 1, fs: 0 },
           events: {
             onReady: resolve
           },
         });
       }).then((event) => {
+        event.target.setPlaybackQuality('small');
         event.target.setVolume(15);
         chat.autoscroll();
       });
@@ -120,7 +121,7 @@ class MessageControlButton extends HTMLButtonElement {
     });
   }
 }
-class ChatMessage extends HTMLDivElement {
+class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
   constructor(tags, message, self) {
     super();
     const body = document.createElement('div');
@@ -136,6 +137,8 @@ class ChatMessage extends HTMLDivElement {
     this.body.classList.add('card-body');
     if (tags['message-type'] === "action") body.style.color = nickname.style.color;
     this.body.dataset.date = (this.timestamp(Date.now()));
+    let notice = message.includes('@')?'@' + user.username: user.username;
+    message = message.replace(notice, `<span class="notice">${notice}</span>`);
     if (Array.isArray(this.haveLinks(message))) {
       message = this.linkify(message);
     }
@@ -179,7 +182,6 @@ class ChatMessage extends HTMLDivElement {
     //Change email addresses to mailto:: links
     var replacePattern3 = /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/gim;
     var replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
-
     return replacedText;
   }
   formatEmotes(text, emotes) {

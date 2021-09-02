@@ -168,10 +168,24 @@ body .card .card-body img {
 .btn-small svg path {
   fill: var(--bs-light);
 }
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
 .notice {
-  background-color: var(--bs-light);
-  color: var(--bs-gray-dark);
+  color: var(--bs-light);
   padding: 5px;
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  border-radius: .25rem;
 }
 .chatters-counter {
   display: inline-block;
