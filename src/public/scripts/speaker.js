@@ -185,7 +185,6 @@ const speaker = new Speaker2();
         speaker.speak(Filter.separate(depeche.msg));
       break;
       case 'play-sound':
-      if (depeche.msg.includes('Nuzhdiki')) player.audio.volume = (player.playerRanger.value/100)*0.7;
         player.loadSource(depeche.msg);
       break;
       case 'connection':
