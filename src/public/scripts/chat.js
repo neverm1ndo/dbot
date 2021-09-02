@@ -87,20 +87,22 @@ class YTFrame extends HTMLDivElement {
     const rep = document.createElement('div');
     rep.id = String(url + Date.now()).hashCode();
     this.append(rep);
-    new Promise((resolve) => {
-      this.player = new YT.Player(rep.id, {
-        videoId: YTFrame.getVideoID(url),
-        height: '100%',
-        width: '100%',
-        playerVars: { autoplay: 0, controls: 1 },
-        events: {
-          onReady: resolve
-        },
+    setTimeout(() => {
+      new Promise((resolve) => {
+        this.player = new YT.Player(rep.id, {
+          videoId: YTFrame.getVideoID(url),
+          height: '100%',
+          width: '100%',
+          playerVars: { autoplay: 0, controls: 1 },
+          events: {
+            onReady: resolve
+          },
+        });
+      }).then((event) => {
+        event.target.setVolume(15);
+        chat.autoscroll();
       });
-    }).then((event) => {
-      event.target.setVolume(15);
-      chat.autoscroll();
-    });
+    }, 2000);
   }
   static getVideoID(url) {
     const regExp = new RegExp(/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/);
@@ -136,9 +138,11 @@ class ChatMessage extends HTMLDivElement {
     this.body.dataset.date = (this.timestamp(Date.now()));
     if (Array.isArray(this.haveLinks(message))) {
       message = this.linkify(message);
-      if (YTFrame.getVideoID(message)) {
-        this.body.appendChild(new YTFrame(link));
-      }
+      this.body.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (event.target.tagName !== 'A') return;
+        event.preventDefault();
+      })
     }
     this.body.innerHTML = this.formatEmotes(message, tags.emotes);
     this.body.prepend(nickname);
@@ -151,6 +155,10 @@ class ChatMessage extends HTMLDivElement {
     }
     if (!self && (tags.username !== user.username)) this.body.prepend(new MessageControlButton(tags));
     this.append(this.body);
+    if (this.links) {
+      if (!YTFrame.getVideoID(this.links[0])) return;
+      this.body.appendChild(new YTFrame(this.links[0]));
+    }
   }
 
   timestamp (unix) {
