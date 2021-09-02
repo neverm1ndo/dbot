@@ -138,11 +138,6 @@ class ChatMessage extends HTMLDivElement {
     this.body.dataset.date = (this.timestamp(Date.now()));
     if (Array.isArray(this.haveLinks(message))) {
       message = this.linkify(message);
-      this.body.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (event.target.tagName !== 'A') return;
-        event.preventDefault();
-      })
     }
     this.body.innerHTML = this.formatEmotes(message, tags.emotes);
     this.body.prepend(nickname);
