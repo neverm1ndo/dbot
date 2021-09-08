@@ -1,3 +1,26 @@
+:root {
+  --bs-blue: #0d6efd;
+  --bs-indigo: #6610f2;
+  --bs-purple: #6f42c1;
+  --bs-pink: #d63384;
+  --bs-red: #dc3545;
+  --bs-orange: #fd7e14;
+  --bs-yellow: #ffc107;
+  --bs-green: #198754;
+  --bs-teal: #20c997;
+  --bs-cyan: #0dcaf0;
+  --bs-white: #fff;
+  --bs-gray: #6c757d;
+  --bs-gray-dark: #343a40;
+  --bs-primary: #0d6efd;
+  --bs-secondary: #6c757d;
+  --bs-success: #198754;
+  --bs-info: #0dcaf0;
+  --bs-warning: #ffc107;
+  --bs-danger: #dc3545;
+  --bs-light: #f8f9fa;
+  --bs-dark: #212529;
+}
 body, html {
   margin: 0;
   background: #202020;
@@ -19,6 +42,7 @@ body, html {
   /* border-radius: 3px; */
   width: 60px;
   height: 100vh;
+  width: 100vw;
   border: none;
   background: #8a8a8a;
   opacity: 0.7;
@@ -40,21 +64,79 @@ body, html {
   left: 0;
   right: 0; */
 }
-.slidecontainer {
-  width: 100%; /* Width of the outside container */
+.col {
+  display: flex!important;
+  flex-direction: row;
+  height: 100%;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: center;
+}
+.col div {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.compressor {
+  display: flex!important;
+  flex-direction: column;
+  height: 100%;
+  align-content: center;
+  justify-content: center;
+}
+.compressor input[type="range"] {
+  max-width: 100px;
+}
+.compressor span, .col span {
+  align-self: flex-start;
+  font-size: 9px;
+  line-height: 20px;
+}
+.compressor input[type="checkbox"] {
+  width: 0;
+  height: 0;
+  visibility: hidden;
+}
+.compressor label {
+  width: 40px;
+  height: 20px;
+  display:block;
+  background-color: var(--bs-dark);
+  border-radius: 100px;
+  position: relative;
+  cursor: pointer;
+  transition: 0.5s;
+}
+.compressor label::after {
+  content: "";
+  width: 16px;
+  height: 16px;
+  background-color: var(--bs-light);
+  position: absolute;
+  border-radius: 100%;
+  top: 2px;
+  left: 2px;
+  transition: 0.5s;
 }
 
-label span {
-  mix-blend-mode: difference;
-  font-weight: 400;
-  font-size: 12vh;
-  color: #ffffff;
+.compressor input:checked + label:after {
+  left: calc(100% - 2px);
+  transform: translateX(-100%);
 }
+
+.compressor input:checked + label {
+  background-color: var(--bs-success);
+}
+
+.compressor label:active:after {
+  width: 16px;
+}
+
+
 .container {
   height: 100vh;
   width: 100vw;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
 }
 .imps {
@@ -64,9 +146,24 @@ label span {
   flex-grow: 12;
 }
 .imps div {
-  display: block;
-  height: 50vh;
+  display: flex;
+  flex-basis: auto;
   width: 100%;
+}
+.header {
+  background: url('/omd.png') 0 0 no-repeat;
+  background-size: 10%;
+  max-height: 25px;
+}
+.header span {
+  font-size: 12px;
+  line-height: 25px;
+}
+.bg-red {
+  background-color: var(--bs-danger);
+}
+.bg-green {
+  background-color: var(--bs-success);
 }
 #vol_label {
   position: absolute;

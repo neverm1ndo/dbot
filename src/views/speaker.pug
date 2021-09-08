@@ -14,17 +14,34 @@ html
     <![endif]-->
 
   body
+    button#accept(type="button" name="button") Разрешить управление спикером
     div.container
-      button#accept(type="button" name="button") Разрешить управление спикером
       div.imps
-        div
-          label#vol_label(for="volume1")
-            span(style={float: 'left', 'margin-left': '75px'}) Speaker
-            span#sp_vol(style={float: 'right', 'margin-right': '15px'}) 100
-          input#volume.slider(type="range" min="0" max="100" name="volume" value="35")
+        div.col.header#indicator
+          span Speaker
+        div.col
+          div.compressor
+            span Compressor
+            input(type="checkbox" name="compressor" id="compressor")
+            label(for="compressor")
+          div.compressor
+            span Knee
+            input(type="range" min="0" max="40" name="knee" id="knee")
+          div.compressor
+            span Ratio
+            input(type="range" min="1" max="20" name="ratio" id="ratio")
+          div.compressor
+            span Attack
+            input(type="range" min="0" step="0.05" max="1" name="attack" id="attack")
+          div.compressor
+            span Release
+            input(type="range" min="0.05" step="0.05" max="1" name="release" id="release")
+          div.compressor
+            span Threshold
+            input(type="range" min="-100" max="0" name="threshold" id="threshold")
         div
           label#vol_label2(for="volume2")
-            span(style="float: left; margin-left: 75px") Sounds
-            span#sou_vol(style={float: 'right', 'margin-right': '15px'}) 100
-          input#volume2.slider(type="range" min="0" max="100" name="volume2" value="35")
+            span(style="float: left; margin-left: 75px") Gain
+            span#gain_value(style={float: 'right', 'margin-right': '15px'}) 100
+          input#gain.slider(type="range" min="0" max="100" name="volume2" value="35")
     script(type="text/javascript" src="/scripts/speaker.js")
