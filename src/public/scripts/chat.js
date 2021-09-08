@@ -99,7 +99,6 @@ class YTFrame extends HTMLDivElement {
           },
         });
       }).then((event) => {
-        event.target.setPlaybackQuality('small');
         event.target.setVolume(15);
         chat.autoscroll();
       });
@@ -137,12 +136,7 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
     this.body.classList.add('card-body');
     if (tags['message-type'] === "action") body.style.color = nickname.style.color;
     this.body.dataset.date = (this.timestamp(Date.now()));
-    let notice = message.includes('@')?'@' + user.username: user.username;
-    message = message.replace(notice, `<span class="notice">${notice}</span>`);
-    if (Array.isArray(this.haveLinks(message))) {
-      message = this.linkify(message);
-    }
-    this.body.innerHTML = this.formatEmotes(message, tags.emotes);
+    this.body.innerHTML = this.pretty(message);
     this.body.prepend(nickname);
     if (tags.badges) {
       const badges = Object.keys(tags.badges);
@@ -159,6 +153,16 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
     }
   }
 
+  pretty(message) {
+    let notice = message.includes('@')?'@' + user.username: user.username;
+    message = this.formatEmotes(message, tags.emotes);
+    message = message.replace(notice, `<span class="notice">${notice}</span>`);
+    if (Array.isArray(this.haveLinks(message))) {
+      message = this.linkify(message);
+    }
+    return message;
+  }
+
   timestamp (unix) {
     const  date = new Date(unix);
     let hours = date.getHours();
@@ -168,7 +172,7 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
   }
   haveLinks(text) {
     this.links = text.match(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig);
-    return this.links
+    return this.links;
   }
   linkify(text) {
     //URLs starting with http://, https://, or ftp://
