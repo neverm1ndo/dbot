@@ -65,6 +65,8 @@ class Player {
     });
   }
   play (path) {
+    this.source = null;
+    this.source = this.ctx.createBufferSource();
     new Promise((resolve, reject) => {
       var request = new XMLHttpRequest();
       request.open('GET', path, true);
