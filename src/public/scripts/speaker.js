@@ -111,7 +111,6 @@ const accept = document.querySelector('#accept');
 accept.addEventListener('click', (event) => {
   player = new Player();
   event.target.style.display = 'none';
-  player.play('/sounds/sunny.mp3');
 });
 
 const indicator = document.querySelector('#indicator');
