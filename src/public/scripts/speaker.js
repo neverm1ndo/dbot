@@ -18,9 +18,11 @@ class Player {
     this.compressor.attack.value = window.localStorage.getItem('attack');
     this.compressor.release.value = window.localStorage.getItem('release');
 
-    this.source.connect(this.gainNode);
     if (window.localStorage.getItem('compressor') === 'true') {
+      this.source.connect(this.compressor);
       this.compressor.connect(this.gainNode);
+    } else {
+      this.source.connect(this.gainNode);
     }
     this.gainNode.connect(this.ctx.destination);
 
@@ -80,20 +82,25 @@ class Player {
             resolve();
           },
           (e) => {
-            console.log("Error with decoding audio data" + e.err);
-            reject();
+            reject(e);
           });
         }
         request.send();
     }).then(() => {
-      this.source.connect(this.compressor);
+      this.source.connect(this.gainNode);
       this.source.start(0);
+    }).catch((e) => {
+        console.log("Error with decoding audio data" + e.err);
     })
 	}
   switchCompressor(value) {
     if (!value) {
+      this.source.disconnect(0);
+      this.source.connect(this.gainNode)
 			this.compressor.disconnect(0);
 		} else {
+      this.source.disconnect(0);
+      this.source.connect(this.compressor);
       this.compressor.connect(this.gainNode);
 		}
   }
@@ -104,6 +111,7 @@ const accept = document.querySelector('#accept');
 accept.addEventListener('click', (event) => {
   player = new Player();
   event.target.style.display = 'none';
+  player.play('/sounds/sunny.mp3');
 });
 
 const indicator = document.querySelector('#indicator');

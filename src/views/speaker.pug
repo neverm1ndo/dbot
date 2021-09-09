@@ -26,19 +26,19 @@ html
             label(for="compressor")
           div.compressor
             span Knee
-            input(type="range" min="0" max="40" name="knee" id="knee")
+            input.ranger(type="range" min="0" max="40" name="knee" id="knee")
           div.compressor
             span Ratio
-            input(type="range" min="1" max="20" name="ratio" id="ratio")
+            input.ranger(type="range" min="1" max="20" name="ratio" id="ratio")
           div.compressor
             span Attack
-            input(type="range" min="0" step="0.05" max="1" name="attack" id="attack")
+            input.ranger(type="range" min="0" step="0.05" max="1" name="attack" id="attack")
           div.compressor
             span Release
-            input(type="range" min="0.05" step="0.05" max="1" name="release" id="release")
+            input.ranger(type="range" min="0.05" step="0.05" max="1" name="release" id="release")
           div.compressor
             span Threshold
-            input(type="range" min="-100" max="0" name="threshold" id="threshold")
+            input.ranger(type="range" min="-100" max="0" name="threshold" id="threshold")
         div
           label#vol_label2(for="volume2")
             span(style="float: left; margin-left: 75px") Gain
