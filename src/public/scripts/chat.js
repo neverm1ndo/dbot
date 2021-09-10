@@ -136,7 +136,7 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
     this.body.classList.add('card-body');
     if (tags['message-type'] === "action") body.style.color = nickname.style.color;
     this.body.dataset.date = (this.timestamp(Date.now()));
-    this.body.innerHTML = this.pretty(message);
+    this.body.innerHTML = this.pretty(tags, message);
     this.body.prepend(nickname);
     if (tags.badges) {
       const badges = Object.keys(tags.badges);
@@ -153,7 +153,7 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
     }
   }
 
-  pretty(message) {
+  pretty(tags, message) {
     let notice = message.includes('@')?'@' + user.username: user.username;
     message = this.formatEmotes(message, tags.emotes);
     message = message.replace(notice, `<span class="notice">${notice}</span>`);
