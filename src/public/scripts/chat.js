@@ -131,14 +131,14 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
     this.links = [];
     nickname.classList.add('nickname');
     nickname.innerHTML = tags['display-name'];
-    nickname.style.color = tags.color === '#000000'?'#707070':tags.color;
+    nickname.style.color = tags.color;
     this.classList.add('card');
     this.body.classList.add('card-body');
     if (tags['message-type'] === "action") body.style.color = nickname.style.color;
     this.body.dataset.date = (this.timestamp(Date.now()));
     let notice = message.includes('@')?'@' + user.username: user.username;
     message = message.replace(notice, `<span class="notice">${notice}</span>`);
-    if (Array.isArray(this.haveLinks(message))) {
+    if (this.haveLinks(message)) {
       message = this.linkify(message);
     }
     this.body.innerHTML = this.formatEmotes(message, tags.emotes);
