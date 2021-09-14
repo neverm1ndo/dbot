@@ -250,6 +250,10 @@ class ChatAlert extends HTMLDivElement {
     if (username) {
       this.prepend(new MessageControlButton('btn-lurk', () => {
         this.addLurker(username);
+        const span = new HTMLSpanElement();
+        span.classList.add('text-disabled');
+        span.innerHTML = '(' + username + ' добавлен в черный список)';
+        this.append(span))
       }));
     }
     this.append(body);
