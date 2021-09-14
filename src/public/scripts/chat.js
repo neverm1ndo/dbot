@@ -450,9 +450,11 @@ client.on('ban', (channel, username, reason) => {
 client.on('part', (channel, username, self) => {
   if (self || lurkers.includes(username)) return;
   setTimeout(() => {
-    connected.pop(username);
-    counter.innerHTML = connected.length;
-    chat.alert(`<b>${username}</b> отключился`, 'danger', username);
+    if (connected.includes(username)) {
+      connected.pop(username);
+      counter.innerHTML = connected.length;
+      chat.alert(`<b>${username}</b> отключился`, 'danger', username);
+    }
   }, 180000);
 });
 client.on('message', (channel, tags, message, self) => {
