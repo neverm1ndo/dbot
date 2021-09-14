@@ -156,9 +156,6 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
       }
     }
     if (!self && (tags.username !== user.username)) {
-      this.body.prepend(new MessageControlButton('btn-lurk', () => {
-        this.addLurker(tags);
-      }));
       this.body.prepend(new MessageControlButton('btn-control', () => {
         client.ban(user.username, tags.username)
       }));
@@ -170,10 +167,6 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
     }
   }
 
-  addLurker(tags) {
-    lurkers.push(tags.username);
-    window.localStorage.setItem('lurkers', JSON.stringify([...new Set(lurkers)]));
-  }
   pretty(tags, message) {
     let notice = message.includes('@')?'@' + user.username: user.username;
     message = this.formatEmotes(message, tags.emotes);
@@ -230,7 +223,7 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
 }
 
 class ChatAlert extends HTMLDivElement {
-  constructor(message, type = 'default') {
+  constructor(message, type = 'default', username = '') {
     super();
     const body = document.createElement('div');
     this.classList.add('alert', 'mb-1');
@@ -254,7 +247,16 @@ class ChatAlert extends HTMLDivElement {
         this.classList.add('text-muted');
     }
     this.innerHTML = message;
+    if (username) {
+      this.prepend(new MessageControlButton('btn-lurk', () => {
+        this.addLurker(tags);
+      }));
+    }
     this.append(body);
+  }
+  addLurker(username) {
+    lurkers.push(username);
+    window.localStorage.setItem('lurkers', JSON.stringify([...new Set(lurkers)]));
   }
 }
 
@@ -344,8 +346,8 @@ class ChatController {
     this.chat.append(new ChatMessage(tags, message, self));
     this.autoscroll();
   }
-  alert(message, type) {
-    this.chat.append(new ChatAlert(message, type));
+  alert(message, type, username) {
+    this.chat.append(new ChatAlert(message, type, username));
     this.autoscroll();
   }
   autoscroll () {
@@ -405,7 +407,7 @@ const client = new tmi.Client({
   channels: [params.has('channel')?params.get('channel'):user.username]
 });
 
-client.connect();
+// client.connect();
 // chat.add({
 //     "badge-info": null,
 //     "badges": null,
@@ -423,7 +425,7 @@ client.connect();
 //     "username": "moodinthemoon",
 //     "message-type": "chat"
 // }, 'test', false);
-
+chat.alert('kek присоединился к чату', 'success', 'kek');
 client.on('connected', (channel, self) => {
   chat.alert('Добро пожаловать в чат!');
   chat.connected = true;
@@ -439,7 +441,7 @@ client.on('join', (channel, username, self) => {
   if (self || connected.includes(username) || lurkers.includes(username)) return;
   connected.push(username);
   counter.innerHTML = connected.length;
-  chat.alert(`<b>${username}</b> подключился к чату`, 'success');
+  chat.alert(`<b>${username}</b> подключился к чату`, 'success', username);
 });
 client.on('ban', (channel, username, reason) => {
   chat.alert(`<b>${username}</b> забанен`, 'warning');
@@ -450,7 +452,7 @@ client.on('part', (channel, username, self) => {
   setTimeout(() => {
     connected.pop(username);
     counter.innerHTML = connected.length;
-    chat.alert(`<b>${username}</b> отключился`, 'danger');
+    chat.alert(`<b>${username}</b> отключился`, 'danger', username);
   }, 180000);
 });
 client.on('message', (channel, tags, message, self) => {

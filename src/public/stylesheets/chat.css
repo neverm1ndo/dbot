@@ -257,6 +257,9 @@ body .card .card-body img {
 .btn-lurk:hover:before {
   filter: grayscale(0);
 }
+.btn-lurk {
+  margin-right: 1rem;
+}
 .dropdown-menu {
   max-height: 400px;
   overflow: auto;
