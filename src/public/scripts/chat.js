@@ -386,7 +386,7 @@ const connected = [];
 
 
 let lurkers;
-Http.get('/controls/chat/lurkers').then(data => { lurkers = data });
+Http.get('/controls/chat/lurkers').then(data => { lurkers = [...lurkers, data] });
 if (window.localStorage.getItem('lurkers')) {
   lurkers = [...new Set(...[JSON.parse(window.localStorage.getItem('lurkers')), lurkers])];
 }
