@@ -249,7 +249,7 @@ class ChatAlert extends HTMLDivElement {
     this.innerHTML = message;
     if (username) {
       this.prepend(new MessageControlButton('btn-lurk', () => {
-        this.addLurker(tags);
+        this.addLurker(username);
       }));
     }
     this.append(body);
