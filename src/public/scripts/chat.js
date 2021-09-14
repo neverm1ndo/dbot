@@ -253,7 +253,7 @@ class ChatAlert extends HTMLDivElement {
         const span = new HTMLSpanElement();
         span.classList.add('text-disabled');
         span.innerHTML = '(' + username + ' добавлен в черный список)';
-        this.append(span))
+        this.append(span);
       }));
     }
     this.append(body);
