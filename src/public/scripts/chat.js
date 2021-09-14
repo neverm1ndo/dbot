@@ -32,6 +32,13 @@ class Http {
       alert.error(`Ошибка HTTP: ${this.res.status}`);
     }
   }
+  static async post(url, data) {
+    const response = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+    return await response.json();
+  }
 }
 
 class ChatMessageBadge extends HTMLDivElement {
@@ -111,13 +118,11 @@ class YTFrame extends HTMLDivElement {
   }
 }
 class MessageControlButton extends HTMLButtonElement {
-  constructor(tags) {
+  constructor(type, cb) {
     super();
     this.type = 'button';
-    this.classList.add('btn', 'btn-control');
-    this.addEventListener('click', () => {
-      client.ban(user.username, tags.username)
-    });
+    this.classList.add('btn', type);
+    this.addEventListener('click', cb);
   }
 }
 class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
@@ -150,7 +155,14 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
         this.body.prepend(new ChatMessageBadge(badges[i]));
       }
     }
-    if (!self && (tags.username !== user.username)) this.body.prepend(new MessageControlButton(tags));
+    if (!self && (tags.username !== user.username)) {
+      this.body.prepend(new MessageControlButton('btn-lurk', () => {
+        this.addLurker(tags);
+      }));
+      this.body.prepend(new MessageControlButton('btn-control', () => {
+        client.ban(user.username, tags.username)
+      }));
+    }
     this.append(this.body);
     if (this.links) {
       if (!YTFrame.getVideoID(this.links[0])) return;
@@ -158,6 +170,10 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
     }
   }
 
+  addLurker(tags) {
+    lurkers.push(tags.username);
+    window.localStorage.setItem('lurkers', JSON.stringify([...new Set(lurkers)]));
+  }
   pretty(tags, message) {
     let notice = message.includes('@')?'@' + user.username: user.username;
     message = this.formatEmotes(message, tags.emotes);
@@ -285,6 +301,7 @@ class ChatController {
     this.text.addEventListener('keydown', (event) => {
       if (event.code === 'Enter') this.send();
     });
+    //*********************FIXIT***************************//
     Http.get(
       'https://api.twitch.tv/helix/chat/emotes/global',
       {
@@ -301,6 +318,7 @@ class ChatController {
       }
     )
     .then(data => { this.addEmotes(data.data, user.username) });
+    //*************************************************//
     this.emotes.addEventListener('click', (event) => {
       if (event.target.tagName !== 'IMG') return;
       if (typeof this.selfEmotes[event.target.dataset.id] !== 'object') {
@@ -367,6 +385,9 @@ const connected = [];
 
 let lurkers;
 Http.get('/controls/chat/lurkers').then(data => { lurkers = data });
+if (window.localStorage.getItem('lurkers')) {
+  lurkers = [...new Set(...[JSON.parse(window.localStorage.getItem('lurkers')), lurkers])];
+}
 const params = new URLSearchParams(window.location.search);
 
 const client = new tmi.Client({
@@ -385,6 +406,23 @@ const client = new tmi.Client({
 });
 
 client.connect();
+// chat.add({
+//     "badge-info": null,
+//     "badges": null,
+//     "color": null,
+//     "display-name": "dummy",
+//     "emotes": null,
+//     "flags": null,
+//     "mod": false,
+//     "subscriber": false,
+//     "turbo": false,
+//     "user-type": null,
+//     "emotes-raw": null,
+//     "badge-info-raw": null,
+//     "badges-raw": null,
+//     "username": "moodinthemoon",
+//     "message-type": "chat"
+// }, 'test', false);
 
 client.on('connected', (channel, self) => {
   chat.alert('Добро пожаловать в чат!');
@@ -421,7 +459,6 @@ client.on('message', (channel, tags, message, self) => {
     chat.add(tags, message, self);
     return;
   }
-  console.log(tags);
   chat.add(tags, message, self);
 });
 client.on('subscription', (channel, username, methods, message, userstate) => {

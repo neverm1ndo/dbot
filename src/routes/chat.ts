@@ -11,5 +11,8 @@ router.get('/', corsOpt, (req: Request, res: Response,) => {
 router.get('/lurkers', corsOpt, (req: Request, res: Response,) => {
   res.send(bot.opts.blacklist);
 });
+router.post('/add-lurker', corsOpt, (req: Request, res: Response,) => {
+  bot.opts.blacklist.push(req.body);
+});
 
 export default router;
