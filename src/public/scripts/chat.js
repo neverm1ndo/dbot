@@ -250,10 +250,7 @@ class ChatAlert extends HTMLDivElement {
     if (username) {
       this.prepend(new MessageControlButton('btn-lurk', () => {
         this.addLurker(username);
-        const span = new HTMLSpanElement();
-        span.classList.add('text-disabled');
-        span.innerHTML = '(' + username + ' добавлен в черный список)';
-        this.append(span);
+        this.innerHTML = '<em>(<b>' + username + '</b> добавлен в черный список)</em>';
       }));
     }
     this.append(body);
@@ -411,7 +408,7 @@ const client = new tmi.Client({
   channels: [params.has('channel')?params.get('channel'):user.username]
 });
 
-client.connect();
+// client.connect();
 // chat.add({
 //     "badge-info": null,
 //     "badges": null,
@@ -429,7 +426,7 @@ client.connect();
 //     "username": "moodinthemoon",
 //     "message-type": "chat"
 // }, 'test', false);
-// chat.alert('kek присоединился к чату', 'success', 'kek');
+chat.alert('kek присоединился к чату', 'success', 'kek');
 client.on('connected', (channel, self) => {
   chat.alert('Добро пожаловать в чат!');
   chat.connected = true;
