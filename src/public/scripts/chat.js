@@ -408,7 +408,7 @@ const client = new tmi.Client({
   channels: [params.has('channel')?params.get('channel'):user.username]
 });
 
-// client.connect();
+client.connect();
 // chat.add({
 //     "badge-info": null,
 //     "badges": null,
@@ -426,7 +426,7 @@ const client = new tmi.Client({
 //     "username": "moodinthemoon",
 //     "message-type": "chat"
 // }, 'test', false);
-chat.alert('kek присоединился к чату', 'success', 'kek');
+// chat.alert('kek присоединился к чату', 'success', 'kek');
 client.on('connected', (channel, self) => {
   chat.alert('Добро пожаловать в чат!');
   chat.connected = true;
