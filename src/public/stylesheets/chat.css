@@ -61,7 +61,7 @@ body iframe {
   font-weight: bold;
   margin-right: 10px;
   margin-left: 5px;
-  filter: contrast(0.5) brightness(2);
+  filter: contrast(0.5) brightness(1.2);
 }
 ul li {
   list-style-type: none;
