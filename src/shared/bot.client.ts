@@ -80,6 +80,7 @@ export class Bot {
     logger.info('Bot status: ' + this.status);
     this.client.connect();
     this.client.on('message', (channel: string, tags: ChatUserstate, message: string, self: boolean) => {
+      this.banSpam(channel, tags, message, self);
       if(self || !message.startsWith(this.prefix)) return;
     	const args = message.slice(1).split(' ');
     	const command = args.shift()!.toLowerCase();
@@ -101,6 +102,17 @@ export class Bot {
     }
     return chatter.badges.broadcaster || chatter.badges.founder || chatter.badges.subscriber;
   }
+  private banSpam(channel: string, tags: ChatUserstate, message: string, self: boolean) {
+    if (self) return;
+    if (!this.isPrevileged(tags)) {
+      for (let i = 0; i < this.opts.dictionary.length; i+=1) {
+        if (message.includes(this.opts.dictionary[i])) {
+          this.client.ban(channel, tags.username!);
+          return;
+        }
+      };
+    }
+  }
   readChattersMessage(channel: any, tags: ChatUserstate, command?: string, args?: string[]): void {
     if (!tags.username || (this.status === 'sleeps') || !command) return;
     // SOUNDS
@@ -110,15 +122,6 @@ export class Bot {
         return;
       }
     });
-    // BANHAMMER
-    if (!this.isPrevileged(tags)) {
-      for (let i = 0; i < this.opts.dictionary.length; i+=1) {
-        if (command.includes(this.opts.dictionary[i])) {
-          this.client.ban(channel, tags.username!);
-          return;
-        }
-      };
-    }
     // COMMANDS
     switch (command) {
       case 'ранг': {
