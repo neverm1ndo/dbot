@@ -454,7 +454,7 @@ client.on('part', (channel, username, self) => {
   if (self || lurkers.includes(username)) return;
   setTimeout(() => {
     if (connected.includes(username)) {
-      connected.pop(username);
+      connected.splice(connected.indexOf(username), 1);
       counter.innerHTML = connected.length;
       chat.alert(`<b>${username}</b> отключился`, 'danger', username);
     }
