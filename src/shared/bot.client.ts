@@ -28,6 +28,7 @@ export class Bot {
       channels: [process.env.BOT_CHANNEL!]
     });
   announcer: Announcer;
+  annsub: any;
 
   private status: BotStatus = 'sleeps';
   private prefix: string = '!';
@@ -35,6 +36,9 @@ export class Bot {
   constructor() {
     this.opts = new Schedule('neverm1nd_o');
     this.announcer = new Announcer(900000);
+    this.annsub = this.announcer.start.subscribe((announce: string) => {
+     this.client.say(this.client.getChannels()[0], announce);
+    })
     if (process.env.NODE_ENV !== 'development') {
       Twitch.getAppAccessToken().then((body: any) => {
         Twitch.getSubs(body.data.access_token).then((subsBody: any) => {
@@ -63,15 +67,13 @@ export class Bot {
     if (this.status === 'sleeps') return;
     this.status = 'sleeps';
     if (!this.announceSub) return;
-    this.announceSub.unsubscribe();
+    this.announceSub.remove(this.annsub);
   }
 
   public wakeup(): void {
     if (this.status === 'works') return;
     this.status = 'works';
-    this.announceSub.add(this.announcer._announcer.subscribe((announce: string) => {
-      this.client.say(this.client.getChannels()[0], announce);
-    }));
+    this.announceSub.add(this.annsub);
   }
 
   public init(): void {

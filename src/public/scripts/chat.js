@@ -250,6 +250,8 @@ class ChatAlert extends HTMLDivElement {
     if (username) {
       this.prepend(new MessageControlButton('btn-lurk', () => {
         this.addLurker(username);
+        connected.splice(connected.indexOf(username), 1);
+        counter.innerHTML = connected.length;
         this.innerHTML = '<em>(<b>' + username + '</b> добавлен в черный список)</em>';
       }));
     }
@@ -386,8 +388,8 @@ const counter = document.querySelector('#chatters-counter');
 const connected = [];
 
 
-let lurkers;
-Http.get('/controls/chat/lurkers').then(data => { lurkers = [...lurkers, data] });
+let lurkers = [];
+// Http.get('/controls/chat/lurkers').then(data => { lurkers = [...lurkers, ...data] });
 if (window.localStorage.getItem('lurkers')) {
   lurkers = [...new Set(...[JSON.parse(window.localStorage.getItem('lurkers')), lurkers])];
 }
