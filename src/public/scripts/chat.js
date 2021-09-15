@@ -157,7 +157,7 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
     }
     if (!self && (tags.username !== user.username)) {
       this.body.prepend(new MessageControlButton('btn-control', () => {
-        client.ban(user.username, tags.username)
+        client.ban(params.has('channel')?params.get('channel'):user.username, tags.username);
       }));
     }
     this.append(this.body);
