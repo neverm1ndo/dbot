@@ -1,14 +1,19 @@
-import { Observable, timer } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Subscription, timer } from 'rxjs';
+import { map, takeWhile } from 'rxjs/operators';
 import { bot } from '@server';
 
 export class Announcer {
-  public start: Observable<string>;
+  public start: Subscription;
   public delay: number;
   constructor(delay: number) {
     this.delay = delay;
-    this.start = timer(delay, delay).pipe(
+    this.start = timer(delay, delay)
+    .pipe(
+      takeWhile(() => bot.status === 'works')
+    ).pipe(
       map(e => bot.opts.schedules.automessages[e % bot.opts.schedules.automessages.length])
-    )
+    ).subscribe((announce: string) => {
+      bot.client.say(bot.client.getChannels()[0], announce);
+    });
   }
 };

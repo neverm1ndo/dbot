@@ -5,18 +5,16 @@ import { Announcer } from '@shared/bot.announcer';
 import { Chatter } from '@interfaces/chatter';
 import { Media } from '@shared/media';
 import { Schedule } from '@shared/bot.schedule';
-import { Dota2, Dota2Ratings } from '@shared/dota2';
+import { Subscription } from 'rxjs';
+import { Dota2 } from '@shared/dota2';
 import { Twitch } from '@shared/twitch';
 import { Nuzhdiki } from '@shared/nuzhdiki';
 import { Aneki } from '@shared/aneki';
-import { Subscription } from 'rxjs';
-// import { CHATTER } from '../schemas/chatters.schema';
 import StartOptions from '../pre-start';
 type BotStatus = 'works' | 'sleeps';
 
 export class Bot {
   opts: Schedule;
-  announceSub: Subscription = new Subscription();
   media: Media = new Media();
   client: Client = new Client({
       options: { debug: true, messagesLogLevel: 'info'  },
@@ -28,17 +26,14 @@ export class Bot {
       channels: [process.env.BOT_CHANNEL!]
     });
   announcer: Announcer;
-  annsub: any;
 
-  private status: BotStatus = 'sleeps';
-  private prefix: string = '!';
+  public status: BotStatus = 'sleeps';
+  private readonly prefix: string = '!';
+  private subscriptions: Subscription = new Subscription();
 
   constructor() {
     this.opts = new Schedule('neverm1nd_o');
     this.announcer = new Announcer(900000);
-    this.annsub = this.announcer.start.subscribe((announce: string) => {
-     this.client.say(this.client.getChannels()[0], announce);
-    })
     if (process.env.NODE_ENV !== 'development') {
       Twitch.getAppAccessToken().then((body: any) => {
         Twitch.getSubs(body.data.access_token).then((subsBody: any) => {
@@ -61,19 +56,17 @@ export class Bot {
     if (StartOptions.works) {
       this.wakeup();
     }
+    this.subscriptions.add(this.announcer.start);
   }
 
   public shutdown(): void {
     if (this.status === 'sleeps') return;
     this.status = 'sleeps';
-    if (!this.announceSub) return;
-    this.announceSub.remove(this.annsub);
   }
 
   public wakeup(): void {
     if (this.status === 'works') return;
     this.status = 'works';
-    this.announceSub.add(this.annsub);
   }
 
   public init(): void {
@@ -96,7 +89,7 @@ export class Bot {
   /**
   * @param {ChatUserstate} chatter Checks users channel subscription
   **/
-  private сheckSub(chatter: Chatter | ChatUserstate) {
+  private isSubscriber(chatter: Chatter | ChatUserstate) {
     if (!chatter.badges) {
       return false;
     }
@@ -104,10 +97,11 @@ export class Bot {
   }
   private banSpam(channel: string, tags: ChatUserstate, message: string, self: boolean) {
     if (self) return;
-    if (!this.isPrevileged(tags)) {
+    if (!this.isPrevileged(tags) || !this.isSubscriber(tags)) {
       for (let i = 0; i < this.opts.dictionary.length; i+=1) {
         if (message.includes(this.opts.dictionary[i])) {
           this.client.ban(channel, tags.username!);
+          logger.warn(tags.username + ' banned for reason: ' + this.opts.dictionary[i]);
           return;
         }
       };
@@ -145,11 +139,11 @@ export class Bot {
         break;
       }
       case 'хелп': {
-        this.client.say(channel, `Список команд тут: https://apps.nmnd.ru/commands OhMyDog`);
+        this.client.say(channel, `OhMyDog Список команд тут: https://apps.nmnd.ru/commands`);
         break;
       }
       case 'help': {
-        this.client.say(channel, `Список команд тут: https://apps.nmnd.ru/commands OhMyDog`);
+        this.client.say(channel, `OhMyDog Список команд тут: https://apps.nmnd.ru/commands`);
         break;
       }
       case 'нуждики': {
