@@ -43,11 +43,11 @@ export class Bot {
             if (subsBody.data.total >= 2) { // FIXME: fix algorithm for checking existing subscribers
               logger.info('All subs already existing')
             } else {
-              Twitch.streamChanges('stream.online', Number(process.env.TWITCH_USER_ID), body.data.access_token)
-              .then(() => { logger.info('Subbed to stream.online event')})
-              .catch((err) => { logger.err(err, true) });
-              Twitch.streamChanges('stream.offline', Number(process.env.TWITCH_USER_ID), body.data.access_token)
-              .then(() => { logger.info('Subbed to stream.offline event')})
+              Promise.all([
+                Twitch.streamChanges('stream.online', Number(process.env.TWITCH_USER_ID), body.data.access_token),
+                Twitch.streamChanges('stream.offline', Number(process.env.TWITCH_USER_ID), body.data.access_token)
+              ])
+              .then(() => { logger.info('Subbed to all events')})
               .catch((err) => { logger.err(err, true) });
             }
           })

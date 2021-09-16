@@ -141,12 +141,7 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
     this.body.classList.add('card-body');
     if (tags['message-type'] === "action") body.style.color = nickname.style.color;
     this.body.dataset.date = (this.timestamp(Date.now()));
-    let notice = message.includes('@')?'@' + user.username: user.username;
-    message = message.replace(notice, `<span class="notice">${notice}</span>`);
-    if (this.haveLinks(message)) {
-      message = this.linkify(message);
-    }
-    this.body.innerHTML = this.formatEmotes(message, tags.emotes);
+    this.body.innerHTML = this.pretty(tags, message);
     this.body.prepend(nickname);
     if (tags.badges) {
       const badges = Object.keys(tags.badges);
@@ -172,12 +167,39 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
 
   pretty(tags, message) {
     let notice = message.includes('@')?'@' + user.username: user.username;
-    message = this.formatEmotes(message, tags.emotes);
-    message = message.replace(notice, `<span class="notice">${notice}</span>`);
-    if (Array.isArray(this.haveLinks(message))) {
-      message = this.linkify(message);
+    let splited = message.split(' ');
+    let result = [];
+    let emoted = this.formatEmotes(message, tags.emotes);
+    let position = 0;
+    let emotes = [];
+    for (let emote in tags.emotes) {
+      for (let i = 0; i < tags.emotes[emote].length; i++) {
+        let points = tags.emotes[emote][i].split('-');
+        emotes.push([emote, parseInt(points[0]), points[1] - points[0] + 1]);
+      }
     }
-    return message;
+    for (let i = 0; i < splited.length; i++) {
+      let emoted = false;
+      position+= splited[i].length + 1;
+      if (this.haveLinks(splited[i])) {
+        result.push(this.linkify(splited[i]));
+        continue;
+      }
+      if (splited[i] === user.username || splited[i] ==='@' + user.username) {
+        result.push(`<span class="notice">${notice}</span>`);
+        continue;
+      }
+      for (let j = 0; j < emotes.length; j++ ) {
+        if (position === emotes[j][1] + emotes[j][2] + 1) {
+          emoted = true;
+            result.push('<img class="emoticon" src="https://static-cdn.jtvnw.net/emoticons/v2/' + emotes[j][0] + '/default/dark/3.0">');
+            break;
+        }
+      }
+      if (emoted) continue;
+      result.push(splited[i]);
+    }
+    return result.join(' ');
   }
 
   timestamp (unix) {
@@ -309,6 +331,15 @@ class ChatController {
     this.text.addEventListener('keydown', (event) => {
       if (event.code === 'Enter') this.send();
     });
+    this.text.addEventListener('input', (event) => {
+      if (this.text.value === '') {
+        this.selfEmotes = {};
+      }
+    });
+    if (!window.localStorage.getItem('lastEmotes')) {
+      window.localStorage.setItem('lastEmotes', JSON.stringify([]));
+    }
+    this.addEmotes(JSON.parse(window.localStorage.getItem('lastEmotes')), 'last used');
     //*********************FIXIT***************************//
     Http.get(
       'https://api.twitch.tv/helix/chat/emotes/global',
@@ -334,6 +365,9 @@ class ChatController {
       }
       this.selfEmotes[event.target.dataset.id].push(`${this.text.value.length}-${this.text.value.length + event.target.dataset.name.length}`);
       this.text.value = this.text.value + ' ' + event.target.dataset.name + ' ';
+      // let last = JSON.parse(window.localStorage.getItem('lastEmotes'));
+      // last.push({id: event.target.dataset.id, name: event.target.dataset.name, format: 'default'});
+      // window.localStorage.setItem('lastEmotes', JSON.stringify([...new Set(last)]));
     });
   }
   addEmotes(emotes, type) {
@@ -422,6 +456,38 @@ const client = new tmi.Client({
 client.connect();
 // chat.add({
 //     "badge-info": null,
+//     "badges": {
+//         "broadcaster": "1"
+//     },
+//     "client-nonce": "53e1213553551ff9ed968a50f984006a",
+//     "color": "#FF0000",
+//     "display-name": "neverm1nd_o",
+//     "emotes": {
+//         "25": [
+//             "10-14",
+//             "62-66"
+//         ],
+//         "114836": [
+//             "73-80"
+//         ]
+//     },
+//     "flags": null,
+//     "id": "27d4fee8-f2df-4f3e-9318-2328ec3842a9",
+//     "mod": false,
+//     "room-id": "144668618",
+//     "subscriber": false,
+//     "tmi-sent-ts": "1631823016655",
+//     "turbo": false,
+//     "user-id": "144668618",
+//     "user-type": null,
+//     "emotes-raw": "25:10-14,61-65/114836:72-79",
+//     "badge-info-raw": null,
+//     "badges-raw": "broadcaster/1",
+//     "username": "neverm1nd_o",
+//     "message-type": "chat"
+// }, 'sdfsdfsds Kappa https://www.twitch.tv/neverm1nd_o neverm1nd_o Kappa test Jebaited', false)
+// chat.add({
+//     "badge-info": null,
 //     "badges": null,
 //     "color": null,
 //     "display-name": "dummy",
@@ -436,7 +502,7 @@ client.connect();
 //     "badges-raw": null,
 //     "username": "moodinthemoon",
 //     "message-type": "chat"
-// }, 'test', false);
+// }, 'test https://www.twitch.tv/neverm1nd_o @neverm1nd_o neverm1nd_o', false);
 // chat.alert('kek присоединился к чату', 'success', 'kek');
 client.on('connected', (channel, self) => {
   chat.alert('Добро пожаловать в чат!');
