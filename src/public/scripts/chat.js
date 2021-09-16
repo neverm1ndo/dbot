@@ -156,6 +156,9 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
       }
     }
     if (!self && (tags.username !== user.username)) {
+      this.body.prepend(new MessageControlButton('btn-timeout', () => {
+        client.timeout(params.has('channel')?params.get('channel'):user.username, tags.username, 600, 'rediska');
+      }));
       this.body.prepend(new MessageControlButton('btn-control', () => {
         client.ban(params.has('channel')?params.get('channel'):user.username, tags.username);
       }));
@@ -389,9 +392,15 @@ const connected = [];
 
 
 let lurkers = [];
-// Http.get('/controls/chat/lurkers').then(data => { lurkers = [...lurkers, ...data] });
+Http.get('/controls/chat/lurkers').then(data => { lurkers = [...lurkers, ...data] });
 if (window.localStorage.getItem('lurkers')) {
   lurkers = [...new Set(...[JSON.parse(window.localStorage.getItem('lurkers')), lurkers])];
+  JSON.parse(window.localStorage.getItem('lurkers')).forEach((lurker, index, arr) => {
+    if (Array.isArray(lurker)) {
+      lurkers.splice(lurkers.indexOf(lurker), 1);
+    }
+  })
+  window.localStorage.setItem('lurkers', JSON.stringify(lurkers));
 }
 const params = new URLSearchParams(window.location.search);
 
@@ -447,7 +456,11 @@ client.on('join', (channel, username, self) => {
   chat.alert(`<b>${username}</b> подключился к чату`, 'success', username);
 });
 client.on('ban', (channel, username, reason) => {
-  chat.alert(`<b>${username}</b> забанен`, 'warning');
+  chat.alert(`<b>${username}</b> забанен ${reason?': ' + reason:''}`, 'warning');
+  chat.pseudoDelete(username);
+});
+client.on('timeout', (channel, username, reason, duration, userstate) => {
+  chat.alert(`<b>${username}</b> отстранен на ${duration} секунд ${reason?'по причине ' + reason:''}`, 'warning');
   chat.pseudoDelete(username);
 });
 client.on('part', (channel, username, self) => {

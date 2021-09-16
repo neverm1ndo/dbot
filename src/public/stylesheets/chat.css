@@ -86,7 +86,8 @@ body .card .card-body::before {
   color: var(--bs-gray);
   position: absolute;
   margin-top: -11px;
-  margin-left: -20px;
+  /* margin-left: -20px; */
+  left: 5px;
 }
 @keyframes logo {
   from { transform: rotate(0deg);}
@@ -211,7 +212,7 @@ body .card .card-body img {
   width: 16px;
   height: 16px;
 }
-.btn-control, .btn-lurk {
+.btn-control, .btn-lurk, .btn-timeout {
   width: 16px;
   height: 16px;
   padding: 0px;
@@ -254,8 +255,23 @@ body .card .card-body img {
   background-size: 22px 22px;
   transition: .2s ease-in-out;
 }
-.btn-lurk:hover:before {
-  filter: grayscale(0);
+.btn-timeout:before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  margin-top: -7px;
+  margin-left: -10px;
+  background: url('/timeout.svg') no-repeat 0 0;
+  filter: grayscale(0.9) brightness(30%) hue-rotate(145deg);
+  background-size: 19px 19px;
+  transition: .2s ease-in-out;
+}
+.btn-lurk:hover:before, .btn-timeout:hover:before {
+  filter: grayscale(0%);
+}
+.btn-timeout {
+  margin-right: 5px;
 }
 .btn-lurk {
   margin-right: 1rem;
