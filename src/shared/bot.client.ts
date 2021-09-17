@@ -5,7 +5,6 @@ import { Announcer } from '@shared/bot.announcer';
 import { Chatter } from '@interfaces/chatter';
 import { Media } from '@shared/media';
 import { Schedule } from '@shared/bot.schedule';
-import { Subscription } from 'rxjs';
 import { Dota2 } from '@shared/dota2';
 import { Twitch } from '@shared/twitch';
 import { Nuzhdiki } from '@shared/nuzhdiki';
@@ -29,7 +28,6 @@ export class Bot {
 
   public status: BotStatus = 'sleeps';
   private readonly prefix: string = '!';
-  private subscriptions: Subscription = new Subscription();
 
   constructor() {
     this.opts = new Schedule('neverm1nd_o');
@@ -56,17 +54,18 @@ export class Bot {
     if (StartOptions.works) {
       this.wakeup();
     }
-    this.subscriptions.add(this.announcer.start);
   }
 
   public shutdown(): void {
     if (this.status === 'sleeps') return;
     this.status = 'sleeps';
+    this.announcer.start.unsubscribe();
   }
 
   public wakeup(): void {
     if (this.status === 'works') return;
     this.status = 'works';
+    this.announcer = new Announcer(900000);
   }
 
   public init(): void {
