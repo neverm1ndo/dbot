@@ -123,7 +123,7 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
   }
 
   pretty(tags, message) {
-    let notice = message.includes('@')?'@' + user.username: user.username;
+    let notice = message.includes('@')?'@' + user.display_name: user.display_name;
     let splited = message.split(' ');
     let result = [];
     let position = 0;
@@ -142,7 +142,7 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
         result.push(this.linkify(splited[i]));
         continue;
       }
-      if (splited[i] === user.username || splited[i] ==='@' + user.username) {
+      if (splited[i].toLowerCase() === user.display_name.toLowerCase() || splited[i].toLowerCase() ==='@' + user.username.toLowerCase()) {
         result.push(`<span class="notice">${notice}</span>`);
         continue;
       }

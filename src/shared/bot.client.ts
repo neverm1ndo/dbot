@@ -24,7 +24,7 @@ export class Bot {
       },
       channels: [process.env.BOT_CHANNEL!]
     });
-  announcer: Announcer;
+  announcer: Announcer | undefined;
 
   public status: BotStatus = 'sleeps';
   private readonly prefix: string = '!';
@@ -59,13 +59,18 @@ export class Bot {
   public shutdown(): void {
     if (this.status === 'sleeps') return;
     this.status = 'sleeps';
-    this.announcer.start.unsubscribe();
+    if (this.announcer) {
+      this.announcer.start.unsubscribe();
+      delete this.announcer;
+    }
   }
 
   public wakeup(): void {
     if (this.status === 'works') return;
     this.status = 'works';
-    this.announcer = new Announcer(900000);
+    if (!this.announcer) {
+      this.announcer = new Announcer(900000);
+    }
   }
 
   public init(): void {

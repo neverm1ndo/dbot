@@ -1,5 +1,6 @@
 const user = {
   username: document.querySelector('#chatjs').dataset.username,
+  display_name: document.querySelector('#chatjs').dataset.displayname,
   token: document.querySelector('#chatjs').dataset.token,
   id: document.querySelector('#chatjs').dataset.id,
   client: document.querySelector('#chatjs').dataset.client
