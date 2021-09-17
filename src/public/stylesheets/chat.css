@@ -160,6 +160,7 @@ body .card .card-body img {
 .btn-small {
   background: transparent;
   border: none;
+  border-radius: .25rem!important;
 }
 .btn-small:hover {
   background: var(--bs-gray-dark);
@@ -316,6 +317,8 @@ body .card .card-body img {
   background-color: var(--bs-gray-dark);
   color: var(--bs-light);
   border: none;
+  border-top-left-radius: .25rem;
+  border-bottom-left-radius: .25rem;
 }
 body .logo {
   margin-top: 6px;
