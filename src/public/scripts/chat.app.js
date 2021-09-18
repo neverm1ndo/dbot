@@ -99,6 +99,7 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
     if (tags['message-type'] === "action") body.style.color = nickname.style.color;
     this.body.dataset.date = (this.timestamp(Date.now()));
     this.body.innerHTML = this.pretty(tags, message);
+    this.addTooltipsToEmotes();
     this.body.prepend(nickname);
     if (tags.badges) {
       const badges = Object.keys(tags.badges);
@@ -149,7 +150,7 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
       for (let j = 0; j < emotes.length; j++ ) {
         if (position === emotes[j][1] + emotes[j][2] + 1) {
           emoted = true;
-            result.push('<img class="emoticon" src="https://static-cdn.jtvnw.net/emoticons/v2/' + emotes[j][0] + '/default/dark/3.0">');
+            result.push('<img data-bs-toggle="tooltip" title="'+ splited[i] +'" class="emoticon" src="https://static-cdn.jtvnw.net/emoticons/v2/' + emotes[j][0] + '/default/dark/3.0">');
             break;
         }
       }
@@ -157,6 +158,13 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
       result.push(splited[i]);
     }
     return result.join(' ');
+  }
+
+  addTooltipsToEmotes() {
+    let tooltipTriggerList = [].slice.call(this.body.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
   }
 
   timestamp (unix) {
@@ -296,7 +304,7 @@ class ChatController {
         'Client-ID': 'ezap2dblocyxqnsjhl9dpyw1jpn8c7'
       }
     )
-    .then(data => { if (data.data.length > 0) this.addEmotes(data.data, id) });
+    .then(data => { if (data.data.length > 0) this.addEmotes(data.data, id) })
   }
   addEmotes(emotes, type) {
     const title = document.createElement('h6');
@@ -305,10 +313,13 @@ class ChatController {
     emotes.forEach(emote => {
       const img = document.createElement('img');
       img.title = emote.name;
+      img.setAttribute('data-bs-toggle', 'tooltip');
+      img.setAttribute('data-bs-placement', 'top');
       img.src = `https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/light/3.0`;
       img.dataset.name = emote.name;
       img.dataset.id = emote.id;
       this.emotes.append(img);
+      new bootstrap.Tooltip(img, { boundary: this.emotes });
     })
   }
   add(tags, message, self) {
