@@ -116,3 +116,8 @@ client.on('hosted', (channel, username, viewers, autohost) => {
 client.on('whisper', (channel, tags, message, self) => {
   chat.add(tags, message, self);
 });
+client.on("emotesets", (sets, obj) => {
+    sets.split(',').forEach((id) => {
+      chat.getEmoteSet(id);
+    })
+});

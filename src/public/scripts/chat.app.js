@@ -273,25 +273,7 @@ class ChatController {
     if (!window.localStorage.getItem('lastEmotes')) {
       window.localStorage.setItem('lastEmotes', JSON.stringify([]));
     }
-    this.addEmotes(JSON.parse(window.localStorage.getItem('lastEmotes')), 'last used');
-    //*********************FIXIT***************************//
-    Http.get(
-      'https://api.twitch.tv/helix/chat/emotes/global',
-      {
-        'Authorization': 'Bearer ' + user.token,
-        'Client-ID': 'ezap2dblocyxqnsjhl9dpyw1jpn8c7'
-      }
-    )
-    .then(data => { this.addEmotes(data.data, 'Twitch') });
-    Http.get(
-      'https://api.twitch.tv/helix/chat/emotes?broadcaster_id=' + user.id,
-      {
-        'Authorization': 'Bearer ' + user.token,
-        'Client-ID': 'ezap2dblocyxqnsjhl9dpyw1jpn8c7'
-      }
-    )
-    .then(data => { this.addEmotes(data.data, user.username) });
-    //*************************************************//
+    this.addEmotes(JSON.parse(window.localStorage.getItem('lastEmotes')), 'Last Used');
     this.emotes.addEventListener('click', (event) => {
       if (event.target.tagName !== 'IMG') return;
       if (typeof this.selfEmotes[event.target.dataset.id] !== 'object') {
@@ -300,9 +282,21 @@ class ChatController {
       this.selfEmotes[event.target.dataset.id].push(`${this.text.value.length}-${this.text.value.length + event.target.dataset.name.length}`);
       this.text.value = this.text.value + ' ' + event.target.dataset.name + ' ';
       // let last = JSON.parse(window.localStorage.getItem('lastEmotes'));
-      // last.push({id: event.target.dataset.id, name: event.target.dataset.name, format: 'default'});
+      // last.push({id: event.target.dataset.id, name: event.target.dataset.name});
+      // if (last.length > 16) last.splice(0, 1);
       // window.localStorage.setItem('lastEmotes', JSON.stringify([...new Set(last)]));
+      //   this.addEmotes(JSON.parse(window.localStorage.getItem('lastEmotes')), 'last used');
     });
+  }
+  getEmoteSet(id) {
+    Http.get(
+      `https://api.twitch.tv/helix/chat/emotes/set?emote_set_id=${id}`,
+      {
+        'Authorization': 'Bearer ' + user.token,
+        'Client-ID': 'ezap2dblocyxqnsjhl9dpyw1jpn8c7'
+      }
+    )
+    .then(data => { if (data.data.length > 0) this.addEmotes(data.data, id) });
   }
   addEmotes(emotes, type) {
     const title = document.createElement('h6');
@@ -310,7 +304,8 @@ class ChatController {
     this.emotes.append(title);
     emotes.forEach(emote => {
       const img = document.createElement('img');
-      img.src = `https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/${emote.format}/dark/3.0`;
+      img.title = emote.name;
+      img.src = `https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/light/3.0`;
       img.dataset.name = emote.name;
       img.dataset.id = emote.id;
       this.emotes.append(img);
