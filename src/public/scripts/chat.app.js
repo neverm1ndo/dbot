@@ -216,7 +216,7 @@ class ChatAlert extends HTMLDivElement {
     this.innerHTML = message;
     if (username) {
       this.prepend(new MessageControlButton('btn-lurk', () => {
-        this.addLurker(username);
+        ChatAlert.addLurker(username);
         connected.splice(connected.indexOf(username), 1);
         counter.innerHTML = connected.length;
         this.innerHTML = '<em>(<b>' + username + '</b> добавлен в черный список)</em>';
@@ -224,7 +224,7 @@ class ChatAlert extends HTMLDivElement {
     }
     this.append(body);
   }
-  addLurker(username) {
+  static addLurker(username) {
     lurkers.push(username);
     window.localStorage.setItem('lurkers', JSON.stringify([...new Set(lurkers)]));
   }
@@ -247,6 +247,23 @@ class ChattersListController {
       for (let i = 0; i < connected.length; i+=1) {
         const li = document.createElement('li');
         li.innerHTML = connected[i];
+        li.prepend(
+          new MessageControlButton('btn-lurk', () => {
+            ChatAlert.addLurker(connected[i]);
+            li.innerHTML = '<em>(<b>' + connected[i] + '</b> добавлен в черный список)</em>';
+            connected.splice(connected.indexOf(connected[i]), 1);
+            counter.innerHTML = connected.length;
+            setTimeout(() => {
+              li.remove()
+            }, 3000);
+          }),
+          // new MessageControlButton('btn-control', () => {
+          //   client.ban(params.has('channel')?params.get('channel'):user.username, connected[i]);
+          // }),
+          // new MessageControlButton('btn-timeout', () => {
+          //   client.timeout(params.has('channel')?params.get('channel'):user.username, connected[i], 600, 'rediska');
+          // }),
+        );
         this.list.append(li);
       }
     });
