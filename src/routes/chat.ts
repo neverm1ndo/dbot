@@ -23,7 +23,7 @@ router.get('/last', corsOpt, (req: Request, res: Response,) => {
   if (!req.query.channel) res.sendStatus(BAD_REQUEST);
   MESSAGE.find({ channel: '#' + req.query.channel }, [], { sort: {date: -1}, limit: 30 }, (err: any, messages: Document[]) => {
     if (err) return logger.err(err);
-    res.send(messages);
+    res.send(messages.reverse());
   });
 });
 
