@@ -4,7 +4,8 @@
 html, body {
   height: 100vh;
   background-color: #18181b;
-  color: var(--bs-light)
+  color: var(--bs-light);
+  overflow: hidden;
 }
 html body div::-webkit-scrollbar {
  background: var(--bs-gray-dark);
@@ -59,10 +60,19 @@ body iframe {
 }
 .nickname {
   font-weight: bold;
-  margin-right: 10px;
+  margin-right: 2px;
   margin-left: 5px;
+  display: inline-block;
   filter: contrast(0.5) brightness(1.2);
+  cursor: pointer;
+  transition: .2s ease-in-out;
+  border-radius: .25rem;
+  padding: 1px 2px 1px 2px;
 }
+.nickname:hover {
+  background-color: #ffffff40;
+}
+
 ul li {
   list-style-type: none;
   padding-top: 3px;
@@ -79,6 +89,9 @@ body .card .card-body {
   padding: 5px;
   border: none;
   word-wrap: break-word;
+}
+body .card .card-body span {
+  display: inline;
 }
 body .card .card-body::before {
   content: attr(data-date);

@@ -1,41 +1,28 @@
 class ChatMessageBadge extends HTMLDivElement {
+  badges = {
+    'diktorbot': '/tank2.png',
+    'broadcaster': '/img/bc.png',
+    'moderator': '/img/cm.png',
+    'subscriber': '/img/sub.png',
+    'founder': '/img/sub.png',
+    'vip': '/img/vip.png',
+    'turbo': '/img/tur.png',
+    'verified': '/img/vf.png',
+    'prime': '/img/prime.png',
+  };
   constructor(type) {
     super();
     this.classList.add('badge-icon');
     this.icon = document.createElement('img');
     this.icon.classList.add('badge-icon-img');
-    switch (type) {
-      case 'diktorbot':
-        this.icon.src = '/tank2.png';
+    const badgesKeys = Object.keys(this.badges);
+    for (let i = 0; i < badgesKeys.length; i++ ) {
+      if (type === badgesKeys[i]) {
+        this.icon.src = this.badges[badgesKeys[i]];
         break;
-      case 'broadcaster':
-        this.icon.src = '/img/bc.png';
-        break;
-      case 'moderator':
-        this.icon.src = '/img/cm.png';
-        break;
-      case 'subscriber':
-        this.icon.src = '/img/sub.png';
-        break;
-      case 'founder':
-        this.icon.src = '/img/sub.png';
-        break;
-      case 'vip':
-        this.icon.src = '/img/vip.png';
-        break;
-      case 'turbo':
-        this.icon.src = '/img/tur.png';
-        break;
-      case 'verified':
-        this.icon.src = '/img/vf.png';
-        break;
-      case 'prime':
-        this.icon.src = '/img/prime.png';
-        break;
-      default:
-        delete this.icon;
-        break;
+      }
     }
+    if (!this.icon.src) delete this.icon;
     if (this.icon) {
       this.append(this.icon);
     }
@@ -82,25 +69,23 @@ class MessageControlButton extends HTMLButtonElement {
     this.addEventListener('click', cb);
   }
 }
-class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
+class ChatMessage extends HTMLDivElement {
   constructor(tags, message, self) {
     super();
-    const body = document.createElement('div');
-    const nickname = document.createElement('span');
-    const ban = document.createElement('button');
+    this.body = document.createElement('div');
+    this.nickname = document.createElement('span');
     this.tags = tags;
-    this.body = body;
     this.links = [];
-    nickname.classList.add('nickname');
-    nickname.innerHTML = tags['display-name'];
-    nickname.style.color = tags.color;
+    this.nickname.classList.add('nickname');
+    this.nickname.innerHTML = tags['display-name'];
+    this.nickname.style.color = tags.color;
     this.classList.add('card');
     this.body.classList.add('card-body');
     if (tags['message-type'] === "action") body.style.color = nickname.style.color;
     this.body.dataset.date = (this.timestamp(Date.now()));
-    this.body.innerHTML = this.pretty(tags, message);
+    this.body.innerHTML = ': ' + this.pretty(tags, message);
     this.addTooltipsToEmotes();
-    this.body.prepend(nickname);
+    this.body.prepend(this.nickname);
     if (tags.badges) {
       const badges = Object.keys(tags.badges);
       if (tags.username === 'diktorbot') badges.push('diktorbot');
@@ -117,10 +102,15 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
       }));
     }
     this.append(this.body);
-    if (this.links) {
+    if (this.links) { // FIXME: remove unnecessary variable (links), fix condition
       if (!YTFrame.getVideoID(this.links[0])) return;
       this.body.appendChild(new YTFrame(this.links[0]));
     }
+    this.nickname.addEventListener('click', () => { // ??? Exprerimental (may cause perfomance violation)
+      chat.text.value = chat.text.value + ' @' + tags.username + ' ';
+      chat.text.focus();
+    });
+    delete this.links;
   }
 
   pretty(tags, message) {
@@ -163,7 +153,7 @@ class ChatMessage extends HTMLDivElement { // FIXIT: Implement it with lodash
   addTooltipsToEmotes() {
     let tooltipTriggerList = [].slice.call(this.body.querySelectorAll('[data-bs-toggle="tooltip"]'))
     let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl)
+      return new bootstrap.Tooltip(tooltipTriggerEl);
     });
   }
 
@@ -217,8 +207,7 @@ class ChatAlert extends HTMLDivElement {
     if (username) {
       this.prepend(new MessageControlButton('btn-lurk', () => {
         ChatAlert.addLurker(username);
-        connected.splice(connected.indexOf(username), 1);
-        counter.innerHTML = connected.length;
+        chatterList.remove(username);
         this.innerHTML = '<em>(<b>' + username + '</b> добавлен в черный список)</em>';
       }));
     }
@@ -234,6 +223,8 @@ class ChattersListController {
   constructor() {
     this.box = document.querySelector('#chatters-list');
     this.list = document.querySelector('#list');
+    this.counter = document.querySelector('#chatters-counter');
+    this.connected = [];
     this.buttons = {
       open: document.querySelector('#open-chatters-list'),
       close: document.querySelector('#close')
@@ -244,29 +235,30 @@ class ChattersListController {
     this.buttons.open.addEventListener('click', () => {
       this.open();
       this.list.innerHTML = '';
-      for (let i = 0; i < connected.length; i+=1) {
+      for (let i = 0; i < this.connected.length; i++) {
         const li = document.createElement('li');
-        li.innerHTML = connected[i];
+        li.innerHTML = this.connected[i];
         li.prepend(
           new MessageControlButton('btn-lurk', () => {
-            ChatAlert.addLurker(connected[i]);
-            li.innerHTML = '<em>(<b>' + connected[i] + '</b> добавлен в черный список)</em>';
-            connected.splice(connected.indexOf(connected[i]), 1);
-            counter.innerHTML = connected.length;
+            ChatAlert.addLurker(this.connected[i]);
+            li.innerHTML = '<em>(<b>' + this.connected[i] + '</b> добавлен в черный список)</em>';
+            this.remove(this.connected[i]);
             setTimeout(() => {
-              li.remove()
+              li.remove();
             }, 3000);
           }),
-          // new MessageControlButton('btn-control', () => {
-          //   client.ban(params.has('channel')?params.get('channel'):user.username, connected[i]);
-          // }),
-          // new MessageControlButton('btn-timeout', () => {
-          //   client.timeout(params.has('channel')?params.get('channel'):user.username, connected[i], 600, 'rediska');
-          // }),
         );
         this.list.append(li);
       }
     });
+  }
+  remove(username) {
+    this.connected.splice(this.connected.indexOf(username), 1);
+    this.counter.innerHTML = this.connected.length;
+  }
+  add(username) {
+    this.connected.push(username);
+    this.counter.innerHTML = this.connected.length;
   }
   open() {
     this.box.style.display = 'block';
@@ -336,7 +328,10 @@ class ChatController {
       img.dataset.name = emote.name;
       img.dataset.id = emote.id;
       this.emotes.append(img);
-      new bootstrap.Tooltip(img, { boundary: this.emotes });
+      new bootstrap.Tooltip(img, {
+        boundary: this.emotes.parentNode,
+        delay: { "show": 1000, "hide": 0 }
+      });
     })
   }
   add(tags, message, self) {

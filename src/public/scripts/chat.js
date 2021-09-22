@@ -11,7 +11,6 @@ tag.src = 'https://www.youtube.com/player_api';
 const firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-const parser = new DOMParser();
 
 //** Define custom HTML elements **//
 
@@ -23,11 +22,10 @@ customElements.define('control-button', MessageControlButton, { extends: 'button
 
 //*******************************//
 
+const parser = new DOMParser();
 const chat = new ChatController('#chat');
 const chatterList = new ChattersListController();
-
-const counter = document.querySelector('#chatters-counter');
-const connected = [];
+const params = new URLSearchParams(window.location.search);
 
 let lurkers = [];
 Http.get('/controls/chat/lurkers').then(data => { lurkers = [...lurkers, ...data] });
@@ -40,7 +38,6 @@ if (window.localStorage.getItem('lurkers')) {
   })
   window.localStorage.setItem('lurkers', JSON.stringify(lurkers));
 }
-const params = new URLSearchParams(window.location.search);
 
 const client = new tmi.Client({
   options: {
@@ -68,11 +65,9 @@ client.on('disconnected', (channel, self) => {
   chat.connected = false;
   chat.submit.disabled = true;
 });
-
 client.on('join', (channel, username, self) => {
-  if (self || connected.includes(username) || lurkers.includes(username)) return;
-  connected.push(username);
-  counter.innerHTML = connected.length;
+  if (self || chatterList.connected.includes(username) || lurkers.includes(username)) return;
+  chatterList.add(username);
   chat.alert(`<b>${username}</b> подключился к чату`, 'success', username);
 });
 client.on('ban', (channel, username, reason) => {
@@ -87,8 +82,7 @@ client.on('part', (channel, username, self) => {
   if (self || lurkers.includes(username)) return;
   setTimeout(() => {
     if (connected.includes(username)) {
-      connected.splice(connected.indexOf(username), 1);
-      counter.innerHTML = connected.length;
+      chatterList.remove(username);
       chat.alert(`<b>${username}</b> отключился`, 'danger', username);
     }
   }, 180000);
