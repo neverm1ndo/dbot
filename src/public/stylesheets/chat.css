@@ -309,6 +309,21 @@ body .card .card-body img {
   padding-top: 3px;
   padding-bottom: 3px;
 }
+.pseudo-delete {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-wrap: break-word;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--bs-gray);
+  transition: .2s ease-in-out;
+  cursor: pointer;
+}
+.pseudo-delete:hover {
+  white-space: normal;
+  text-overflow: inherit;
+  color: inherit;
+}
 .avatar {
   position: relative;
   margin-right: 15px;

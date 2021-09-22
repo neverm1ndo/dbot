@@ -350,7 +350,7 @@ class ChatController {
     for (let i = 0; i < childs.length; i += 1) {
       if (childs[i].className === 'card') {
         if (childs[i].tags.username === username) {
-          childs[i].body.classList.add('text-decoration-line-through');
+          childs[i].body.classList.add('text-decoration-line-through', 'pseudo-delete');
         }
       }
     }
