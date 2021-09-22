@@ -86,7 +86,7 @@ client.on('timeout', (channel, username, reason, duration, userstate) => {
 client.on('part', (channel, username, self) => {
   if (self || lurkers.includes(username)) return;
   setTimeout(() => {
-    if (connected.includes(username)) {
+    if (chatterList.connected.includes(username)) {
       chatterList.remove(username);
       chat.alert(`<b>${username}</b> отключился`, 'danger', username);
     }
