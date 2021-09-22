@@ -1,6 +1,11 @@
 import { Router, Request, Response } from 'express';
+import logger from '@shared/Logger';
 import { bot } from '@server';
 import { corsOpt } from '@shared/constants';
+import { MESSAGE } from '../schemas/message.schema';
+import StatusCodes from 'http-status-codes';
+import { Document } from 'mongoose';
+const { BAD_REQUEST } = StatusCodes;
 
 const router = Router();
 
@@ -13,6 +18,13 @@ router.get('/lurkers', corsOpt, (req: Request, res: Response,) => {
 });
 router.post('/add-lurker', corsOpt, (req: Request, res: Response,) => {
   bot.opts.blacklist.push(req.body);
+});
+router.get('/last', corsOpt, (req: Request, res: Response,) => {
+  if (!req.query.channel) res.sendStatus(BAD_REQUEST);
+  MESSAGE.find({ channel: '#' + req.query.channel }, [], { limit: 30 }, (err: any, messages: Document[]) => {
+    if (err) return logger.err(err);
+    res.send(messages);
+  });
 });
 
 export default router;

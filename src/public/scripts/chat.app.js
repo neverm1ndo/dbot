@@ -70,7 +70,7 @@ class MessageControlButton extends HTMLButtonElement {
   }
 }
 class ChatMessage extends HTMLDivElement {
-  constructor(tags, message, self) {
+  constructor(tags, message, self, date) {
     super();
     this.body = document.createElement('div');
     this.nickname = document.createElement('span');
@@ -82,7 +82,7 @@ class ChatMessage extends HTMLDivElement {
     this.classList.add('card');
     this.body.classList.add('card-body');
     if (tags['message-type'] === "action") body.style.color = nickname.style.color;
-    this.body.dataset.date = (this.timestamp(Date.now()));
+    this.body.dataset.date = (this.timestamp(date));
     this.body.innerHTML = ': ' + this.pretty(tags, message);
     this.addTooltipsToEmotes();
     this.body.prepend(this.nickname);
@@ -334,8 +334,8 @@ class ChatController {
       });
     })
   }
-  add(tags, message, self) {
-    this.chat.append(new ChatMessage(tags, message, self));
+  add(tags, message, self, date = Date.now()) {
+    this.chat.append(new ChatMessage(tags, message, self, date));
     this.autoscroll();
   }
   alert(message, type, username) {

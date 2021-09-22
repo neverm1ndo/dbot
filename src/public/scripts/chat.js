@@ -29,6 +29,11 @@ const params = new URLSearchParams(window.location.search);
 
 let lurkers = [];
 Http.get('/controls/chat/lurkers').then(data => { lurkers = [...lurkers, ...data] });
+Http.get(`/controls/chat/last?channel=${user.username}`).then(messages => {
+  messages.forEach((message) => {
+    chat.add(message.tags, message.message, message.self, message.date);
+  });
+}).catch((err) => console.error(err));
 if (window.localStorage.getItem('lurkers')) {
   lurkers = [...new Set(...[JSON.parse(window.localStorage.getItem('lurkers')), lurkers])];
   JSON.parse(window.localStorage.getItem('lurkers')).forEach((lurker, index, arr) => {

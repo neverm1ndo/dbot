@@ -18,7 +18,6 @@ router.get('/', (req: Request, res: Response) => {
   })
 });
 router.post('/update-settings', json(), (req: Request, res: Response) => {
-  console.log(req.body)
   if (!req.body.settings) return res.sendStatus(BAD_REQUEST);
   USER.updateOne({'user.id': req.body.id }, { settings: req.body.settings }, { upsert: true, setDefaultsOnInsert: true } ,(err: any, user: any) => {
     if (err) return res.send;

@@ -9,6 +9,7 @@ import { Dota2 } from '@shared/dota2';
 import { Twitch } from '@shared/twitch';
 import { Nuzhdiki } from '@shared/nuzhdiki';
 import { Aneki } from '@shared/aneki';
+import { MESSAGE } from '../schemas/message.schema';
 import StartOptions from '../pre-start';
 type BotStatus = 'works' | 'sleeps';
 
@@ -78,6 +79,8 @@ export class Bot {
     this.client.connect();
     this.client.on('message', (channel: string, tags: ChatUserstate, message: string, self: boolean) => {
       this.banSpam(channel, tags, message, self);
+      let msg = new MESSAGE({channel, tags, message, self, date: Date.now()});
+      msg.save();
       if(self || !message.startsWith(this.prefix)) return;
     	const args = message.slice(1).split(' ');
     	const command = args.shift()!.toLowerCase();
