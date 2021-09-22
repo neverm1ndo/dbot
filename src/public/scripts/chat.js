@@ -29,7 +29,7 @@ const params = new URLSearchParams(window.location.search);
 
 let lurkers = [];
 Http.get('/controls/chat/lurkers').then(data => { lurkers = [...lurkers, ...data] });
-Http.get(`/controls/chat/last?channel=${user.username}`).then(messages => {
+Http.get(`/controls/chat/last?channel=${params.has('channel')?params.get('channel'):user.username}`).then(messages => {
   messages.forEach((message) => {
     chat.add(message.tags, message.message, message.self, message.date);
   });
