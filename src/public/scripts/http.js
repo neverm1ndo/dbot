@@ -1,6 +1,6 @@
 class Http {
-  static async get(url, headers) {
-    const res = await fetch(url, { headers })
+  static async get(url, headers, mode = 'cors') {
+    const res = await fetch(url, { headers, cache: 'default' })
       if (res.ok) {
        return await res.json();
     } else {
