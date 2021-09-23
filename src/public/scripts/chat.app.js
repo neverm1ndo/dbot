@@ -17,7 +17,9 @@ class BTTV {
     allowEmotesAnyChannel: false // Allow all BTTV emotes that are loaded no matter the channel restriction
   };
   getEmotes() {
-    Http.get('https://api.betterttv.net/2/emotes', { Accept: 'application/json' })
+    Http.get('https://api.betterttv.net/2/emotes', {
+       Accept: 'application/json',
+     })
     .then((data) => {
       console.log('Got BTTV global emotes \n', data);
       this.bttvEmotes = this.bttvEmotes.emotes.concat(data.emotes.map(function(n) {
@@ -132,7 +134,7 @@ class ChatMessage extends HTMLDivElement {
     this.nickname.style.color = tags.color;
     this.classList.add('card');
     this.body.classList.add('card-body');
-    if (tags['message-type'] === "action") body.style.color = nickname.style.color;
+    if (tags['message-type'] === "action") this.body.style.color = this.nickname.style.color;
     this.body.dataset.date = (this.timestamp(date));
     this.body.innerHTML = ': ' + this.pretty(tags, message);
     this.addTooltipsToEmotes();

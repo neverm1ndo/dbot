@@ -26,6 +26,9 @@ const parser = new DOMParser();
 const chat = new ChatController('#chat');
 const chatterList = new ChattersListController();
 const params = new URLSearchParams(window.location.search);
+// const bttv = new BTTV();
+//
+// bttv.getEmotes();
 
 let lurkers = [];
 Http.get('/controls/chat/lurkers').then(data => { lurkers = [...lurkers, ...data] });
