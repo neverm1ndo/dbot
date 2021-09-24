@@ -52,9 +52,9 @@ Promise.all([
   Http.get('/controls/chat/lurkers'),
   Http.get(`/controls/chat/last?channel=${params.has('channel')?params.get('channel'):user.username}`),
 ]).then(([badges, lurkers, lastMessages]) => {
-  channelSets.badges = badges.value.data;
-  channelSets.lurkers = [...channelSets.lurkers, ...lurkers.value];
-  lastMessages.value.forEach((message) => {
+  channelSets.badges = badges.data;
+  channelSets.lurkers = [...channelSets.lurkers, ...lurkers];
+  lastMessages.forEach((message) => {
     chat.add(message.tags, message.message, message.self, message.date);
   });
 }).catch((err) => console.error(err));
@@ -118,7 +118,6 @@ client.on('part', (channel, username, self) => {
   }, 180000);
 });
 client.on('message', (channel, tags, message, self) => {
-  console.log(tags);
   if (self) {
     tags.emotes = chat.selfEmotes;
     chat.add(tags, message, self);
