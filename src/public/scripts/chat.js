@@ -6,6 +6,12 @@ const user = {
   client: document.querySelector('#chatjs').dataset.client
 };
 
+const channelSets = {
+  badges: [],
+  lurkers: [],
+  id: user.id
+}
+
 const tag = document.createElement('script');
 tag.src = 'https://www.youtube.com/player_api';
 const firstScriptTag = document.getElementsByTagName('script')[0];
@@ -29,22 +35,38 @@ const params = new URLSearchParams(window.location.search);
 // const bttv = new BTTV();
 //
 // bttv.getEmotes();
-
-let lurkers = [];
-Http.get('/controls/chat/lurkers').then(data => { lurkers = [...lurkers, ...data] });
-Http.get(`/controls/chat/last?channel=${params.has('channel')?params.get('channel'):user.username}`).then(messages => {
-  messages.forEach((message) => {
+// if (params.has('channel')) {
+//   Http.get(`https://api.twitch.tv/helix/users?login=${params.get('channel')}`, {
+//     'Authorization': 'Bearer ' + user.token,
+//     'Client-ID': user.client
+//   }).then((data) => {
+//     console.log(data);
+//     channelSets.id = data.data[0].id
+//   });
+// }
+Promise.allSettled([
+  Http.get(`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${channelSets.id}`, {
+      'Authorization': 'Bearer ' + user.token,
+      'Client-ID': user.client
+  }),
+  Http.get('/controls/chat/lurkers'),
+  Http.get(`/controls/chat/last?channel=${params.has('channel')?params.get('channel'):user.username}`),
+]).then(([badges, lurkers, lastMessages]) => {
+  channelSets.badges = badges.value.data;
+  channelSets.lurkers = [...channelSets.lurkers, ...lurkers.value];
+  lastMessages.value.forEach((message) => {
     chat.add(message.tags, message.message, message.self, message.date);
   });
 }).catch((err) => console.error(err));
+
 if (window.localStorage.getItem('lurkers')) {
-  lurkers = [...new Set(...[JSON.parse(window.localStorage.getItem('lurkers')), lurkers])];
+  channelSets.lurkers = [...new Set(...[JSON.parse(window.localStorage.getItem('lurkers')), channelSets.lurkers])];
   JSON.parse(window.localStorage.getItem('lurkers')).forEach((lurker, index, arr) => {
     if (Array.isArray(lurker)) {
-      lurkers.splice(lurkers.indexOf(lurker), 1);
+      channelSets.lurkers.splice(channelSets.lurkers.indexOf(lurker), 1);
     }
   })
-  window.localStorage.setItem('lurkers', JSON.stringify(lurkers));
+  window.localStorage.setItem('lurkers', JSON.stringify(channelSets.lurkers));
 }
 
 const client = new tmi.Client({
@@ -74,7 +96,7 @@ client.on('disconnected', (channel, self) => {
   chat.submit.disabled = true;
 });
 client.on('join', (channel, username, self) => {
-  if (self || chatterList.connected.includes(username) || lurkers.includes(username)) return;
+  if (self || chatterList.connected.includes(username) || channelSets.lurkers.includes(username)) return;
   chatterList.add(username);
   chat.alert(`<b>${username}</b> подключился к чату`, 'success', username);
 });
@@ -87,7 +109,7 @@ client.on('timeout', (channel, username, reason, duration, userstate) => {
   chat.pseudoDelete(username);
 });
 client.on('part', (channel, username, self) => {
-  if (self || lurkers.includes(username)) return;
+  if (self || channelSets.lurkers.includes(username)) return;
   setTimeout(() => {
     if (chatterList.connected.includes(username)) {
       chatterList.remove(username);
@@ -96,6 +118,7 @@ client.on('part', (channel, username, self) => {
   }, 180000);
 });
 client.on('message', (channel, tags, message, self) => {
+  console.log(tags);
   if (self) {
     tags.emotes = chat.selfEmotes;
     chat.add(tags, message, self);

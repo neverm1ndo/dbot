@@ -1,3 +1,14 @@
+const defaultBadges = {
+  'diktorbot': '/tank2.png',
+  'broadcaster': '/img/bc.png',
+  'moderator': '/img/cm.png',
+  'subscriber': '/img/sub.png',
+  'founder': '/img/sub.png',
+  'vip': '/img/vip.png',
+  'turbo': '/img/tur.png',
+  'verified': '/img/vf.png',
+  'prime': '/img/prime.png',
+};
 class Cookies {
   static getCookie(name) {
     let matches = document.cookie.match(new RegExp(
@@ -52,27 +63,29 @@ class BTTV {
   }
 }
 class ChatMessageBadge extends HTMLDivElement {
-  badges = {
-    'diktorbot': '/tank2.png',
-    'broadcaster': '/img/bc.png',
-    'moderator': '/img/cm.png',
-    'subscriber': '/img/sub.png',
-    'founder': '/img/sub.png',
-    'vip': '/img/vip.png',
-    'turbo': '/img/tur.png',
-    'verified': '/img/vf.png',
-    'prime': '/img/prime.png',
-  };
   constructor(type) {
     super();
     this.classList.add('badge-icon');
     this.icon = document.createElement('img');
     this.icon.classList.add('badge-icon-img');
-    const badgesKeys = Object.keys(this.badges);
-    for (let i = 0; i < badgesKeys.length; i++ ) {
-      if (type === badgesKeys[i]) {
-        this.icon.src = this.badges[badgesKeys[i]];
+    for (let i = 0; i < channel.badges.length; i++) {
+      if (type[0] === channel.badges[i].set_id) {
+        for (let j = 0; j < channel.badges[i].versions.length; j++) {
+          if (type[1] === channel.badges[i].versions[j].id) {
+              this.icon.src = channel.badges[i].versions[j].image_url_2x;
+              break;
+          }
+        }
         break;
+      }
+    }
+    if (!this.icon.src) {
+      const defaultBadgesKeys = Object.keys(defaultBadges);
+      for (let i = 0; i < defaultBadgesKeys.length; i++ ) {
+        if (type[0] === defaultBadgesKeys[i]) {
+          this.icon.src = defaultBadges[defaultBadgesKeys[i]];
+          break;
+        }
       }
     }
     if (!this.icon.src) delete this.icon;
@@ -140,7 +153,7 @@ class ChatMessage extends HTMLDivElement {
     this.addTooltipsToEmotes();
     this.body.prepend(this.nickname);
     if (tags.badges) {
-      const badges = Object.keys(tags.badges);
+      const badges = Object.entries(tags.badges);
       if (tags.username === 'diktorbot') badges.push('diktorbot');
       for (let i = 0; i < badges.length; i+=1) {
         this.body.prepend(new ChatMessageBadge(badges[i]));
@@ -367,6 +380,7 @@ class ChatController {
       }
     )
     .then(data => { if (data.data.length > 0) this.addEmotes(data.data, id) })
+    .catch(err => console.error);
   }
   addEmotes(emotes, type) {
     const title = document.createElement('h6');
