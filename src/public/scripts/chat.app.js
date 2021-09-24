@@ -68,11 +68,11 @@ class ChatMessageBadge extends HTMLDivElement {
     this.classList.add('badge-icon');
     this.icon = document.createElement('img');
     this.icon.classList.add('badge-icon-img');
-    for (let i = 0; i < channel.badges.length; i++) {
-      if (type[0] === channel.badges[i].set_id) {
-        for (let j = 0; j < channel.badges[i].versions.length; j++) {
-          if (type[1] === channel.badges[i].versions[j].id) {
-              this.icon.src = channel.badges[i].versions[j].image_url_2x;
+    for (let i = 0; i < channelSets.badges.length; i++) {
+      if (type[0] === channelSets.badges[i].set_id) {
+        for (let j = 0; j < channelSets.badges[i].versions.length; j++) {
+          if (type[1] === channelSets.badges[i].versions[j].id) {
+              this.icon.src = channelSets.badges[i].versions[j].image_url_2x;
               break;
           }
         }
@@ -280,8 +280,8 @@ class ChatAlert extends HTMLDivElement {
     this.append(body);
   }
   static addLurker(username) {
-    lurkers.push(username);
-    window.localStorage.setItem('lurkers', JSON.stringify([...new Set(lurkers)]));
+    channelSets.lurkers.push(username);
+    window.localStorage.setItem('lurkers', JSON.stringify([...new Set(channelSets.lurkers)]));
   }
 }
 
