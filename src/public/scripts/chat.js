@@ -44,7 +44,7 @@ const params = new URLSearchParams(window.location.search);
 //     channelSets.id = data.data[0].id
 //   });
 // }
-Promise.allSettled([
+Promise.all([
   Http.get(`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${channelSets.id}`, {
       'Authorization': 'Bearer ' + user.token,
       'Client-ID': user.client
