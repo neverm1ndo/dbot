@@ -36,38 +36,36 @@ const params = new URLSearchParams(window.location.search);
 //
 // bttv.getEmotes();
 // if (params.has('channel')) {
-//   Http.get(`https://api.twitch.tv/helix/users?login=${params.get('channel')}`, {
-//     'Authorization': 'Bearer ' + user.token,
-//     'Client-ID': user.client
-//   }).then((data) => {
-//     console.log(data);
-//     channelSets.id = data.data[0].id
-//   });
-// }
-Promise.all([
-  Http.get(`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${channelSets.id}`, {
-      'Authorization': 'Bearer ' + user.token,
-      'Client-ID': user.client
-  }),
-  Http.get('/controls/chat/lurkers'),
-  Http.get(`/controls/chat/last?channel=${params.has('channel')?params.get('channel'):user.username}`),
-]).then(([badges, lurkers, lastMessages]) => {
-  channelSets.badges = badges.data;
-  channelSets.lurkers = [...channelSets.lurkers, ...lurkers];
-  lastMessages.forEach((message) => {
-    chat.add(message.tags, message.message, message.self, message.date);
-  });
-}).catch((err) => console.error(err));
+  Http.get(`https://api.twitch.tv/helix/users?login=${params.has('channel')?params.get('channel'):user.username}`, {
+    'Authorization': 'Bearer ' + user.token,
+    'Client-ID': user.client
+  }).then((data) => {
+    channelSets.id = data.data[0].id;
+    return Promise.all([
+      Http.get(`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${channelSets.id}`, {
+        'Authorization': 'Bearer ' + user.token,
+        'Client-ID': user.client
+      }),
+      Http.get('/controls/chat/lurkers'),
+      Http.get(`/controls/chat/last?channel=${params.has('channel')?params.get('channel'):user.username}`),
+    ])
+  }).then(([badges, lurkers, lastMessages]) => {
+    channelSets.badges = badges.data;
+    channelSets.lurkers = [...channelSets.lurkers, ...lurkers];
+    lastMessages.forEach((message) => {
+      chat.add(message.tags, message.message, message.self, message.date);
+    });
+  }).catch((err) => console.error(err));
 
-if (window.localStorage.getItem('lurkers')) {
-  channelSets.lurkers = [...new Set(...[JSON.parse(window.localStorage.getItem('lurkers')), channelSets.lurkers])];
-  JSON.parse(window.localStorage.getItem('lurkers')).forEach((lurker, index, arr) => {
-    if (Array.isArray(lurker)) {
-      channelSets.lurkers.splice(channelSets.lurkers.indexOf(lurker), 1);
-    }
-  })
-  window.localStorage.setItem('lurkers', JSON.stringify(channelSets.lurkers));
-}
+  if (window.localStorage.getItem('lurkers')) {
+    channelSets.lurkers = [...new Set(...[JSON.parse(window.localStorage.getItem('lurkers')), channelSets.lurkers])];
+    JSON.parse(window.localStorage.getItem('lurkers')).forEach((lurker, index, arr) => {
+      if (Array.isArray(lurker)) {
+        channelSets.lurkers.splice(channelSets.lurkers.indexOf(lurker), 1);
+      }
+    })
+    window.localStorage.setItem('lurkers', JSON.stringify(channelSets.lurkers));
+  }
 
 const client = new tmi.Client({
   options: {

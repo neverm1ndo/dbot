@@ -154,7 +154,7 @@ class ChatMessage extends HTMLDivElement {
     this.body.prepend(this.nickname);
     if (tags.badges) {
       const badges = Object.entries(tags.badges);
-      if (tags.username === 'diktorbot') badges.push('diktorbot');
+      if (tags.username === 'diktorbot') badges.push(['diktorbot', '1']);
       for (let i = 0; i < badges.length; i+=1) {
         this.body.prepend(new ChatMessageBadge(badges[i]));
       }
