@@ -46,10 +46,10 @@ const params = new URLSearchParams(window.location.search);
         'Authorization': 'Bearer ' + user.token,
         'Client-ID': user.client
       }),
-      Http.get('/controls/chat/lurkers'),
+      // Http.get('/controls/chat/lurkers'),
       Http.get(`/controls/chat/last?channel=${params.has('channel')?params.get('channel'):user.username}`),
     ])
-  }).then(([badges, lurkers, lastMessages]) => {
+  }).then(([badges, lastMessages]) => {
     channelSets.badges = badges.data;
     channelSets.lurkers = [...channelSets.lurkers, ...lurkers];
     lastMessages.forEach((message) => {
