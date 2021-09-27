@@ -214,8 +214,7 @@ class ChatMessage extends HTMLDivElement {
   constructor(tags, message, self, date) {
     super();
     let splitter = ': ';
-    const color = new HEX(tags.color);
-
+    const color = tags.color?new HEX(tags.color):new HEX('FFFFFF');
     this.body = document.createElement('div');
     this.nickname = document.createElement('span');
     this.tags = tags;
