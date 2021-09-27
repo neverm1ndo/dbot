@@ -10,7 +10,7 @@ const channelSets = {
   badges: [],
   lurkers: [],
   id: user.id,
-  sets: 0
+  sets: new Set()
 }
 
 const tag = document.createElement('script');
@@ -117,7 +117,7 @@ client.on('part', (channel, username, self) => {
     }
   }, 180000);
 });
-client.on('message', (channel, tags, message, self) => {
+client.on('chat', (channel, tags, message, self) => {
   if (self) {
     tags.emotes = chat.selfEmotes;
     chat.add(tags, message, self);
@@ -126,6 +126,18 @@ client.on('message', (channel, tags, message, self) => {
   chat.add(tags, message, self);
 });
 client.on('subscription', (channel, username, methods, message, userstate) => {
+  chat.alert(`<b>${username}</b> оформил подписку<br><small>${message}</small>`, 'info');
+});
+client.on('notice', (channel, msgid, message) => {
+  chat.alert(`<small>${message}</small>`);
+});
+client.on('vips', (channel, vips) => {
+  chat.alert(`<small>${vips.length > 0?vips:'Список VIP пуст'}</small>`);
+});
+client.on('mods', (channel, mods) => {
+  chat.alert(`<small>${mods.length > 0?mods:'Список модераторов пуст'}</small>`);
+});
+client.on('resub', (channel, username, methods, message, userstate) => {
   chat.alert(`<b>${username}</b> оформил подписку<br><small>${message}</small>`, 'info');
 });
 client.on('subgift', (channel, username, streakMonths, recepient, methods, userstate) => {
@@ -140,8 +152,17 @@ client.on('hosted', (channel, username, viewers, autohost) => {
 client.on('whisper', (channel, tags, message, self) => {
   chat.add(tags, message, self);
 });
-client.on("emotesets", (sets, obj) => {
-  channelSets.sets++;
-  if (channelSets.sets <= 1) return;
+client.on('clearchat', (channel) => {
+  chat.alert('Чат был очищен');
+});
+client.on('cheer', (channel, userstate, message) => {
+  chat.alert(`<b>${username}</b> поддержал канал на <b>${userstate.bits}</b> Cheers`, 'info');
+});
+client.on('emotesets', (sets, obj) => {
+  const set = sets.split(',');
+  for (let i = 0; i < set.length; i++) {
+    if (channelSets.sets.has(set[i])) continue;
+    channelSets.sets.add(set[i])
+  }
   chat.getEmoteSet(sets.split(','));
 });
