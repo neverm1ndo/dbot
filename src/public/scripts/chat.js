@@ -9,7 +9,8 @@ const user = {
 const channelSets = {
   badges: [],
   lurkers: [],
-  id: user.id
+  id: user.id,
+  sets: 0
 }
 
 const tag = document.createElement('script');
@@ -140,6 +141,7 @@ client.on('whisper', (channel, tags, message, self) => {
   chat.add(tags, message, self);
 });
 client.on("emotesets", (sets, obj) => {
-  if (client.readyState() !== 'OPEN') return;
+  channelSets.sets++;
+  if (channelSets.sets <= 1) return;
   chat.getEmoteSet(sets.split(','));
 });
