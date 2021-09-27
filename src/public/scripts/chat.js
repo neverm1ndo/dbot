@@ -140,6 +140,6 @@ client.on('whisper', (channel, tags, message, self) => {
   chat.add(tags, message, self);
 });
 client.on("emotesets", (sets, obj) => {
-  console.log(sets);
+  if (client.readyState() !== 'OPEN') return;
   chat.getEmoteSet(sets.split(','));
 });
