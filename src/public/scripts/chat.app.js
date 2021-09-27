@@ -420,6 +420,7 @@ class ChatController {
     this.chat = document.querySelector(selector);
     this.connected = false;
     this.selfEmotes = {};
+    this.emoteSets = [];
     this.text = document.querySelector('#text');
     this.submit = document.querySelector('#send');
     this.emotes = document.querySelector("#emotes-list");
@@ -453,6 +454,8 @@ class ChatController {
     });
   }
   getEmoteSet(id) {
+    if (this.emoteSets.includes(id)) return;
+    this.emoteSets.push(id);
     Http.get(
       `https://api.twitch.tv/helix/chat/emotes/set?emote_set_id=${id}`,
       {
