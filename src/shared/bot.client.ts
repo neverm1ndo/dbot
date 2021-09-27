@@ -105,9 +105,11 @@ export class Bot {
   private banSpam(channel: string, tags: ChatUserstate, message: string, self: boolean) {
     if (self) return;
     if (!this.isPrevileged(tags) || !this.isSubscriber(tags)) {
+      message = message.replace(' ', '').toLowerCase();
       for (let i = 0; i < this.opts.dictionary.length; i+=1) {
-        if (message.includes(this.opts.dictionary[i])) {
-          this.client.ban(channel, tags.username!);
+        let form = this.opts.dictionary[i].replace(' ', '').toLowerCase();
+        if (message.includes(form)) {
+          this.client.ban(channel, tags.username!, 'Banned phrase: ' + this.opts.dictionary[i]);
           logger.warn(tags.username + ' banned for reason: ' + this.opts.dictionary[i]);
           return;
         }
