@@ -420,7 +420,6 @@ class ChatController {
     this.chat = document.querySelector(selector);
     this.connected = false;
     this.selfEmotes = {};
-    this.emoteSets = [];
     this.text = document.querySelector('#text');
     this.submit = document.querySelector('#send');
     this.emotes = document.querySelector("#emotes-list");
@@ -435,10 +434,6 @@ class ChatController {
         this.selfEmotes = {};
       }
     });
-    if (!window.localStorage.getItem('lastEmotes')) {
-      window.localStorage.setItem('lastEmotes', JSON.stringify([]));
-    }
-    this.addEmotes(JSON.parse(window.localStorage.getItem('lastEmotes')), 'Last Used');
     this.emotes.addEventListener('click', (event) => {
       if (event.target.tagName !== 'IMG') return;
       if (typeof this.selfEmotes[event.target.dataset.id] !== 'object') {
@@ -446,44 +441,64 @@ class ChatController {
       }
       this.selfEmotes[event.target.dataset.id].push(`${this.text.value.length}-${this.text.value.length + event.target.dataset.name.length}`);
       this.text.value = this.text.value + ' ' + event.target.dataset.name + ' ';
-      // let last = JSON.parse(window.localStorage.getItem('lastEmotes'));
-      // last.push({id: event.target.dataset.id, name: event.target.dataset.name});
-      // if (last.length > 16) last.splice(0, 1);
-      // window.localStorage.setItem('lastEmotes', JSON.stringify([...new Set(last)]));
-      //   this.addEmotes(JSON.parse(window.localStorage.getItem('lastEmotes')), 'last used');
     });
   }
   getEmoteSet(id) {
-    if (this.emoteSets.includes(id)) return;
-    this.emoteSets.push(id);
     Http.get(
-      `https://api.twitch.tv/helix/chat/emotes/set?emote_set_id=${id}`,
+      `https://api.twitch.tv/helix/chat/emotes/set?emote_set_id=${id.join('&emote_set_id=')}`,
       {
         'Authorization': 'Bearer ' + user.token,
         'Client-ID': user.client
       }
     )
-    .then(data => { if (data.data.length > 0) this.addEmotes(data.data, id) })
+    .then(data => { if (data.data.length > 0) this.addEmotes(data.data);})
     .catch(err => console.error);
   }
-  addEmotes(emotes, type) {
-    const title = document.createElement('h6');
-    title.innerHTML = type;
-    this.emotes.append(title);
-    emotes.forEach(emote => {
-      const img = document.createElement('img');
-      img.title = emote.name;
-      img.setAttribute('data-bs-toggle', 'tooltip');
-      img.setAttribute('data-bs-placement', 'top');
-      img.src = `https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/light/3.0`;
-      img.dataset.name = emote.name;
-      img.dataset.id = emote.id;
-      this.emotes.append(img);
-      new bootstrap.Tooltip(img, {
-        boundary: this.emotes.parentNode,
-        delay: { "show": 1000, "hide": 0 }
-      });
-    })
+  addEmotes(emotes) {
+    const owners = {};
+    let streamers = new Set();
+    for (let i = 0; i < emotes.length; i++) {
+      if (emotes[i].owner_id !== 'twitch' && emotes[i].owner_id !== '0') streamers.add(emotes[i].owner_id);
+      if (!owners[emotes[i].owner_id]) owners[emotes[i].owner_id] = [];
+      owners[emotes[i].owner_id].push(emotes[i]);
+    }
+    Http.get(`https://api.twitch.tv/helix/users?id=${[...streamers].join('&id=')}`, {
+      'Authorization': 'Bearer ' + user.token,
+      'Client-ID': user.client
+    }).then((ownersInfo) => {
+      ownersInfo.data.push({
+        id: '0',
+        display_name: 'Whole World'
+      })
+      for (let i = 0; i < ownersInfo.data.length; i++) {
+        const container = document.createElement('div');
+        const subcont = document.createElement('div');
+        const title = document.createElement('b');
+        let avatar;
+        if (ownersInfo.data[i].profile_image_url) {
+          avatar = new Image(20, 20);
+          avatar.classList.add('avatar');
+          avatar.src = ownersInfo.data[i].profile_image_url;
+        }
+        title.innerHTML = ownersInfo.data[i].display_name;
+        for (let j = 0; j < owners[ownersInfo.data[i].id].length; j++) {
+          const img = document.createElement('img');
+          img.title = owners[ownersInfo.data[i].id][j].name;
+          img.classList.add('emote');
+          img.setAttribute('data-bs-toggle', 'tooltip');
+          img.setAttribute('data-bs-placement', 'top');
+          img.src = `https://static-cdn.jtvnw.net/emoticons/v2/${owners[ownersInfo.data[i].id][j].id}/default/light/3.0`;
+          img.dataset.name = owners[ownersInfo.data[i].id][j].name;
+          img.dataset.id = owners[ownersInfo.data[i].id][j].id;
+          new bootstrap.Tooltip(img, {
+            boundary: this.emotes.parentNode
+          });
+          container.append(title, avatar?avatar:'', subcont);
+          subcont.append(img);
+        }
+        this.emotes.append(container);
+      }
+    }).catch((err) => console.log(err))
   }
   add(tags, message, self, date = Date.now()) {
     this.chat.append(new ChatMessage(tags, message, self, date));

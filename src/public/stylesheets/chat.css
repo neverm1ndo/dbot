@@ -121,7 +121,14 @@ body #logo {
   background-color: var(--twitch-main);
   color: #fff;
 }
-.emotes-list img {
+.emotes-list b {
+  font-size: 14px;
+}
+.emotes-list .avatar {
+  width: 25px;
+  height: 25px;
+}
+.emotes-list .emote {
   display: inline-block;
   max-width: 30px;
   margin: 3px;
@@ -129,7 +136,12 @@ body #logo {
   border-radius: 4px;
   transition: .1s ease-out;
 }
-.emotes-list img:hover {
+.emotes-list div div {
+  width: 100%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.emotes-list .emote:hover {
   transform: scale(1.3);
 }
 .emotes {
