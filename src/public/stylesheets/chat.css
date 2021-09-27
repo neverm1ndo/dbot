@@ -63,7 +63,7 @@ body iframe {
   margin-right: 2px;
   margin-left: 5px;
   display: inline-block;
-  filter: contrast(0.5) brightness(1.2);
+  /* filter: contrast(0.5) brightness(1.2); */
   cursor: pointer;
   transition: .2s ease-in-out;
   border-radius: .25rem;
