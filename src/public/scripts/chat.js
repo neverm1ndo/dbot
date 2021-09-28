@@ -100,7 +100,7 @@ client.on('join', (channel, username, self) => {
   chatterList.add(username);
   chat.alert(`<b>${username}</b> подключился к чату`, 'success', username);
 });
-client.on('ban', (channel, username, reason) => {
+client.on('ban', (channel, username, reason, userstate) => {
   chat.alert(`<b>${username}</b> забанен ${reason?': ' + reason:''}`, 'warning');
   chat.pseudoDelete(username);
 });
@@ -132,9 +132,11 @@ client.on('notice', (channel, msgid, message) => {
   chat.alert(`<small>${message}</small>`);
 });
 client.on('vips', (channel, vips) => {
+  vips = vips.join('</br>');
   chat.alert(`<small>${vips.length > 0?vips:'Список VIP пуст'}</small>`);
 });
 client.on('mods', (channel, mods) => {
+  mods = mods.join('</br>');
   chat.alert(`<small>${mods.length > 0?mods:'Список модераторов пуст'}</small>`);
 });
 client.on('resub', (channel, username, methods, message, userstate) => {

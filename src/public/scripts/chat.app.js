@@ -18,12 +18,12 @@ class HEX {
     this.g = parseInt(color.substr(2, 2), 16);
     this.b = parseInt(color.substr(4, 2), 16);
   }
-  #setSpecters() {
+  setSpecters() {
     this.r = parseInt(this.toString().substr(0, 2), 16);
     this.g = parseInt(this.toString().substr(2, 2), 16);
     this.b = parseInt(this.toString().substr(4, 2), 16);
   }
-  #setColor() {
+  setColor() {
     this.color = parseInt(this.toString().substr(1), 16);
   }
   blend(hex) {
@@ -31,7 +31,7 @@ class HEX {
       throw console.error(Error(hex + ' is not a HEX instance!'));
     }
     this.color = this.color + hex.color;
-    this.#setSpecters();
+    this.setSpecters();
     return this;
   }
   toString() {
@@ -56,7 +56,7 @@ class HEX {
     this.r = Math.round(this.r * amount + gray * (1-amount));
     this.g = Math.round(this.g * amount + gray * (1-amount));
     this.b = Math.round(this.b * amount + gray * (1-amount));
-    this.#setColor();
+    this.setColor();
     return this;
   }
   contrast(amount) {
@@ -68,7 +68,7 @@ class HEX {
     this.r = Math.min(255, Math.round((this.r/col)*this.r + (amount*col)));
     this.g = Math.min(255, Math.round((this.g/col)*this.g + (amount*col)));
     this.b = Math.min(255, Math.round((this.b/col)*this.b + (amount*col)));
-    this.#setColor();
+    this.setColor();
     return this;
   }
   brightness(amount) {
@@ -80,7 +80,7 @@ class HEX {
     this.r = Math.min(255,Math.floor(this.r + 255 - (amount*255)));
     this.g = Math.min(255,Math.floor(this.g + 255 - (amount*255)));
     this.b = Math.min(255,Math.floor(this.b + 255 - (amount*255)));
-    this.#setColor();
+    this.setColor();
     return this;
   }
 }
