@@ -335,10 +335,10 @@ class ChatAlert extends HTMLDivElement {
       this.classList.add('bg-success', 'text-light');
         break;
       case 'ban':
-        this.classList.add('bg-warning', 'text-light');
+        this.classList.add('bg-warning', 'text-dark');
         break;
       case 'unban':
-        this.classList.add('bg-warning', 'text-light');
+        this.classList.add('bg-warning', 'text-dark');
         break;
       case 'danger':
         this.classList.add('bg-danger', 'text-light');
