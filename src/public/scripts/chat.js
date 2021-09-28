@@ -101,7 +101,8 @@ client.on('join', (channel, username, self) => {
   chat.alert(`<b>${username}</b> подключился к чату`, 'success', username);
 });
 client.on('ban', (channel, username, reason, userstate) => {
-  chat.alert(`<b>${username}</b> забанен ${reason?': ' + reason:''}`, 'warning');
+  // Replaced with PubSub event handler
+  // chat.alert(`<b>${username}</b> забанен ${reason?': ' + reason:''}`, 'warning');
   chat.pseudoDelete(username);
 });
 client.on('timeout', (channel, username, reason, duration, userstate) => {
