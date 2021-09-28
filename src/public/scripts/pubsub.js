@@ -27,7 +27,7 @@ class PubSub {
         console.log('[PUBSUB] RECV: ' + JSON.stringify(message) + '\n');
         if (message.type == 'MESSAGE') {
           const msg = JSON.parse(message.data.message).data;
-          if (this.moderation_actions[msg.moderation_action]) return;
+          if (!this.moderation_actions[msg.moderation_action]) return;
           chat.alert(`<b>${msg.created_by}</b> ${this.moderation_actions[msg.moderation_action]} <b>${msg.args[0]}</b> ${msg.args[1]?'по причине: ' + msg.args[1]:''}`, msg.moderation_action);
         }
         if (message.type == 'RECONNECT') {
