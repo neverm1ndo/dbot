@@ -15,6 +15,6 @@ export const CORSoptions = {
       return callback(null, true);
     },
     // origin: '*',
-    preflightContinue: false,
+    preflightContinue: true,
   };
   export const corsOpt = cors(CORSoptions);

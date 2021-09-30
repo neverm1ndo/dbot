@@ -5,6 +5,7 @@ import { corsOpt } from '@shared/constants';
 import { MESSAGE } from '../schemas/message.schema';
 import StatusCodes from 'http-status-codes';
 import { Document } from 'mongoose';
+import EmotesRoute from './bttv';
 const { BAD_REQUEST } = StatusCodes;
 
 const router = Router();
@@ -16,6 +17,7 @@ router.get('/', corsOpt, (req: Request, res: Response,) => {
 router.get('/lurkers', corsOpt, (req: Request, res: Response,) => {
   res.send(bot.opts.blacklist);
 });
+router.use('/emotes', EmotesRoute);
 router.post('/add-lurker', corsOpt, (req: Request, res: Response,) => {
   bot.opts.blacklist.push(req.body);
 });

@@ -227,6 +227,12 @@ body .card .card-body img {
 .chatters-counter svg path {
   fill: #ff8280;
 }
+.chatters-list .chatters-counter {
+  color: var(--bs-light);
+}
+.chatters-list .chatters-counter svg path {
+  fill: var(--bs-light);
+}
 .badge-icon {
   max-width: 16px;
   max-height: 16px;

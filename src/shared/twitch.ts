@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const TWITCH_EVENTS_STREAMS = 'https://api.twitch.tv/helix/eventsub/subscriptions';
 const TWITCH_APP_TOKEN = 'https://id.twitch.tv/oauth2/token';
+const BTTV = 'https://api.betterttv.net/2/';
 
 export class Twitch {
   /**
@@ -10,6 +11,15 @@ export class Twitch {
   * @param {number} id Twitch user id
   * @param {string} accessToken App access token
   **/
+  static getBttvEmotes(url: string) {
+    return axios({
+      method: 'get',
+      url: BTTV + url,
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+  }
   static streamChanges(type: 'stream.online' | 'stream.offline', id: number, accessToken: string) {
     return axios({
       method: 'post',

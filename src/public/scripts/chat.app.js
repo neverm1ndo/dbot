@@ -96,16 +96,14 @@ class BTTV {
   bttvEmotes = {
     urlTemplate: 'https://cdn.betterttv.net/emote/{{id}}/{{image}}',
     scales: { 1: '1x', 2: '2x', 3: '3x' },
-    bots: [], // Bots listed by BTTV for a channel { name: 'name', channel: 'channel' }
-    emoteCodeList: [], // Just the BTTV emote codes
-    emotes: [], // BTTV emotes
-    subEmotesCodeList: [], // I don't have a restriction set for Night-sub-only emotes, but the data's here.
-    allowEmotesAnyChannel: false // Allow all BTTV emotes that are loaded no matter the channel restriction
+    bots: [],
+    emoteCodeList: [],
+    emotes: [],
+    subEmotesCodeList: [],
+    allowEmotesAnyChannel: false
   };
   getEmotes() {
-    Http.get('https://api.betterttv.net/2/emotes', {
-       Accept: 'application/json',
-     })
+    Http.get('chat/emotes')
     .then((data) => {
       console.log('Got BTTV global emotes \n', data);
       this.bttvEmotes = this.bttvEmotes.emotes.concat(data.emotes.map(function(n) {
@@ -113,7 +111,10 @@ class BTTV {
         return n;
       }));
       this.bttvEmotes.subEmotesCodeList = _.chain(this.bttvEmotes.emotes).where({ global: true }).reject(function(n) { return _.isNull(n.channel); }).pluck('code').value();
-    }).catch((err) => console.error);
+    }).catch((err) => console.error)
+    .then(() => {
+      this.addEmotes();
+    })
   }
   mergeEmotes(data, channel) {
     console.log('Got BTTV emotes for ' + channel);
@@ -135,6 +136,28 @@ class BTTV {
         channel: channel
       };
     }));
+  }
+  addEmotes() {
+    const container = document.createElement('div');
+    const subcont = document.createElement('div');
+    const title = document.createElement('b');
+    title.innerText = 'BTTV';
+    for (let i = 0; i < this.bttvEmotes.length; i++) {
+      const img = document.createElement('img');
+      img.title = this.bttvEmotes[i].code;
+      img.classList.add('emote');
+      img.setAttribute('data-bs-toggle', 'tooltip');
+      img.setAttribute('data-bs-placement', 'top');
+      img.src = `https://cdn.betterttv.net/emote/${this.bttvEmotes[i].id}/1x`;
+      img.dataset.name = this.bttvEmotes[i].code;
+      img.dataset.id = this.bttvEmotes[i].id;
+      new bootstrap.Tooltip(img, {
+        boundary: chat.emotes.parentNode
+      });
+      subcont.append(img);
+    }
+    container.append(title, subcont);
+    chat.emotes.append(container);
   }
 }
 class ChatMessageBadge extends HTMLDivElement {
@@ -290,6 +313,12 @@ class ChatMessage extends HTMLDivElement {
             break;
         }
       }
+      for (let k = 0; k < bttv.bttvEmotes.length; k++) {
+        if (bttv.bttvEmotes[k].code === splited[i]) {
+          emoted = true;
+          result.push('<img data-bs-toggle="tooltip" title="'+ splited[i] +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.bttvEmotes[k].id +'/1x">')
+        }
+      }
       if (emoted) continue;
       result.push(splited[i]);
     }
@@ -376,6 +405,7 @@ class ChattersListController {
     this.box = document.querySelector('#chatters-list');
     this.list = document.querySelector('#list');
     this.counter = document.querySelector('#chatters-counter');
+    this.altCounter = document.querySelector('#chatters-counter-alt');
     this.connected = [];
     this.buttons = {
       open: document.querySelector('#open-chatters-list'),
@@ -406,11 +436,11 @@ class ChattersListController {
   }
   remove(username) {
     this.connected.splice(this.connected.indexOf(username), 1);
-    this.counter.innerHTML = this.connected.length;
+    this.altCounter.innerHTML = this.connected.length;
   }
   add(username) {
     this.connected.push(username);
-    this.counter.innerHTML = this.connected.length;
+    this.altCounter.innerHTML = this.connected.length;
   }
   open() {
     this.box.style.display = 'block';

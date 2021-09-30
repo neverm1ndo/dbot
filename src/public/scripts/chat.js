@@ -33,41 +33,56 @@ const parser = new DOMParser();
 const chat = new ChatController('#chat');
 const chatterList = new ChattersListController();
 const params = new URLSearchParams(window.location.search);
-// const bttv = new BTTV();
-//
-// bttv.getEmotes();
-// if (params.has('channel')) {
-  Http.get(`https://api.twitch.tv/helix/users?login=${params.has('channel')?params.get('channel'):user.username}`, {
-    'Authorization': 'Bearer ' + user.token,
-    'Client-ID': user.client
-  }).then((data) => {
-    channelSets.id = data.data[0].id;
-    return Promise.all([
-      Http.get(`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${channelSets.id}`, {
-        'Authorization': 'Bearer ' + user.token,
-        'Client-ID': user.client
-      }),
-      // Http.get('/controls/chat/lurkers'),
-      // Http.get('https://api.twitch.tv/helix/streams'),
-      Http.get(`/controls/chat/last?channel=${params.has('channel')?params.get('channel'):user.username}`),
-    ])
-  }).then(([badges, lastMessages]) => {
-    channelSets.badges = badges.data;
-    // channelSets.lurkers = [...channelSets.lurkers, ...lurkers];
-    lastMessages.forEach((message) => {
-      chat.add(message.tags, message.message, message.self, message.date);
-    });
-  }).catch((err) => console.error(err));
+const bttv = new BTTV();
 
-  if (window.localStorage.getItem('lurkers')) {
-    channelSets.lurkers = [...new Set(...[JSON.parse(window.localStorage.getItem('lurkers')), channelSets.lurkers])];
-    JSON.parse(window.localStorage.getItem('lurkers')).forEach((lurker, index, arr) => {
-      if (Array.isArray(lurker)) {
-        channelSets.lurkers.splice(channelSets.lurkers.indexOf(lurker), 1);
+let trigger = 0;
+
+bttv.getEmotes();
+// if (params.has('channel')) {
+function handleStreamInfo(id) {
+  setInterval(() => {
+    Http.get(`https://api.twitch.tv/helix/streams?user_id=${id}`, {
+      'Authorization': 'Bearer ' + user.token,
+      'Client-ID': user.client
+    }).then((data) => {
+      if (data.data[0]) {
+        chatterList.counter.innerHTML = data.data[0].viewer_count;
       }
     })
-    window.localStorage.setItem('lurkers', JSON.stringify(channelSets.lurkers));
-  }
+  }, 120000);
+}
+Http.get(`https://api.twitch.tv/helix/users?login=${params.has('channel')?params.get('channel'):user.username}`, {
+  'Authorization': 'Bearer ' + user.token,
+  'Client-ID': user.client
+}).then((data) => {
+  channelSets.id = data.data[0].id;
+  handleStreamInfo(channelSets.id);
+  return Promise.all([
+    Http.get(`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${channelSets.id}`, {
+      'Authorization': 'Bearer ' + user.token,
+      'Client-ID': user.client
+    }),
+    // Http.get('/controls/chat/lurkers'),
+    // Http.get('https://api.twitch.tv/helix/streams'),
+    Http.get(`/controls/chat/last?channel=${params.has('channel')?params.get('channel'):user.username}`),
+  ])
+}).then(([badges, lastMessages]) => {
+  channelSets.badges = badges.data;
+  // channelSets.lurkers = [...channelSets.lurkers, ...lurkers];
+  lastMessages.forEach((message) => {
+    chat.add(message.tags, message.message, message.self, message.date);
+  });
+}).catch((err) => console.error(err));
+
+if (window.localStorage.getItem('lurkers')) {
+  channelSets.lurkers = [...new Set(...[JSON.parse(window.localStorage.getItem('lurkers')), channelSets.lurkers])];
+  JSON.parse(window.localStorage.getItem('lurkers')).forEach((lurker, index, arr) => {
+    if (Array.isArray(lurker)) {
+      channelSets.lurkers.splice(channelSets.lurkers.indexOf(lurker), 1);
+    }
+  })
+  window.localStorage.setItem('lurkers', JSON.stringify(channelSets.lurkers));
+}
 
 const client = new tmi.Client({
   options: {
@@ -162,10 +177,7 @@ client.on('cheer', (channel, userstate, message) => {
   chat.alert(`<b>${username}</b> поддержал канал на <b>${userstate.bits}</b> Cheers`, 'info');
 });
 client.on('emotesets', (sets, obj) => {
-  const set = sets.split(',');
-  for (let i = 0; i < set.length; i++) {
-    if (channelSets.sets.has(set[i])) continue;
-    channelSets.sets.add(set[i])
-  }
+  if (trigger > 0) return;
+  trigger++;
   chat.getEmoteSet(sets.split(','));
 });
