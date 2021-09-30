@@ -65,7 +65,7 @@ function handleStreamInfo(id) {
       'Client-ID': user.client
     }).then((data) => {
       if (data.data[0]) {
-        chatterList.counter.innerHTML = data.data[0].viewer_count;
+        chatterList.dom.counter.innerHTML = data.data[0].viewer_count;
       }
     })
   }, 120000);
