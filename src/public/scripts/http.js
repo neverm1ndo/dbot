@@ -15,3 +15,4 @@ class Http {
     return await res.json();
   }
 }
+export default Http;

@@ -1,4 +1,7 @@
+import { chat, user } from './chat';
+
 const _SCOPE = 'user_read+chat_login';
+
 class PubSub {
   ws
   moderation_actions = {
@@ -65,16 +68,6 @@ class PubSub {
     this.ws.send(JSON.stringify(message));
   }
 }
-function parseFragment(hash) {
-    let hashMatch = function(expr) {
-      let match = hash.match(expr);
-      return match ? match[1] : null;
-    };
-    let state = hashMatch(/state=(\w+)/);
-    if (sessionStorage.twitchOAuthState == state)
-        sessionStorage.twitchOAuthToken = hashMatch(/access_token=(\w+)/);
-    return
-};
 function nonce(length) {
     let text = "";
     let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -84,5 +77,4 @@ function nonce(length) {
     return text;
 }
 
-const pubsub  = new PubSub();
-      pubsub.connect();
+export default PubSub;

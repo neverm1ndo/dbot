@@ -1,16 +1,31 @@
-const user = {
-  username: document.querySelector('#chatjs').dataset.username,
-  display_name: document.querySelector('#chatjs').dataset.displayname,
-  token: document.querySelector('#chatjs').dataset.token,
-  id: document.querySelector('#chatjs').dataset.id,
-  client: document.querySelector('#chatjs').dataset.client
+import {
+  ChatController,
+  ChattersListController,
+  ChatMessageBadge,
+  ChatMessage,
+  ChatAlert,
+  YTFrame,
+  MessageControlButton
+} from './chat.app';
+import PubSub from './pubsub';
+import Http from './http';
+import BTTV from './bttv';
+
+class User {
+  username = document.querySelector('#chatjs').dataset.username;
+  display_name = document.querySelector('#chatjs').dataset.displayname;
+  token = document.querySelector('#chatjs').dataset.token;
+  id = document.querySelector('#chatjs').dataset.id;
+  client = document.querySelector('#chatjs').dataset.client;
 };
 
-const channelSets = {
+export const user = new User();
+
+export const channelSets = {
   badges: [],
   lurkers: [],
+  sets: new Set(),
   id: user.id,
-  sets: new Set()
 }
 
 const tag = document.createElement('script');
@@ -30,14 +45,18 @@ customElements.define('control-button', MessageControlButton, { extends: 'button
 //*******************************//
 
 const parser = new DOMParser();
-const chat = new ChatController('#chat');
-const chatterList = new ChattersListController();
-const params = new URLSearchParams(window.location.search);
-const bttv = new BTTV();
+export const chat = new ChatController('#chat');
+export const chatterList = new ChattersListController();
+export const params = new URLSearchParams(window.location.search);
+export const bttv = new BTTV(params);
+
+const pubsub = new PubSub();
+
+bttv.getEmotes();
+pubsub.connect();
 
 let trigger = 0;
 
-bttv.getEmotes();
 // if (params.has('channel')) {
 function handleStreamInfo(id) {
   setInterval(() => {
@@ -62,13 +81,10 @@ Http.get(`https://api.twitch.tv/helix/users?login=${params.has('channel')?params
       'Authorization': 'Bearer ' + user.token,
       'Client-ID': user.client
     }),
-    // Http.get('/controls/chat/lurkers'),
-    // Http.get('https://api.twitch.tv/helix/streams'),
     Http.get(`/controls/chat/last?channel=${params.has('channel')?params.get('channel'):user.username}`),
   ])
 }).then(([badges, lastMessages]) => {
   channelSets.badges = badges.data;
-  // channelSets.lurkers = [...channelSets.lurkers, ...lurkers];
   lastMessages.forEach((message) => {
     chat.add(message.tags, message.message, message.self, message.date);
   });
@@ -84,7 +100,7 @@ if (window.localStorage.getItem('lurkers')) {
   window.localStorage.setItem('lurkers', JSON.stringify(channelSets.lurkers));
 }
 
-const client = new tmi.Client({
+export const client = new tmi.Client({
   options: {
     debug: true,
     messagesLogLevel: "info",

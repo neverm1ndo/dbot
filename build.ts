@@ -20,6 +20,7 @@ logger.timestamp = false;
         // Copy front-end files
         await copy('./src/public', './dist/public');
         await copy('./src/views', './dist/views');
+        await exec('webpack --config ./webpack.frontend.js', './');
         // Copy production env file
         await copy('./src/pre-start/env/production.env', './dist/pre-start/env/production.env');
         // Copy back-end files

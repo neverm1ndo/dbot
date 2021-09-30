@@ -1,3 +1,7 @@
+import Http from './http';
+import HEX from './hex';
+import { user, bttv, channelSets, chatterList, client, params } from './chat';
+
 const defaultBadges = {
   'diktorbot': '/tank2.png',
   'broadcaster': '/img/bc.png',
@@ -9,171 +13,32 @@ const defaultBadges = {
   'verified': '/img/vf.png',
   'prime': '/img/prime.png',
 };
-class HEX {
-  constructor(color) {
-    if (typeof color !== 'string') throw console.error(Error(color + ' is not a string!'));
-    if (color.startsWith('#')) color = color.substr(1);
-    this.color = parseInt(color, 16);
-    this.r = parseInt(color.substr(0, 2), 16);
-    this.g = parseInt(color.substr(2, 2), 16);
-    this.b = parseInt(color.substr(4, 2), 16);
-  }
-  setSpecters() {
-    this.r = parseInt(this.toString().substr(0, 2), 16);
-    this.g = parseInt(this.toString().substr(2, 2), 16);
-    this.b = parseInt(this.toString().substr(4, 2), 16);
-  }
-  setColor() {
-    this.color = parseInt(this.toString().substr(1), 16);
-  }
-  blend(hex) {
-    if (!(hex instanceof HEX)) {
-      throw console.error(Error(hex + ' is not a HEX instance!'));
-    }
-    this.color = this.color + hex.color;
-    this.setSpecters();
-    return this;
-  }
-  toString() {
-    const c = {
-      r: this.r.toString(16),
-      g: this.g.toString(16),
-      b: this.b.toString(16)
-    };
-    const result = '#' + ('0').repeat(2 - c.r.length) + c.r + ('0').repeat(2 - c.g.length) + c.g + ('0').repeat(2 - c.b.length) + c.b;
-    return result;
-  }
-  valueOf() {
-    return this.color;
-  }
-  saturation(amount) {
-    amount = amount/100;
-    if (amount < 0) {
-      console.warn('Saturation percentage must be more than 0', amount);
-      return this;
-    }
-    const gray = this.r * 0.3086 + this.g * 0.6094 + this.b * 0.0820;
-    this.r = Math.round(this.r * amount + gray * (1-amount));
-    this.g = Math.round(this.g * amount + gray * (1-amount));
-    this.b = Math.round(this.b * amount + gray * (1-amount));
-    this.setColor();
-    return this;
-  }
-  contrast(amount) {
-    amount = amount/100;
-    if (amount < 0) {
-      return this;
-    }
-    const col = Math.max.apply(null, [this.r, this.g, this.b]);
-    this.r = Math.min(255, Math.round((this.r/col)*this.r + (amount*col)));
-    this.g = Math.min(255, Math.round((this.g/col)*this.g + (amount*col)));
-    this.b = Math.min(255, Math.round((this.b/col)*this.b + (amount*col)));
-    this.setColor();
-    return this;
-  }
-  brightness(amount) {
-    amount = amount/100;
-    if (amount < 0) {
-      console.warn('Brightness percentage must be more than 0', amount);
-      return this;
-    }
-    this.r = Math.min(255,Math.floor(this.r + 255 - (amount*255)));
-    this.g = Math.min(255,Math.floor(this.g + 255 - (amount*255)));
-    this.b = Math.min(255,Math.floor(this.b + 255 - (amount*255)));
-    this.setColor();
-    return this;
-  }
+
+function timestamp (unix) {
+  const  date = new Date(unix);
+  let hours = date.getHours();
+  let minutes = "0" + date.getMinutes();
+  let seconds = "0" + date.getSeconds();
+  return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 }
-class Cookies {
-  static getCookie(name) {
-    let matches = document.cookie.match(new RegExp(
-      "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-    ));
-    return matches ? decodeURIComponent(matches[1]) : undefined;
-  }
+function haveLinks(text) {
+  return text.match(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig);
 }
-class BTTV {
-  bttvEmotes = {
-    urlTemplate: 'https://cdn.betterttv.net/emote/{{id}}/{{image}}',
-    scales: { 1: '1x', 2: '2x', 3: '3x' },
-    bots: [],
-    emoteCodeList: [],
-    emotes: [],
-    subEmotesCodeList: [],
-    allowEmotesAnyChannel: false
-  };
-  globalEmotes = {
-    emotes: []
-  }
-  getEmotes() {
-    console.log('Getting BTTV emotes');
-    Http.get(`chat/emotes?channel=${params.has('channel')?params.get('channel'):user.username}`)
-    .then((data) => {
-      console.log('Got BTTV global emotes \n', data);
-      this.bttvEmotes = this.bttvEmotes.emotes.concat(data.channel.emotes.map(function(n) {
-        n.global = true;
-        return n;
-      }));
-      this.globalEmotes = this.globalEmotes.emotes.concat(data.global.emotes.map(function(n) {
-        n.global = true;
-        return n;
-      }));
-      this.bttvEmotes.subEmotesCodeList = _.chain(this.bttvEmotes.emotes).where({ global: true }).reject(function(n) { return _.isNull(n.channel); }).pluck('code').value();
-    }).catch((err) => console.error)
-    .then(() => {
-      this.addEmotes(this.bttvEmotes, params.has('channel')?params.get('channel'):user.username);
-      this.addEmotes(this.globalEmotes, 'Global');
-    })
-  }
-  mergeEmotes(data, channel) {
-    console.log('Got BTTV emotes for ' + channel);
-    this.bttvEmotes.emotes = this.bttvEmotes.emotes.concat(data.emotes.map(function(n) {
-        if(!_.has(n, 'restrictions')) {
-          n.restrictions = {
-              channels: [],
-              games: []
-            };
-        }
-        if(n.restrictions.channels.indexOf(channel) == -1) {
-          n.restrictions.channels.push(channel);
-        }
-        return n;
-      }));
-    this.bttvEmotes.bots = this.bttvEmotes.bots.concat(data.bots.map(function(n) {
-      return {
-        name: n,
-        channel: channel
-      };
-    }));
-  }
-  addEmotes(emotes, titleof) {
-    const container = document.createElement('div');
-    const subcont = document.createElement('div');
-    const title = document.createElement('b');
-    title.innerText = 'BTTV ' + titleof;
-    for (let i = 0; i < emotes.length; i++) {
-      const img = document.createElement('img');
-      img.title = emotes[i].code;
-      img.classList.add('emote');
-      img.setAttribute('data-bs-toggle', 'tooltip');
-      img.setAttribute('data-bs-placement', 'top');
-      img.src = `https://cdn.betterttv.net/emote/${emotes[i].id}/1x`;
-      img.dataset.name = emotes[i].code;
-      img.dataset.id = emotes[i].id;
-      new bootstrap.Tooltip(img, {
-        boundary: chat.emotes.parentNode
-      });
-      subcont.append(img);
-    }
-    container.append(title, subcont);
-    chat.emotes.append(container);
-  }
+function linkify(text) {
+  var replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+  var replacedText = text.replace(replacePattern1, '<a href="$1">$1</a>');
+  var replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+  var replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2">$2</a>');
+  var replacePattern3 = /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/gim;
+  var replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
+  return replacedText;
 }
+
 class ChatMessageBadge extends HTMLDivElement {
-  constructor(type) {
+  constructor(type, badges) {
     super();
     this.classList.add('badge-icon');
-    this.icon = document.createElement('img');
+    this.icon = new Image(20, 20);
     this.icon.classList.add('badge-icon-img');
     for (let i = 0; i < channelSets.badges.length; i++) {
       if (type[0] === channelSets.badges[i].set_id) {
@@ -202,9 +67,9 @@ class ChatMessageBadge extends HTMLDivElement {
   }
 }
 class YTFrame extends HTMLDivElement {
+  player;
   constructor(url) {
     super();
-    this.player;
     this.replace(url)
   }
   replace(url) {
@@ -224,7 +89,7 @@ class YTFrame extends HTMLDivElement {
         });
       }).then((event) => {
         event.target.setVolume(15);
-        chat.autoscroll();
+        // chat.autoscroll();
       });
     }, 2000);
   }
@@ -250,7 +115,6 @@ class ChatMessage extends HTMLDivElement {
     this.body = document.createElement('div');
     this.nickname = document.createElement('span');
     this.tags = tags;
-    this.links = [];
     this.nickname.classList.add('nickname');
     this.nickname.innerHTML = tags['display-name'];
     this.nickname.style.color = color < 0x505050?color.brightness(70).contrast(30).toString():color.toString();
@@ -260,7 +124,7 @@ class ChatMessage extends HTMLDivElement {
     };
     this.classList.add('card');
     this.body.classList.add('card-body');
-    this.body.dataset.date = (this.timestamp(date));
+    this.body.dataset.date = timestamp(date);
     this.body.innerHTML = splitter + this.pretty(tags, message);
     this.addTooltipsToEmotes();
     this.body.prepend(this.nickname);
@@ -280,15 +144,15 @@ class ChatMessage extends HTMLDivElement {
       }));
     }
     this.append(this.body);
-    if (this.links) { // FIXME: remove unnecessary variable (links), fix condition
-      if (!YTFrame.getVideoID(this.links[0])) return;
-      this.body.appendChild(new YTFrame(this.links[0]));
+    if (haveLinks(message)) { // FIXME: remove unnecessary variable (links), fix condition
+      const links = haveLinks(message);
+      if (!YTFrame.getVideoID(links[0])) return;
+      this.body.appendChild(new YTFrame(links[0]));
     }
     this.nickname.addEventListener('click', () => { // ??? Exprerimental (may cause perfomance violation)
       chat.text.value = chat.text.value + ' @' + tags.username + ' ';
       chat.text.focus();
     });
-    delete this.links;
   }
 
   pretty(tags, message) {
@@ -307,8 +171,8 @@ class ChatMessage extends HTMLDivElement {
     for (let i = 0; i < splited.length; i++) { // FIXME
       let emoted = false;
       position+= splited[i].length + 1;
-      if (this.haveLinks(splited[i])) {
-        result.push(this.linkify(splited[i]));
+      if (haveLinks(splited[i])) {
+        result.push(linkify(splited[i]));
         continue;
       }
       if (splited[i].toLowerCase() === user.display_name.toLowerCase() || splited[i].toLowerCase() ==='@' + user.username.toLowerCase()) {
@@ -347,27 +211,6 @@ class ChatMessage extends HTMLDivElement {
     let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl);
     });
-  }
-
-  timestamp (unix) {
-    const  date = new Date(unix);
-    let hours = date.getHours();
-    let minutes = "0" + date.getMinutes();
-    let seconds = "0" + date.getSeconds();
-    return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
-  }
-  haveLinks(text) {
-    this.links = text.match(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig);
-    return this.links;
-  }
-  linkify(text) {
-    var replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
-    var replacedText = text.replace(replacePattern1, '<a href="$1">$1</a>');
-    var replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
-    var replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2">$2</a>');
-    var replacePattern3 = /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/gim;
-    var replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
-    return replacedText;
   }
 }
 
@@ -418,25 +261,27 @@ class ChatAlert extends HTMLDivElement {
 }
 
 class ChattersListController {
-  constructor() {
-    this.box = document.querySelector('#chatters-list');
-    this.list = document.querySelector('#list');
-    this.counter = document.querySelector('#chatters-counter');
-    this.altCounter = document.querySelector('#chatters-counter-alt');
-    this.connected = [];
-    this.buttons = {
+  dom = {
+    box: document.querySelector('#chatters-list'),
+    list: document.querySelector('#list'),
+    counter: document.querySelector('#chatters-counter'),
+    altCounter: document.querySelector('#chatters-counter-alt'),
+    buttons: {
       open: document.querySelector('#open-chatters-list'),
       close: document.querySelector('#close')
     }
-    this.buttons.close.addEventListener('click', () => {
+  };
+  connected = [];
+  constructor() {
+    this.dom.buttons.close.addEventListener('click', () => {
       this.close();
     });
-    this.buttons.open.addEventListener('click', () => {
+    this.dom.buttons.open.addEventListener('click', () => {
       this.open();
-      this.list.innerHTML = '';
+      this.dom.list.innerHTML = '';
       for (let i = 0; i < this.connected.length; i++) {
         const li = document.createElement('li');
-        li.innerHTML = this.connected[i];
+        li.innerText = this.connected[i];
         li.prepend(
           new MessageControlButton('btn-lurk', () => {
             ChatAlert.addLurker(this.connected[i]);
@@ -447,23 +292,23 @@ class ChattersListController {
             }, 3000);
           }),
         );
-        this.list.append(li);
+        this.dom.list.append(li);
       }
     });
   }
   remove(username) {
     this.connected.splice(this.connected.indexOf(username), 1);
-    this.altCounter.innerHTML = this.connected.length;
+    this.dom.altCounter.innerText = this.connected.length;
   }
   add(username) {
     this.connected.push(username);
-    this.altCounter.innerHTML = this.connected.length;
+    this.dom.altCounter.innerText = this.connected.length;
   }
   open() {
-    this.box.style.display = 'block';
+    this.dom.box.style.display = 'block';
   }
   close() {
-    this.box.style.display = 'none';
+    this.dom.box.style.display = 'none';
   }
 }
 
@@ -580,3 +425,5 @@ class ChatController {
     this.selfEmotes = {};
   }
 }
+
+export { ChatAlert, ChatMessage, ChatController, ChattersListController, YTFrame, MessageControlButton, ChatMessageBadge };
