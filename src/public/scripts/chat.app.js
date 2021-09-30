@@ -102,18 +102,27 @@ class BTTV {
     subEmotesCodeList: [],
     allowEmotesAnyChannel: false
   };
+  globalEmotes = {
+    emotes: []
+  }
   getEmotes() {
-    Http.get('chat/emotes?channel=' + user.username)
+    console.log('Getting BTTV emotes');
+    Http.get(`chat/emotes?channel=${params.has('channel')?params.get('channel'):user.username}`)
     .then((data) => {
       console.log('Got BTTV global emotes \n', data);
-      this.bttvEmotes = this.bttvEmotes.emotes.concat(data.emotes.map(function(n) {
+      this.bttvEmotes = this.bttvEmotes.emotes.concat(data.channel.emotes.map(function(n) {
+        n.global = true;
+        return n;
+      }));
+      this.globalEmotes = this.globalEmotes.emotes.concat(data.global.emotes.map(function(n) {
         n.global = true;
         return n;
       }));
       this.bttvEmotes.subEmotesCodeList = _.chain(this.bttvEmotes.emotes).where({ global: true }).reject(function(n) { return _.isNull(n.channel); }).pluck('code').value();
     }).catch((err) => console.error)
     .then(() => {
-      this.addEmotes();
+      this.addEmotes(this.bttvEmotes, params.has('channel')?params.get('channel'):user.username);
+      this.addEmotes(this.globalEmotes, 'Global');
     })
   }
   mergeEmotes(data, channel) {
@@ -137,20 +146,20 @@ class BTTV {
       };
     }));
   }
-  addEmotes() {
+  addEmotes(emotes, titleof) {
     const container = document.createElement('div');
     const subcont = document.createElement('div');
     const title = document.createElement('b');
-    title.innerText = 'BTTV';
-    for (let i = 0; i < this.bttvEmotes.length; i++) {
+    title.innerText = 'BTTV ' + titleof;
+    for (let i = 0; i < emotes.length; i++) {
       const img = document.createElement('img');
-      img.title = this.bttvEmotes[i].code;
+      img.title = emotes[i].code;
       img.classList.add('emote');
       img.setAttribute('data-bs-toggle', 'tooltip');
       img.setAttribute('data-bs-placement', 'top');
-      img.src = `https://cdn.betterttv.net/emote/${this.bttvEmotes[i].id}/1x`;
-      img.dataset.name = this.bttvEmotes[i].code;
-      img.dataset.id = this.bttvEmotes[i].id;
+      img.src = `https://cdn.betterttv.net/emote/${emotes[i].id}/1x`;
+      img.dataset.name = emotes[i].code;
+      img.dataset.id = emotes[i].id;
       new bootstrap.Tooltip(img, {
         boundary: chat.emotes.parentNode
       });
@@ -295,7 +304,7 @@ class ChatMessage extends HTMLDivElement {
         emotes.push([emote, parseInt(points[0]), points[1] - points[0] + 1]);
       }
     }
-    for (let i = 0; i < splited.length; i++) {
+    for (let i = 0; i < splited.length; i++) { // FIXME
       let emoted = false;
       position+= splited[i].length + 1;
       if (this.haveLinks(splited[i])) {
@@ -306,17 +315,25 @@ class ChatMessage extends HTMLDivElement {
         result.push(`<span class="notice">${notice}</span>`);
         continue;
       }
+      for (let k = 0; k < bttv.globalEmotes.length; k++) {
+        if (bttv.globalEmotes[k].code === splited[i]) {
+          emoted = true;
+          result.push('<img data-bs-toggle="tooltip" title="'+ splited[i] +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.globalEmotes[k].id +'/1x">')
+        }
+      }
+      if (emoted) continue;
+      for (let k = 0; k < bttv.bttvEmotes.length; k++) {
+        if (bttv.bttvEmotes[k].code === splited[i]) {
+          emoted = true;
+          result.push('<img data-bs-toggle="tooltip" title="'+ splited[i] +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.bttvEmotes[k].id +'/1x">')
+        }
+      }
+      if (emoted) continue;
       for (let j = 0; j < emotes.length; j++ ) {
         if (position === emotes[j][1] + emotes[j][2] + 1) {
           emoted = true;
             result.push('<img data-bs-toggle="tooltip" title="'+ splited[i] +'" class="emoticon" src="https://static-cdn.jtvnw.net/emoticons/v2/' + emotes[j][0] + '/default/dark/3.0">');
             break;
-        }
-      }
-      for (let k = 0; k < bttv.bttvEmotes.length; k++) {
-        if (bttv.bttvEmotes[k].code === splited[i]) {
-          emoted = true;
-          result.push('<img data-bs-toggle="tooltip" title="'+ splited[i] +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.bttvEmotes[k].id +'/1x">')
         }
       }
       if (emoted) continue;
