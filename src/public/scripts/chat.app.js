@@ -103,7 +103,7 @@ class BTTV {
     allowEmotesAnyChannel: false
   };
   getEmotes() {
-    Http.get('chat/emotes')
+    Http.get('chat/emotes?channel=' + user.username);
     .then((data) => {
       console.log('Got BTTV global emotes \n', data);
       this.bttvEmotes = this.bttvEmotes.emotes.concat(data.emotes.map(function(n) {
