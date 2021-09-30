@@ -8,28 +8,30 @@ import { connect } from 'mongoose';
 import express, { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 import passport from 'passport';
+// import cors from 'cors';
 import OAuth2Strategy from 'passport-oauth2';
 
 import StatusCodes from 'http-status-codes';
 import 'express-async-errors';
 
 import { Bot } from '@shared/bot.client';
-import { Schedule } from '@shared/bot.schedule';
 
 import BaseRouter from './routes';
+import CommandsRouter from './routes/landings';
 import APIRouter from './routes/api.routes';
 import logger from '@shared/Logger';
 import axios from 'axios';
 
 import { USER } from './schemas/user.schema';
 
+// import { verifySignature, rawBody } from '@shared/functions';
 
 const app = express();
-const { BAD_REQUEST } = StatusCodes;
+const { BAD_REQUEST, OK } = StatusCodes;
 
-const bot = new Bot({ schedule: new Schedule() });
+export const bot = new Bot();
 
-
+// const useCors = cors();
 
 /************************************************************************************
  *                              Set basic express settings
@@ -46,6 +48,28 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
+// app.options('*', useCors);
+// app.use(cors({
+//   allowedHeaders: [
+//     'Origin',
+//     'X-Requested-With',
+//     'Content-Type',
+//     'Accept',
+//     'X-Access-Token',
+//     'Authorization'
+//   ],
+//   credentials: true,
+//   methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
+//   origin: (origin: any, callback: any) => {
+//     console.log(JSON.parse(process.env.CORS_ORIGINS!));
+//     if (JSON.parse(process.env.CORS_ORIGINS!).indexOf(origin) !== -1) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error('Not allowed by CORS'))
+//     }
+//   },
+//   preflightContinue: false,
+// }));
 
 // Override passport profile function to get user profile from Twitch API
 OAuth2Strategy.prototype.userProfile = function(accessToken, done) {
@@ -87,7 +111,7 @@ passport.use('twitch',  new OAuth2Strategy({
       user: profile.data[0],
       accessToken: accessToken,
       refreshToken: accessToken,
-    }, { upsert: true, setDefaultsOnInsert: true }, (err: any, user: any) => {
+    }, { upsert: true, setDefaultsOnInsert: true }, (err: any) => {
       if (err) return logger.err(err);
     });
 
@@ -110,18 +134,24 @@ if (process.env.NODE_ENV === 'production') {
 
 // Add APIs
 app.use('/controls', BaseRouter);
+app.use('/commands', CommandsRouter);
 app.use('/api', express.json(), APIRouter);
 
 // Set route to start OAuth link, this is where you define scopes to request
-app.get('/auth/twitch', passport.authenticate('twitch', { scope: 'user_read' }));
+app.get('/auth/twitch', passport.authenticate('twitch', { scope: ['user_read', 'user_subscriptions', 'chat:read', 'chat:edit', 'channel:moderate'] }));
 
 // Set route for OAuth redirect
-app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/', failureRedirect: '/' }));
+app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/controls/chat', failureRedirect: '/controls/chat' }));
 
 // Set route for webhooks
-app.use('/webhooks/callback', express.json());
-app.post('/webhooks/callback/streams', (req: Request, res: Response) => {
-  console.log(req.body);
+app.post('/webhooks/callback/streams', express.json({ verify: (req: any, res: any, buf: any) => { req.rawBody = buf }}), (req: any, res: Response) => {
+    if (req.header("Twitch-Eventsub-Message-Type") === "webhook_callback_verification") {
+      res.send(req.body.challenge) // Returning a 200 status with the received challenge to complete webhook creation flow
+    } else if (req.header("Twitch-Eventsub-Message-Type") === "notification") {
+      if (req.body.subscription.type == 'stream.online') bot.wakeup();
+      if (req.body.subscription.type == 'stream.offline') bot.shutdown();
+      res.status(OK).end();
+    }
 });
 // Print API errors
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -148,7 +178,8 @@ app.use(express.static(staticDir));
 
 app.use('/.well-known/acme-challenge', express.static(join(__dirname, 'public/.well-known/acme-challenge')));
 app.get('*', (req: Request, res: Response) => {
-    res.render('index', { session: req.session });
+  res.set("Content-Security-Policy", "default-src *");
+  res.render('index', { session: req.session });
 });
 // Export express instance
 export default app;

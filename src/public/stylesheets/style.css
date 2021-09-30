@@ -1,6 +1,7 @@
 body {
   padding: 100px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  text-align: center;
 }
 @keyframes logo {
   from { transform: rotate(0deg);}

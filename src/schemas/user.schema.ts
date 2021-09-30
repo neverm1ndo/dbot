@@ -18,6 +18,14 @@ export const USER = model('User', new Schema ({
   refreshToken: String,
   settings: {
     automessages: [String],
-    banwords: [String]
+    banwords: [String],
+    announcer_delay: Number,
+    sounds: [
+      {
+        _id : false,
+        command: { type: String },
+        path: { type: String }
+      }
+    ]
   }
 }));

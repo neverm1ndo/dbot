@@ -9,3 +9,4 @@
 *.ogg
 *.log
 /src/public/.well-known/*
+client/*

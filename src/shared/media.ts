@@ -3,7 +3,7 @@ import { ChatUserstate } from 'tmi.js';
 import { cm } from '../routes/sockets';
 
 export class Media {
-  queue: Queue = new Queue({ cooldown: 1, global: false });
+  queue: Queue = new Queue({ cooldown: 60000, global: true });
   constructor() {}
 
   playSound(chatter: ChatUserstate, path: string) {
