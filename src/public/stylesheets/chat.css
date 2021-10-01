@@ -9,7 +9,7 @@ html, body {
 }
 html body div::-webkit-scrollbar {
  background: var(--bs-gray-dark);
- width: 7px;
+ width: 3px;
  border-radius: 3px;
 }
 html body div::-webkit-scrollbar-corner {
@@ -128,9 +128,16 @@ body #logo {
   width: 25px;
   height: 25px;
 }
+.dropdown-menu-dark {
+  background-color: #131416;
+}
+.dropdown-menu-dark hr {
+  background-color: #343434;
+}
 .emotes-list .emote {
   display: inline-block;
   max-width: 30px;
+  width: 30px;
   margin: 3px;
   cursor: pointer;
   border-radius: 4px;
@@ -219,13 +226,30 @@ body .card .card-body img {
   display: inline-block;
   color: #ff8280;
   margin-left: 10px;
-  font-weight: bold;
+  width: 100px;
+}
+.balance {
+  width: 100px;
+}
+.chatters-counter .chatters-counter-alt {
+  display: inline-block;
+  color: #ff8280;
+  width: 40px;
 }
 .chatters-counter span {
+  font-weight: bold;
   margin-left: 3px;
+}
+.chatters-counter #chatters-counter-alt {
+  font-weight: 300;
+  margin-left: 3px;
+  color: var(--bs-gray);
 }
 .chatters-counter svg path {
   fill: #ff8280;
+}
+.chatters-counter .chatters-counter-alt svg path {
+  fill: var(--bs-gray);
 }
 .chatters-list .chatters-counter {
   color: var(--bs-light);

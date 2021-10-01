@@ -75,7 +75,7 @@ class BTTV {
       subcont.append(img);
     }
     container.append(title, subcont);
-    chat.emotes.append(container);
+    chat.emotes.append(container, document.createElement('hr'));
   }
 }
 

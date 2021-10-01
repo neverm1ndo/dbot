@@ -393,7 +393,7 @@ class ChatController {
           container.append(title, avatar?avatar:'', subcont);
           subcont.append(img);
         }
-        this.emotes.append(container);
+        this.emotes.append(container, document.createElement('hr'));
       }
     }).catch((err) => console.log(err))
   }
