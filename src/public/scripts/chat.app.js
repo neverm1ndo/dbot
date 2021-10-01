@@ -1,6 +1,6 @@
 import Http from './http';
 import HEX from './hex';
-import { user, bttv, channelSets, chatterList, client, params } from './chat';
+import { user, bttv, channelSets, chatterList, client, params, chat } from './chat';
 
 const defaultBadges = {
   'diktorbot': '/tank2.png',
@@ -89,7 +89,7 @@ class YTFrame extends HTMLDivElement {
         });
       }).then((event) => {
         event.target.setVolume(15);
-        // chat.autoscroll();
+        chat.autoscroll();
       });
     }, 2000);
   }
