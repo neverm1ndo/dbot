@@ -1,5 +1,5 @@
-module.exports = class Cookies {
-  static getCookie(name) {
+export default class Cookies {
+  static get(name) {
     let matches = document.cookie.match(new RegExp(
       "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
     ));

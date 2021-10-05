@@ -75,6 +75,15 @@ export class Twitch {
       }
     })
   }
+  static validateToken(accessToken: string) {
+    return axios({
+      method: 'get',
+      url: 'https://id.twitch.tv/oauth2/validate',
+      headers: {
+        'Authorization': 'Bearer ' + accessToken
+      }
+    })
+  }
   /**
   (POST) Get applications access token
   **/

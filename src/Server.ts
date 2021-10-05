@@ -8,6 +8,7 @@ import { connect } from 'mongoose';
 import express, { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 import passport from 'passport';
+import refresh from 'passport-oauth2-refresh';
 // import cors from 'cors';
 import OAuth2Strategy from 'passport-oauth2';
 
@@ -48,28 +49,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
-// app.options('*', useCors);
-// app.use(cors({
-//   allowedHeaders: [
-//     'Origin',
-//     'X-Requested-With',
-//     'Content-Type',
-//     'Accept',
-//     'X-Access-Token',
-//     'Authorization'
-//   ],
-//   credentials: true,
-//   methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
-//   origin: (origin: any, callback: any) => {
-//     console.log(JSON.parse(process.env.CORS_ORIGINS!));
-//     if (JSON.parse(process.env.CORS_ORIGINS!).indexOf(origin) !== -1) {
-//       callback(null, true)
-//     } else {
-//       callback(new Error('Not allowed by CORS'))
-//     }
-//   },
-//   preflightContinue: false,
-// }));
 
 // Override passport profile function to get user profile from Twitch API
 OAuth2Strategy.prototype.userProfile = function(accessToken, done) {
@@ -95,7 +74,7 @@ passport.deserializeUser(function(user: any, done) {
     done(null, user);
 });
 
-passport.use('twitch',  new OAuth2Strategy({
+const strategy = new OAuth2Strategy({
     authorizationURL: 'https://id.twitch.tv/oauth2/authorize',
     tokenURL: 'https://id.twitch.tv/oauth2/token',
     clientID: process.env.TWITCH_CLIENT_ID!,
@@ -113,11 +92,11 @@ passport.use('twitch',  new OAuth2Strategy({
       refreshToken: accessToken,
     }, { upsert: true, setDefaultsOnInsert: true }, (err: any) => {
       if (err) return logger.err(err);
+      done(null, profile);
     });
-
-    done(null, profile);
-  }
-));
+  });
+passport.use('twitch',  strategy);
+refresh.use('twitch', strategy);
 
 // MongoDB connection
 connect(process.env.MONGO!, { useNewUrlParser: true, useUnifiedTopology: true });

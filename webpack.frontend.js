@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     mode: 'production',
     entry: {
-      app: './src/public/scripts/index.js'
+      chat: './src/public/scripts/index.js'
     },
     // plugins: [
     //   new HtmlWebpackPlugin({
@@ -16,7 +16,7 @@ module.exports = {
     //   new HtmlWebpackPugPlugin()
     // ],
     output: {
-      path: path.join(__dirname, 'dist/'),
+      path: path.join(__dirname, 'src/'),
       publicPath: '/',
       filename: 'public/scripts/[name].bundle.js'
     },

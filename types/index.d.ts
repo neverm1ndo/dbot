@@ -3,10 +3,3 @@ declare module 'http' {
         rawBody: any;
     }
 }
-// declare global {
-//     namespace Express {
-//         interface Request {
-//             rawBody: any
-//         }
-//     }
-// }

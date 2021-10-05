@@ -7,16 +7,17 @@ import {
   YTFrame,
   MessageControlButton
 } from './chat.app';
+import Cookies from './cookies';
 import PubSub from './pubsub';
 import Http from './http';
 import BTTV from './bttv';
 
 class User {
-  username = document.querySelector('#chatjs').dataset.username;
-  display_name = document.querySelector('#chatjs').dataset.displayname;
-  token = document.querySelector('#chatjs').dataset.token;
-  id = document.querySelector('#chatjs').dataset.id;
-  client = document.querySelector('#chatjs').dataset.client;
+  username = Cookies.get('nmnd_user_login');
+  display_name = Cookies.get('nmnd_user_display_name');
+  token = Cookies.get('nmnd_user_access_token');
+  id = Cookies.get('nmnd_user_id');
+  client = Cookies.get('nmnd_app_client_id');
 };
 
 export const user = new User();

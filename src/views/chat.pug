@@ -11,7 +11,7 @@ html(lang="en")
     link(href="/stylesheets/chat.css" rel="stylesheet")
     script(src="/scripts/tmi.min.js")
   body
-    if session.passport
+    if user
       div.chatters-list.w-100.h-100#chatters-list
         div.d-flex.flex-column.flex-nowrap.h-100.align-items-start.justify-content-stretch
           div.d-flex.w-100.head
@@ -45,7 +45,7 @@ html(lang="en")
                         path(fill-rule="evenodd" d="M5 7a5 5 0 116.192 4.857A2 2 0 0013 13h1a3 3 0 013 3v2h-2v-2a1 1 0 00-1-1h-1a3.99 3.99 0 01-3-1.354A3.99 3.99 0 017 15H6a1 1 0 00-1 1v2H3v-2a3 3 0 013-3h1a2 2 0 001.808-1.143A5.002 5.002 0 015 7zm5 3a3 3 0 110-6 3 3 0 010 6z" clip-rule="evenodd")
                     span#chatters-counter-alt.pl-3 0
               div
-                img.avatar(src=session.passport.user.data[0].profile_image_url)
+                img.avatar(src=user.data[0].profile_image_url)
               div.balance.d-flex.flex-row.align-items-end.justify-content-end
                 button.btn.btn-small.btn-secondary.open-chatters-list#open-chatters-list(type="button")
                   svg(width="100%" height="100%" version="1.1" viewBox="0 0 20 20" x="0px" y="0px" class="ScIconSVG-sc-1bgeryd-1 cMQeyU")
@@ -70,7 +70,7 @@ html(lang="en")
                 button.btn.btn-dark#send(type="button" disabled) Чат
       script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous")
       script(type="text/javascript" src="/scripts/polyfills.js")
-      script(id="chatjs" type="text/javascript" data-id=session.passport.user.data[0].id data-username=session.passport.user.data[0].login data-displayname=session.passport.user.data[0].display_name data-token=session.passport.user.accessToken src="/scripts/app.bundle.js" data-client=clientid)
+      script(id="chatjs" type="text/javascript" src="/scripts/chat.bundle.js")
     else
       div.d-flex.flex-column.flex-nowrap.h-100.align-items-center.justify-content-center
         img#logo.mb-4(src="/tank2.png" alt="")
