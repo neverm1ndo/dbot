@@ -54,7 +54,6 @@ export const bttv = new BTTV(params);
 const pubsub = new PubSub();
 
 bttv.getEmotes();
-pubsub.connect();
 
 let trigger = 0;
 
@@ -76,6 +75,7 @@ Http.get(`https://api.twitch.tv/helix/users?login=${params.has('channel')?params
   'Client-ID': user.client
 }).then((data) => {
   channelSets.id = data.data[0].id;
+  pubsub.connect();
   handleStreamInfo(channelSets.id);
   return Promise.all([
     Http.get(`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${channelSets.id}`, {

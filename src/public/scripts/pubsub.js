@@ -1,4 +1,4 @@
-import { chat, user } from './chat';
+import { chat, user, channelSets } from './chat';
 
 const _SCOPE = 'user_read+chat_login';
 
@@ -60,7 +60,7 @@ class PubSub {
         type: 'LISTEN',
         nonce: nonce(15),
         data: {
-            topics: [`chat_moderator_actions.${user.id}.${user.id}`],
+            topics: [`chat_moderator_actions.${channelSets.id}.${channelSets.id}`],
             auth_token: user.token
         }
     };

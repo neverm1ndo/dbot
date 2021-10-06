@@ -20,4 +20,12 @@ module.exports = {
       publicPath: '/',
       filename: 'public/scripts/[name].bundle.js'
     },
+    module: {
+      rules: [
+        {
+          test: /\.(css|svg|png)$/i,
+          use: ['url-loader', 'style-loader', 'css-loader'],
+        },
+      ],
+    },
 };

@@ -60,12 +60,14 @@
     "build.ts"
   ],
   "dependencies": {
+    "@popperjs/core": "^2.10.2",
     "@types/cors": "^2.8.12",
     "@types/mongoose": "^5.11.97",
     "@types/passport-oauth2-refresh": "^1.1.1",
     "@types/tmi.js": "^1.7.1",
     "@types/ws": "^7.4.0",
     "axios": "^0.21.1",
+    "bootstrap": "^5.1.2",
     "command-line-args": "^5.1.1",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
@@ -107,6 +109,7 @@
     "@types/supertest": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^4.15.2",
     "@typescript-eslint/parser": "^4.15.2",
+    "css-loader": "^6.3.0",
     "eslint": "^7.20.0",
     "find": "^0.3.0",
     "fs-extra": "^9.1.0",
@@ -115,10 +118,12 @@
     "jasmine": "^3.6.4",
     "nodemon": "^2.0.7",
     "nodemon-webpack-plugin": "^4.5.2",
+    "style-loader": "^3.3.0",
     "supertest": "^6.1.3",
     "ts-node": "^9.1.1",
     "tsconfig-paths": "^3.9.0",
     "typescript": "^4.2.2",
+    "url-loader": "^4.1.1",
     "webpack-cli": "^4.8.0"
   }
 }
