@@ -1,5 +1,7 @@
 import Http from './http';
 import { params, user, chat } from './chat';
+import { Tooltip } from 'bootstrap';
+
 class BTTV {
   bttvEmotes = {
     urlTemplate: 'https://cdn.betterttv.net/emote/{{id}}/{{image}}',
@@ -69,7 +71,7 @@ class BTTV {
       img.src = `https://cdn.betterttv.net/emote/${emotes[i].id}/1x`;
       img.dataset.name = emotes[i].code;
       img.dataset.id = emotes[i].id;
-      new bootstrap.Tooltip(img, {
+      new Tooltip(img, {
         boundary: chat.emotes.parentNode
       });
       subcont.append(img);

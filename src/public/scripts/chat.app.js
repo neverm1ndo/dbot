@@ -1,6 +1,7 @@
 import Http from './http';
 import HEX from './hex';
 import { user, bttv, channelSets, chatterList, client, params, chat } from './chat';
+import { Tooltip } from 'bootstrap';
 
 const defaultBadges = {
   'diktorbot': '/tank2.png',
@@ -209,7 +210,7 @@ class ChatMessage extends HTMLDivElement {
   addTooltipsToEmotes() {
     let tooltipTriggerList = [].slice.call(this.body.querySelectorAll('[data-bs-toggle="tooltip"]'))
     let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
+      return new Tooltip(tooltipTriggerEl);
     });
   }
 }
@@ -387,7 +388,7 @@ class ChatController {
           img.src = `https://static-cdn.jtvnw.net/emoticons/v2/${owners[ownersInfo.data[i].id][j].id}/default/light/3.0`;
           img.dataset.name = owners[ownersInfo.data[i].id][j].name;
           img.dataset.id = owners[ownersInfo.data[i].id][j].id;
-          new bootstrap.Tooltip(img, {
+          new Tooltip(img, {
             boundary: this.emotes.parentNode
           });
           container.append(title, avatar?avatar:'', subcont);

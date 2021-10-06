@@ -8143,6 +8143,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _http__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./http */ "./src/public/scripts/http.js");
 /* harmony import */ var _chat__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./chat */ "./src/public/scripts/chat.js");
+/* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! bootstrap */ "./node_modules/bootstrap/dist/js/bootstrap.esm.js");
+
+
 
 
 class BTTV {
@@ -8214,7 +8217,7 @@ class BTTV {
       img.src = `https://cdn.betterttv.net/emote/${emotes[i].id}/1x`;
       img.dataset.name = emotes[i].code;
       img.dataset.id = emotes[i].id;
-      new bootstrap.Tooltip(img, {
+      new bootstrap__WEBPACK_IMPORTED_MODULE_2__.Tooltip(img, {
         boundary: _chat__WEBPACK_IMPORTED_MODULE_1__.chat.emotes.parentNode
       });
       subcont.append(img);
@@ -8248,6 +8251,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _http__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./http */ "./src/public/scripts/http.js");
 /* harmony import */ var _hex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./hex */ "./src/public/scripts/hex.js");
 /* harmony import */ var _chat__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./chat */ "./src/public/scripts/chat.js");
+/* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! bootstrap */ "./node_modules/bootstrap/dist/js/bootstrap.esm.js");
+
 
 
 
@@ -8459,7 +8464,7 @@ class ChatMessage extends HTMLDivElement {
   addTooltipsToEmotes() {
     let tooltipTriggerList = [].slice.call(this.body.querySelectorAll('[data-bs-toggle="tooltip"]'))
     let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
+      return new bootstrap__WEBPACK_IMPORTED_MODULE_3__.Tooltip(tooltipTriggerEl);
     });
   }
 }
@@ -8637,7 +8642,7 @@ class ChatController {
           img.src = `https://static-cdn.jtvnw.net/emoticons/v2/${owners[ownersInfo.data[i].id][j].id}/default/light/3.0`;
           img.dataset.name = owners[ownersInfo.data[i].id][j].name;
           img.dataset.id = owners[ownersInfo.data[i].id][j].id;
-          new bootstrap.Tooltip(img, {
+          new bootstrap__WEBPACK_IMPORTED_MODULE_3__.Tooltip(img, {
             boundary: this.emotes.parentNode
           });
           container.append(title, avatar?avatar:'', subcont);
@@ -8750,7 +8755,6 @@ const bttv = new _bttv__WEBPACK_IMPORTED_MODULE_4__["default"](params);
 const pubsub = new _pubsub__WEBPACK_IMPORTED_MODULE_2__["default"]();
 
 bttv.getEmotes();
-pubsub.connect();
 
 let trigger = 0;
 
@@ -8772,6 +8776,7 @@ _http__WEBPACK_IMPORTED_MODULE_3__["default"].get(`https://api.twitch.tv/helix/u
   'Client-ID': user.client
 }).then((data) => {
   channelSets.id = data.data[0].id;
+  pubsub.connect();
   handleStreamInfo(channelSets.id);
   return Promise.all([
     _http__WEBPACK_IMPORTED_MODULE_3__["default"].get(`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${channelSets.id}`, {
@@ -9116,7 +9121,7 @@ class PubSub {
         type: 'LISTEN',
         nonce: nonce(15),
         data: {
-            topics: [`chat_moderator_actions.${_chat__WEBPACK_IMPORTED_MODULE_0__.user.id}.${_chat__WEBPACK_IMPORTED_MODULE_0__.user.id}`],
+            topics: [`chat_moderator_actions.${_chat__WEBPACK_IMPORTED_MODULE_0__.channelSets.id}.${_chat__WEBPACK_IMPORTED_MODULE_0__.channelSets.id}`],
             auth_token: _chat__WEBPACK_IMPORTED_MODULE_0__.user.token
         }
     };
@@ -9201,9 +9206,8 @@ var __webpack_exports__ = {};
   !*** ./src/public/scripts/index.js ***!
   \*************************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _chat_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./chat.js */ "./src/public/scripts/chat.js");
-/* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! bootstrap */ "./node_modules/bootstrap/dist/js/bootstrap.esm.js");
-/* harmony import */ var _stylesheets_chat_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../stylesheets/chat.css */ "./src/public/stylesheets/chat.css");
+/* harmony import */ var _stylesheets_chat_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../stylesheets/chat.css */ "./src/public/stylesheets/chat.css");
+/* harmony import */ var _chat_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./chat.js */ "./src/public/scripts/chat.js");
 
 
 
