@@ -9,7 +9,7 @@ class PubSub {
     'ban': 'забанил'
   }
   constructor() {}
-  connect() {
+  connect(id) {
     const heartbeatInterval = 1000 * 60;
     const reconnectInterval = 1000 * 3;
     let heartbeatHandle;
@@ -20,7 +20,7 @@ class PubSub {
         heartbeatHandle = setInterval(() => {
           this.heartbeat();
         }, heartbeatInterval);
-        this.listen();
+        this.listen(id);
     };
     this.ws.onerror = (error) => {
         console.error('[PUBSUB] ERR:  ' + JSON.stringify(error) + '\n');
@@ -55,12 +55,12 @@ class PubSub {
     };
     this.ws.send(JSON.stringify(message));
   }
-  listen() {
+  listen(id) {
     const message = {
         type: 'LISTEN',
         nonce: nonce(15),
         data: {
-            topics: [`chat_moderator_actions.${user.id}.${channelSets.id}`],
+            topics: [`chat_moderator_actions.${user.id}.${id}`],
             auth_token: user.token
         }
     };

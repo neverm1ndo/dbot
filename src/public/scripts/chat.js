@@ -75,7 +75,7 @@ Http.get(`https://api.twitch.tv/helix/users?login=${params.has('channel')?params
   'Client-ID': user.client
 }).then((data) => {
   channelSets.id = data.data[0].id;
-  pubsub.connect();
+  pubsub.connect(channelSets.id);
   handleStreamInfo(channelSets.id);
   return Promise.all([
     Http.get(`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${channelSets.id}`, {
