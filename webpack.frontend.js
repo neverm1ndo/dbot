@@ -7,14 +7,6 @@ module.exports = {
     entry: {
       chat: './src/public/scripts/index.js'
     },
-    // plugins: [
-    //   new HtmlWebpackPlugin({
-    //     template: './src/views/chat.pug',
-    //     filename: 'views/chat.pug',
-    //     minify: false
-    //   }),
-    //   new HtmlWebpackPugPlugin()
-    // ],
     output: {
       path: path.join(__dirname, 'src/'),
       publicPath: '/',

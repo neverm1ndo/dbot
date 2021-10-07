@@ -60,7 +60,7 @@ class PubSub {
         type: 'LISTEN',
         nonce: nonce(15),
         data: {
-            topics: [`chat_moderator_actions.${channelSets.id}.${channelSets.id}`],
+            topics: [`chat_moderator_actions.${user.id}.${channelSets.id}`],
             auth_token: user.token
         }
     };

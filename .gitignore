@@ -10,3 +10,4 @@
 *.log
 /src/public/.well-known/*
 client/*
+*.js.map
