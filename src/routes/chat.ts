@@ -21,10 +21,16 @@ const router = Router();
 
 router.get('/', corsOpt, (req: IGetUserAuthInfoRequest, res: Response,) => { // FIXME: fix token refreshing alg
   if (req.user) {
-    let token = req.user.accessToken;
     Twitch.validateToken(req.user.accessToken)
     .then((validated) => {
       logger.info(req.user.data[0].login + ' have valid access token ( expires_in: ' + validated.data.expires_in + ' )');
+      res.cookie('nmnd_app_client_id', process.env.TWITCH_CLIENT_ID)
+      .cookie('nmnd_user_access_token', req.user.accessToken)
+      .cookie('nmnd_user_id', req.user.data[0].id)
+      .cookie('nmnd_user_display_name', req.user.data[0].display_name)
+      .cookie('nmnd_user_login', req.user.data[0].login)
+      .set('Content-Security-Policy', 'default-src *')
+      .render('chat', { user: req.user });
     }).catch((err: Error) => {
       logger.warn(err);
       logger.warn('Users access token expired: ' + req.user.data[0].login);
@@ -33,16 +39,14 @@ router.get('/', corsOpt, (req: IGetUserAuthInfoRequest, res: Response,) => { // 
         USER.updateOne({ 'user.id': req.user.data[0].id }, { accessToken, refreshToken}, { upsert: true }, () => {
           logger.info(req.user.data[0].login + ' updated access token');
         });
-        token = accessToken;
+        res.cookie('nmnd_app_client_id', process.env.TWITCH_CLIENT_ID)
+        .cookie('nmnd_user_access_token', accessToken)
+        .cookie('nmnd_user_id', req.user.data[0].id)
+        .cookie('nmnd_user_display_name', req.user.data[0].display_name)
+        .cookie('nmnd_user_login', req.user.data[0].login)
+        .set('Content-Security-Policy', 'default-src *')
+        .render('chat', { user: req.user });
       });
-    }).finally(() => {
-      res.cookie('nmnd_app_client_id', process.env.TWITCH_CLIENT_ID)
-      .cookie('nmnd_user_access_token', token)
-      .cookie('nmnd_user_id', req.user.data[0].id)
-      .cookie('nmnd_user_display_name', req.user.data[0].display_name)
-      .cookie('nmnd_user_login', req.user.data[0].login)
-      .set('Content-Security-Policy', 'default-src *')
-      .render('chat', { user: req.user });
     })
   } else {
     res.render('chat', { user: req.user });
