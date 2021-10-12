@@ -4,20 +4,22 @@
   "scripts": {
     "build": "ts-node build.ts",
     "lint": "eslint . --ext .ts",
-    "start": "node -r module-alias/register ./dist --env=production",
-    "start:dev": "nodemon",
+    "start": "node -r module-alias/register ./dist",
+    "nodemon:dev": "nodemon",
     "test": "nodemon --config ./spec/nodemon.json",
-    "watch": "webpack --config ./webpack.frontend.dev.js"
+    "build:web": "webpack --config ./webpack.frontend.prod.js",
+    "build:server": "webpack --config ./webpack.backend.prod.js",
+    "watch:web": "webpack --watch --config ./webpack.frontend.dev.js",
+    "watch:server": "webpack --watch --config ./webpack.backend.dev.js"
   },
   "nodemonConfig": {
     "watch": [
-      "src"
+      "dist"
     ],
-    "ext": "ts, html",
+    "ext": "js",
     "ignore": [
-      "src/public"
-    ],
-    "exec": "ts-node -r tsconfig-paths/register ./src"
+      "dist/public"
+    ]
   },
   "_moduleAliases": {
     "@entities": "dist/entities",
@@ -109,7 +111,9 @@
     "@types/supertest": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^4.15.2",
     "@typescript-eslint/parser": "^4.15.2",
+    "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.3.0",
+    "dotenv-webpack": "^7.0.3",
     "eslint": "^7.20.0",
     "find": "^0.3.0",
     "fs-extra": "^9.1.0",
@@ -118,12 +122,15 @@
     "jasmine": "^3.6.4",
     "nodemon": "^2.0.7",
     "nodemon-webpack-plugin": "^4.5.2",
+    "start-server-webpack-plugin": "^2.2.5",
     "style-loader": "^3.3.0",
     "supertest": "^6.1.3",
+    "ts-loader": "^9.2.6",
     "ts-node": "^9.1.1",
     "tsconfig-paths": "^3.9.0",
     "typescript": "^4.2.2",
     "url-loader": "^4.1.1",
-    "webpack-cli": "^4.8.0"
+    "webpack-cli": "^4.8.0",
+    "webpack-node-externals": "^3.0.0"
   }
 }

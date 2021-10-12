@@ -1,7 +1,7 @@
 import Http from './http';
 import HEX from './hex';
 import { user, bttv, channelSets, chatterList, client, params, chat } from './chat';
-import { Tooltip } from 'bootstrap';
+import Tooltip from 'bootstrap/js/dist/tooltip';
 
 const defaultBadges = {
   'diktorbot': '/tank2.png',

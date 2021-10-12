@@ -84,7 +84,6 @@
   },
   "include": [
     "src/**/*.ts",
-    "spec/**/*.ts",
     "types/*"
   ],
   "exclude": [

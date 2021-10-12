@@ -1,6 +1,6 @@
 import Http from './http';
 import { params, user, chat } from './chat';
-import { Tooltip } from 'bootstrap';
+import Tooltip from 'bootstrap/js/dist/tooltip';
 
 class BTTV {
   bttvEmotes = {

@@ -4,12 +4,11 @@ html(lang="en")
     title='Diktorbot | Чат'
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
-    link(rel="shortcut icon" href="/tank2.png")
-    link(rel="manifest" href="/manifest.webmanifest")
+    link(rel="shortcut icon" href="/img/tank2.png")
     link(href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous")
     script(type="text/javascript" src="https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-umd-min.js")
     link(href="/stylesheets/chat.css" rel="stylesheet")
-    script(src="/scripts/tmi.min.js")
+    script(type="text/javascript" src="/scripts/tmi.min.js")
   body
     if user
       div.chatters-list.w-100.h-100#chatters-list
@@ -32,7 +31,7 @@ html(lang="en")
           div.container-fluid
             div.d-flex.flex-row.justify-content-between.align-content-start.pt-2.pb-2
               div.d-flex
-                img.logo(src="/tank2.png")
+                img.logo(src="/img/tank2.png")
                 div.chatters-counter.d-flex.flex-row.justify-content-between.align-items-center
                   div.d-inline
                     svg(type="color-text-accessible-red" width="20px" height="20px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px")
@@ -68,9 +67,9 @@ html(lang="en")
                     div#emotes-list.emotes-list
                 input.form-control#text(type="text" placeholder="Отправить сообщение")
                 button.btn.btn-dark#send(type="button" disabled) Чат
-      script(type="text/javascript" src="/scripts/polyfills.js")
-      script(id="chatjs" type="text/javascript" src="/scripts/chat.bundle.js")
+      script(type="text/javascript" src="/scripts/polyfills.bundle.js")
+      script(type="text/javascript" src="/scripts/chat.bundle.js")
     else
       div.d-flex.flex-column.flex-nowrap.h-100.align-items-center.justify-content-center
-        img#logo.mb-4(src="/tank2.png" alt="")
+        img#logo.mb-4(src="/img/tank2.png" alt="")
         a.btn.btn-twitch(href="/auth/twitch") Авторизация Twitch

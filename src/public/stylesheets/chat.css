@@ -305,7 +305,7 @@ body .card .card-body img {
   position: absolute;
   margin-top: -9px;
   margin-left: -10px;
-  background: url('../robot.svg') no-repeat 0 0;
+  background: url('../img/robot.svg') no-repeat 0 0;
   filter: grayscale(1);
   background-size: 22px 22px;
   transition: .2s ease-in-out;
@@ -317,7 +317,7 @@ body .card .card-body img {
   position: absolute;
   margin-top: -7px;
   margin-left: -10px;
-  background: url('../timeout.svg') no-repeat 0 0;
+  background: url('../img/timeout.svg') no-repeat 0 0;
   filter: grayscale(0.9) brightness(30%) hue-rotate(145deg);
   background-size: 19px 19px;
   transition: .2s ease-in-out;

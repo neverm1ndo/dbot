@@ -5,9 +5,9 @@ html
         meta(http-equiv="Content-Security-Policy" content="default-src *; img-src * 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *")
         title="Diktorbot"
         link(rel="stylesheet" type="text/css" href="/stylesheets/style.css")
-        link(rel="shortcut icon" href="/tank2.png")
+        link(rel="shortcut icon" href="/img/tank2.png")
     body.text-center
-      img#logo(src="/tank2.png" alt="")
+      img#logo(src="/img/tank2.png" alt="")
       if !session.passport
         a.btn(href="/auth/twitch") Авторизация Twitch
       else
