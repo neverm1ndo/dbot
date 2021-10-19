@@ -21,6 +21,8 @@ module.exports = {
         { from: './src/views', to: 'views' },
         { from: './src/public/stylesheets', to: 'public/stylesheets' },
         { from: './src/public/img', to: 'public/img' },
+        { from: './src/public/sounds', to: 'public/sounds' },
+        { from: './src/public/NuzhdikiSound', to: 'public/NuzhdikiSound' },
         { from: './src/public/scripts/tmi.min.js', to: 'public/scripts/tmi.min.js' },
       ],
     }),

@@ -70,8 +70,13 @@ passport.serializeUser(function(user, done) {
     done(null, user);
 });
 
-passport.deserializeUser(function(user: any, done) {
-    done(null, user);
+passport.deserializeUser(function(u: any, done) {
+    USER.findOne({ 'user.id': u.data[0].id }, function(err: any, user: any) {
+        done(null, { data: [u.data[0]],
+        accessToken: user.accessToken,
+        refreshToken: user.refreshnToken,
+      });
+    });
 });
 
 const strategy = new OAuth2Strategy({
