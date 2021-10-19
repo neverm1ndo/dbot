@@ -9,8 +9,10 @@ import * as childProcess from 'child_process';
         // Remove current build
         await remove('./dist/');
 
-        await exec('webpack --config ./webpack.frontend.prod.js', './');
         await exec('webpack --config ./webpack.backend.prod.js', './');
+        await exec('webpack --config ./webpack.frontend.prod.js', './');
+        await copy('./src/public/sounds', './dist/public/sounds');
+        await copy('./src/public/NuzhdikiSound', './dist/public/NuzhdikiSound');
     } catch (err) {
         console.error(err);
     }
@@ -26,13 +28,13 @@ function remove(loc: string): Promise<void> {
 }
 
 
-// function copy(src: string, dest: string): Promise<void> {
-//     return new Promise((res, rej) => {
-//         return fs.copy(src, dest, (err) => {
-//             return (!!err ? rej(err) : res());
-//         });
-//     });
-// }
+function copy(src: string, dest: string): Promise<void> {
+    return new Promise((res, rej) => {
+        return fs.copy(src, dest, (err) => {
+            return (!!err ? rej(err) : res());
+        });
+    });
+}
 
 
 function exec(cmd: string, loc: string): Promise<void> {
