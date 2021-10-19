@@ -31,7 +31,6 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist/'),
     publicPath: '/',
-    filename: 'index.js',
-    clean: true
+    filename: 'index.js
   },
 }
