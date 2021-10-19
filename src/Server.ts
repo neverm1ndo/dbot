@@ -74,7 +74,7 @@ passport.deserializeUser(function(u: any, done) {
     USER.findOne({ 'user.id': u.data[0].id }, function(err: any, user: any) {
         done(null, { data: [u.data[0]],
         accessToken: user.accessToken,
-        refreshToken: user.refreshnToken,
+        refreshToken: user.refreshToken,
       });
     });
 });

@@ -35,7 +35,7 @@ router.get('/', corsOpt, (req: IGetUserAuthInfoRequest, res: Response,) => { // 
       logger.warn(err);
       logger.warn('Users access token expired: ' + req.user.data[0].login);
       refresh.requestNewAccessToken('twitch', req.user.refreshToken, (err: { data?: any, statusCode: number }, accessToken: string, refreshToken: string) => {
-        if (err) { logger.err(err); res.sendStatus(INTERNAL_SERVER_ERROR); return; }
+        if (err) { logger.err(err, true); res.sendStatus(INTERNAL_SERVER_ERROR); return; }
         USER.updateOne({ 'user.id': req.user.data[0].id }, { accessToken, refreshToken}, { upsert: true }, () => {
           logger.info(req.user.data[0].login + ' updated access token');
         });

@@ -13,7 +13,6 @@ router.get('/', (req: Request, res: Response) => {
   if (!req.query.id) return res.sendStatus(BAD_REQUEST);
   USER.findOne({'user.id': req.query.id }, (err: any, user: any) => {
     if (err) return logger.err(err, true);
-    console.log(user);
     res.send(JSON.stringify(user));
   })
 });
