@@ -4,7 +4,7 @@ import { user, bttv, channelSets, chatterList, client, params, chat } from './ch
 import Tooltip from 'bootstrap/js/dist/tooltip';
 
 const defaultBadges = {
-  'diktorbot': '/tank2.png',
+  'diktorbot': '/img/tank2.png',
   'broadcaster': '/img/bc.png',
   'moderator': '/img/cm.png',
   'subscriber': '/img/sub.png',
