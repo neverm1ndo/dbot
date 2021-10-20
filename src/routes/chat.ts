@@ -16,37 +16,36 @@ export interface IGetUserAuthInfoRequest extends Request {
   user?: any
 }
 
-
 const router = Router();
 
-router.get('/', corsOpt, (req: IGetUserAuthInfoRequest, res: Response,) => { // FIXME: fix token refreshing alg
+router.get('/', corsOpt, (req: IGetUserAuthInfoRequest, res: Response,) => {
   if (req.user) {
     Twitch.validateToken(req.user.accessToken)
     .then((validated) => {
       logger.info(req.user.data[0].login + ' have valid access token ( expires_in: ' + validated.data.expires_in + ' )');
+      return req.user.accessToken;
+    }).catch((err: Error) => {
+      logger.warn(err);
+      logger.warn('Users access token expired: ' + req.user.data[0].login);
+      return new Promise((resolve, reject) => {
+        refresh.requestNewAccessToken('twitch', req.user.refreshToken, (err: { data?: any, statusCode: number }, accessToken: string, refreshToken: string) => {
+          if (err) { reject(err); }
+          USER.updateOne({ 'user.id': req.user.data[0].id }, { accessToken, refreshToken }, { upsert: true }, () => {
+            resolve(accessToken);
+            logger.info(req.user.data[0].login + ' updated access token');
+          });
+        });
+      })
+    }).then((accessToken) => {
       res.cookie('nmnd_app_client_id', process.env.TWITCH_CLIENT_ID)
-      .cookie('nmnd_user_access_token', req.user.accessToken)
+      .cookie('nmnd_user_access_token', accessToken)
       .cookie('nmnd_user_id', req.user.data[0].id)
       .cookie('nmnd_user_display_name', req.user.data[0].display_name)
       .cookie('nmnd_user_login', req.user.data[0].login)
       .set('Content-Security-Policy', 'default-src *')
       .render('chat', { user: req.user });
-    }).catch((err: Error) => {
-      logger.warn(err);
-      logger.warn('Users access token expired: ' + req.user.data[0].login);
-      refresh.requestNewAccessToken('twitch', req.user.refreshToken, (err: { data?: any, statusCode: number }, accessToken: string, refreshToken: string) => {
-        if (err) { logger.err(err, true); res.sendStatus(INTERNAL_SERVER_ERROR).json(err); return; }
-        USER.updateOne({ 'user.id': req.user.data[0].id }, { accessToken, refreshToken }, { upsert: true }, () => {
-          logger.info(req.user.data[0].login + ' updated access token');
-        });
-        res.cookie('nmnd_app_client_id', process.env.TWITCH_CLIENT_ID)
-        .cookie('nmnd_user_access_token', accessToken)
-        .cookie('nmnd_user_id', req.user.data[0].id)
-        .cookie('nmnd_user_display_name', req.user.data[0].display_name)
-        .cookie('nmnd_user_login', req.user.data[0].login)
-        .set('Content-Security-Policy', 'default-src *')
-        .render('chat', { user: req.user });
-      });
+    }).catch((err) => {
+      logger.err(err, true); res.sendStatus(INTERNAL_SERVER_ERROR).json(err);
     })
   } else {
     res.render('chat', { user: req.user });
