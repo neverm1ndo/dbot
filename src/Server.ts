@@ -94,7 +94,7 @@ const strategy = new OAuth2Strategy({
     USER.updateOne({ 'user.id': profile.data[0].id }, {
       user: profile.data[0],
       accessToken: accessToken,
-      refreshToken: accessToken,
+      refreshToken: refreshToken,
     }, { upsert: true, setDefaultsOnInsert: true }, (err: any) => {
       if (err) return logger.err(err);
       done(null, profile);
