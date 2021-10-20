@@ -1,7 +1,18 @@
+:root {
+  --twitch-main: #9146FF;
+}
+html {
+  background-color: #18181b;
+  color: var(--bs-light);
+  height: 100vh;
+}
+h4 {
+  font-weight: 300!important;
+}
 body {
-  padding: 100px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-  text-align: center;
+  background: none!important;
+  color: var(--bs-light)!important;
+  height: 100%;
 }
 @keyframes logo {
   from { transform: rotate(0deg);}
@@ -23,6 +34,16 @@ body #logo {
 body pre {
   white-space: pre-wrap;
 }
+.nav-link {
+  border: 2px solid var(--twitch-main)!important;
+  color: #fff!important;
+}
+.nav-link:focus {
+  box-shadow: 0 0 0 0.25rem #9146ff30;
+}
+.nav-link:hover {
+  background: #9146ff30!important;
+}
 .btn {
   padding: 15px;
   border-radius: 4px;
@@ -31,11 +52,7 @@ body pre {
   color: #fff;
 }
 #avatar {
-  position: relative;
-  top: 15px;
-  margin-right: 15px;
-  width: 32px;
-  height: auto;
-  float: left;
+  width: 120px;
+  height: 120px;
   border-radius: 100%;
 }

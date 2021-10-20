@@ -6,11 +6,24 @@ html
         title="Diktorbot"
         link(rel="stylesheet" type="text/css" href="/stylesheets/style.css")
         link(rel="shortcut icon" href="/img/tank2.png")
-    body.text-center
-      img#logo(src="/img/tank2.png" alt="")
-      if !session.passport
-        a.btn(href="/auth/twitch") Авторизация Twitch
-      else
-        img#avatar(src= session.passport.user.data[0].profile_image_url)
-        pre= "id " + session.passport.user.data[0].id + '\n' + "login " + session.passport.user.data[0].login + '\n' + "at " + session.passport.user.accessToken + '\n'
-        pre=JSON.stringify(session.passport)
+        link(href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous")
+    body
+      div.container.h-100
+        div.row.justify-content-center.h-100.align-items-center
+          if !user
+            img#logo(src="/img/tank2.png" alt="")
+            a.btn(href="/auth/twitch") Авторизация Twitch
+          else
+            div.col.col-8
+              div.col
+                nav.nav.nav-pills.nav-justified.mt-2
+                  li.nav-item
+                    a.nav-link(href="/controls/dash" target="_blank") Панель управления
+                  li.nav-item
+                    a.nav-link(href="/controls/chat" target="_blank") Чат
+                  li.nav-item
+                    a.nav-link(href="/controls/speaker" target="_blank") Спикер
+              div.col.mt-2.text-center
+                img#avatar.mt-4(src=user.data[0].profile_image_url)
+                h4.mt-4=user.data[0].display_name
+            

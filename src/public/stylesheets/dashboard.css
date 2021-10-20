@@ -15,6 +15,12 @@ body .logo {
   right: 20px;
   bottom: 20px;
 }
+#avatar {
+  border-radius: 100%;
+  width: 32px;
+  height: 32px;
+  margin-right: 15px;
+}
 .save, .tochat {
   margin-left: 30px;
   max-height: 32px;

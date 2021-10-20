@@ -18,12 +18,14 @@ html(lang="en")
           div.d-flex.w-100
             div.container
               div.d-flex.flex-row.justify-content-between.align-content-start.pt-4.pb-4
-                div.d-flex.flex-grow-1
+                div.d-flex
                   img.logo(src="/img/tank2.png")
                   button.save.btn.btn-dark.ml-3(name="save") Сохранить
                   a.tochat.btn.btn-dark.ml-3(name="tochat" href="/controls/chat") Чат
-                div
-                  p#user(data-id=session.passport.user.data[0].id)=session.passport.user.data[0].login
+                div.d-flex.flex-row.justify-content-start.align-items-center
+                  img#avatar(src=session.passport.user.data[0].profile_image_url)
+                  div
+                    span#user(data-id=session.passport.user.data[0].id)=session.passport.user.data[0].login
           main.d-flex.w-100.flex-fill.pb-4
             div.container.h-100
               form.row.h-100
