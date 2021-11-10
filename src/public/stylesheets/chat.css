@@ -81,7 +81,6 @@ body .chatters-list {
   background-color: #18181b;
   z-index: 21;
   position: fixed;
-  top: 49px;
   display: none;
 }
 body .card .card-body {
@@ -162,12 +161,14 @@ body #logo {
 body .card {
   border: none;
   background: none;
+  /* line-height: 26px; */
 }
 body .card:last-child {
   margin-bottom: 5px;
 }
 body .card .card-body img {
   max-width: 26px;
+  display: inline;
 }
 @keyframes siren {
   0% { opacity: 0.6;}

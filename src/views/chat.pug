@@ -11,7 +11,7 @@ html(lang="en")
   body
     if user
       div.chatters-list.w-100.h-100#chatters-list
-        div.d-flex.flex-column.flex-nowrap.h-100.align-items-start.justify-content-stretch
+        div.d-flex.flex-column.flex-nowrap.align-items-start.justify-content-stretch.h-100
           div.d-flex.w-100.head
             div.container-fluid
               div.d-flex.flex-row.pt-2.pb-2
@@ -24,7 +24,7 @@ html(lang="en")
                   h5.w-100 Пользователи чата
           div.container-fluid.flex-fill.overflow-auto.pt-3.pb-3
             div.d-flex-flex-fill.list
-              ul#list
+              div#list
       div.d-flex.flex-column.flex-nowrap.h-100.align-items-start.justify-content-stretch
         div.d-flex.w-100.head
           div.container-fluid

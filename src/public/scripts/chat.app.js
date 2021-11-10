@@ -183,21 +183,21 @@ class ChatMessage extends HTMLDivElement {
       for (let k = 0; k < bttv.globalEmotes.length; k++) {
         if (bttv.globalEmotes[k].code === splited[i]) {
           emoted = true;
-          result.push('<img data-bs-toggle="tooltip" title="'+ splited[i] +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.globalEmotes[k].id +'/1x">')
+          result.push('<img data-bs-toggle="tooltip" alt="'+ splited[i] +'" title="'+ splited[i] +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.globalEmotes[k].id +'/1x">')
         }
       }
       if (emoted) continue;
       for (let k = 0; k < bttv.bttvEmotes.length; k++) {
         if (bttv.bttvEmotes[k].code === splited[i]) {
           emoted = true;
-          result.push('<img data-bs-toggle="tooltip" title="'+ splited[i] +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.bttvEmotes[k].id +'/1x">')
+          result.push('<img data-bs-toggle="tooltip" alt="'+ splited[i] +'" title="'+ splited[i] +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.bttvEmotes[k].id +'/1x">')
         }
       }
       if (emoted) continue;
       for (let j = 0; j < emotes.length; j++ ) {
         if (position === emotes[j][1] + emotes[j][2] + 1) {
           emoted = true;
-            result.push('<img data-bs-toggle="tooltip" title="'+ splited[i] +'" class="emoticon" src="https://static-cdn.jtvnw.net/emoticons/v2/' + emotes[j][0] + '/default/dark/3.0">');
+            result.push('<img data-bs-toggle="tooltip" alt="'+  +'" title="'+ splited[i] +'" class="emoticon" src="https://static-cdn.jtvnw.net/emoticons/v2/' + emotes[j][0] + '/default/dark/3.0">');
             break;
         }
       }
@@ -272,7 +272,7 @@ class ChattersListController {
       close: document.querySelector('#close')
     }
   };
-  connected = [];
+  connected = ['neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o'];
   constructor() {
     this.dom.buttons.close.addEventListener('click', () => {
       this.close();
@@ -281,19 +281,23 @@ class ChattersListController {
       this.open();
       this.dom.list.innerHTML = '';
       for (let i = 0; i < this.connected.length; i++) {
-        const li = document.createElement('li');
-        li.innerText = this.connected[i];
-        li.prepend(
+        const card = document.createElement('div');
+        card.classList.add('card');
+        const body = document.createElement('div');
+        body.classList.add('card-body', 'pt-0', 'pb-0');
+        body.innerText = this.connected[i];
+        body.prepend(
           new MessageControlButton('btn-lurk', () => {
             ChatAlert.addLurker(this.connected[i]);
-            li.innerHTML = '<em>(<b>' + this.connected[i] + '</b> добавлен в черный список)</em>';
+            card.innerHTML = '<em>(<b>' + this.connected[i] + '</b> добавлен в черный список)</em>';
             this.remove(this.connected[i]);
             setTimeout(() => {
-              li.remove();
+              card.remove();
             }, 3000);
           }),
         );
-        this.dom.list.append(li);
+        card.append(body);
+        this.dom.list.append(card);
       }
     });
   }
@@ -407,7 +411,10 @@ class ChatController {
     this.autoscroll();
   }
   autoscroll () {
-    this.chat.parentElement.scrollTop = this.chat.parentElement.scrollHeight;
+    this.chat.parentElement.scrollTo({
+      top: this.chat.parentElement.scrollHeight,
+      behavior: "smooth"
+    });
   }
   pseudoDelete(username) {
     const childs = this.chat.childNodes;
