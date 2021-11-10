@@ -272,7 +272,7 @@ class ChattersListController {
       close: document.querySelector('#close')
     }
   };
-  connected = ['neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o', 'neverm1nd_o'];
+  connected = [];
   constructor() {
     this.dom.buttons.close.addEventListener('click', () => {
       this.close();
