@@ -105,6 +105,8 @@ body .card .card-body::before {
   to { transform: rotate(360deg);}
 }
 body #logo {
+  width: 30px;
+  height: auto;
   animation-duration: 3s;
   animation-name: logo;
   animation-iteration-count: infinite;
@@ -395,4 +397,45 @@ body .logo {
   margin-bottom: 6px;
   width: 20px;
   height: 20px;
+}
+.btn {
+  padding: 15px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+.btn-twitch {
+  padding-left: 15px!important;
+  padding-right: 15px!important;
+  padding-top: 8px!important;
+  padding-bottom: 8px!important;
+  font-size: 14px!important;
+  border-radius: 4px;
+  text-decoration: none;
+  background-color: var(--twitch-main)!important;
+  color: #fff!important;
+  transition: .1s ease-in-out;
+}
+.btn-twitch:hover {
+  transform: scale(1.03);
+}
+.btn-twitch:active, .btn-twitch:focus {
+  transform: scale(0.99);
+  box-shadow: 0 0 0 0.25rem #9146ff30;
+}
+.z-1 {
+  position: relative;
+  z-index: 1;
+}
+#bg {
+  position: fixed;
+  z-index: 0;
+  top: 0;
+  left: 0;
+}
+.cred {
+  font-size: 10px;
+  text-decoration: none;
+  color: inherit;
+  font-weight: 200!important;
+  opacity: 0.1;
 }

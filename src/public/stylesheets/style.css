@@ -19,11 +19,8 @@ body {
   to { transform: rotate(360deg);}
 }
 body #logo {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  margin-left: -20px;
-  margin-top: -20px;
+  width: 30px;
+  height: auto;
   animation-duration: 3s;
   animation-name: logo;
   animation-iteration-count: infinite;
@@ -48,8 +45,20 @@ body pre {
   padding: 15px;
   border-radius: 4px;
   text-decoration: none;
-  background-color: #9146FF;
-  color: #fff;
+}
+.btn-twitch {
+  padding: 15px;
+  font-size: 14px!important;
+  border-radius: 4px;
+  text-decoration: none;
+  background-color: var(--twitch-main)!important;
+  color: #fff!important;
+}
+#bg {
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  left: 0;
 }
 #avatar {
   width: 120px;

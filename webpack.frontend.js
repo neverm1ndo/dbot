@@ -8,7 +8,8 @@ module.exports = {
     chat: './src/public/scripts/chat.index.js',
     speaker: './src/public/scripts/speaker.js',
     dash: './src/public/scripts/dashboard.js',
-    polyfills: './src/public/scripts/polyfills.js'
+    polyfills: './src/public/scripts/polyfills.js',
+    bg: './src/public/scripts/bg.js'
   },
   output: {
     path: path.resolve(__dirname, 'dist/'),
