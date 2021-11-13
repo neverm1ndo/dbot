@@ -398,11 +398,6 @@ body .logo {
   width: 20px;
   height: 20px;
 }
-.btn {
-  padding: 15px;
-  border-radius: 4px;
-  text-decoration: none;
-}
 .btn-twitch {
   padding-left: 15px!important;
   padding-right: 15px!important;
@@ -426,6 +421,9 @@ body .logo {
   position: relative;
   z-index: 1;
 }
+.ml-15 {
+  margin-left: 15px;
+}
 #bg {
   position: fixed;
   z-index: 0;
@@ -438,4 +436,18 @@ body .logo {
   color: inherit;
   font-weight: 200!important;
   opacity: 0.1;
+}
+.list-group {
+  background-color: #20202020;
+  border-radius: .25rem;
+  margin-top: .25rem;
+  margin-left: -15px;
+  margin-right: -15px;
+}
+.list-group-item {
+  background: none!important;
+}
+.list-group-item:first-child {
+  padding-top: 5px!important;
+  /* background: none!important; */
 }

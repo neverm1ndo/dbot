@@ -57,6 +57,8 @@ bttv.getEmotes();
 
 let trigger = 0;
 
+const alerts = [];
+
 // if (params.has('channel')) {
 function handleStreamInfo(id) {
   setInterval(() => {

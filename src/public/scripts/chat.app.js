@@ -2,6 +2,7 @@ import Http from './http';
 import HEX from './hex';
 import { user, bttv, channelSets, chatterList, client, params, chat } from './chat';
 import Tooltip from 'bootstrap/js/dist/tooltip';
+import Collapse from 'bootstrap/js/dist/collapse';
 
 const defaultBadges = {
   'diktorbot': '/img/tank2.png',
@@ -218,7 +219,8 @@ class ChatMessage extends HTMLDivElement {
 class ChatAlert extends HTMLDivElement {
   constructor(message, type = 'default', username = '') {
     super();
-    const body = document.createElement('div');
+    this.type = type;
+    this.msg = document.createElement('span');
     this.classList.add('alert', 'mb-1');
     switch (type) {
       case 'success':
@@ -245,15 +247,22 @@ class ChatAlert extends HTMLDivElement {
       default:
         this.classList.add('text-muted');
     }
-    this.innerHTML = message;
+    this.msg.innerHTML = message;
+    this.append(this.msg);
     if (username) {
-      this.prepend(new MessageControlButton('btn-lurk', () => {
+      let btn = new MessageControlButton('btn-lurk', (e) => {
+        const msg = document.createElement('span');
         ChatAlert.addLurker(username);
         chatterList.remove(username);
-        this.innerHTML = '<em>(<b>' + username + '</b> добавлен в черный список)</em>';
-      }));
+        btn.remove();
+        this.msg.remove();
+        msg.innerHTML = '<em>(<b>' + username + '</b> добавлен в черный список)</em>';
+        this.prepend(msg);
+        e.preventDefault();
+        e.stopPropagation();
+      })
+      this.prepend(btn);
     }
-    this.append(body);
   }
   static addLurker(username) {
     channelSets.lurkers.push(username);
@@ -286,6 +295,7 @@ class ChattersListController {
         const body = document.createElement('div');
         body.classList.add('card-body', 'pt-0', 'pb-0');
         body.innerText = this.connected[i];
+        let btn =
         body.prepend(
           new MessageControlButton('btn-lurk', () => {
             ChatAlert.addLurker(this.connected[i]);
@@ -407,13 +417,55 @@ class ChatController {
     this.autoscroll();
   }
   alert(message, type, username) {
-    this.chat.append(new ChatAlert(message, type, username));
-    this.autoscroll();
+    if (this.chat.lastChild instanceof ChatAlert && this.chat.lastChild?.type === type) {
+      const last = this.chat.children[this.chat.children.length - 1];
+      let wrap;
+      let btn;
+      let badge;
+      if (last.children.length >= 4) {
+        wrap = last.lastChild;
+        badge = last.getElementsByTagName('a')[0];
+      } else {
+        badge = document.createElement('a');
+        badge.classList.add('ml-15', 'pull-right', 'badge', 'rounded-pill', 'bg-light', 'text-dark');
+        last.append(badge);
+        wrap = document.createElement('div');
+        wrap.classList.add('list-group', 'list-group-flush');
+        badge.setAttribute('data-bs-toggle', 'collapse');
+        last.setAttribute('role', 'button')
+        badge.setAttribute('aria-expanded', true)
+        wrap.id = String(message + Date.now()).hashCode();
+        badge.setAttribute('aria-controls', wrap.id);
+        badge.setAttribute('data-bs-toggle', '#' + wrap.id);
+        let collapse = new Collapse(wrap, {
+          toggle: true
+        });
+        last.append(wrap);
+        last.addEventListener('click', () => {
+          collapse.toggle();
+        })
+      }
+      if (wrap.children.length + 1 >= 3) {
+        setTimeout(() => {
+          Collapse.getInstance(wrap).hide();
+        }, 10);
+      }
+      badge.innerText = `и еще ${wrap.children.length + 1}`
+      let alert = new ChatAlert(message, type, username);
+      alert.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info')
+      alert.classList.add('list-group-item');
+      wrap.append(alert);
+    } else {
+      this.chat.append(new ChatAlert(message, type, username));
+    }
+    setTimeout(() => {
+      this.autoscroll();
+    }, 10);
   }
   autoscroll () {
     this.chat.parentElement.scrollTo({
-      top: this.chat.parentElement.scrollHeight,
-      behavior: "smooth"
+      top: this.chat.parentElement.scrollHeight + 300,
+      behavior: 'smooth'
     });
   }
   pseudoDelete(username) {
