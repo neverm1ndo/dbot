@@ -198,7 +198,7 @@ class ChatMessage extends HTMLDivElement {
       for (let j = 0; j < emotes.length; j++ ) {
         if (position === emotes[j][1] + emotes[j][2] + 1) {
           emoted = true;
-            result.push('<img data-bs-toggle="tooltip" alt="'+  +'" title="'+ splited[i] +'" class="emoticon" src="https://static-cdn.jtvnw.net/emoticons/v2/' + emotes[j][0] + '/default/dark/3.0">');
+            result.push('<img data-bs-toggle="tooltip" alt="'+ splited[i] +'" title="'+ splited[i] +'" class="emoticon" src="https://static-cdn.jtvnw.net/emoticons/v2/' + emotes[j][0] + '/default/dark/3.0">');
             break;
         }
       }
