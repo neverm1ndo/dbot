@@ -417,7 +417,7 @@ class ChatController {
     this.autoscroll();
   }
   alert(message, type, username) {
-    if (this.chat.lastChild instanceof ChatAlert && this.chat.lastChild?.type === type) {
+    if (this.chat.lastChild instanceof ChatAlert && this.chat.lastChild.type === type) {
       const last = this.chat.children[this.chat.children.length - 1];
       let wrap;
       let btn;
