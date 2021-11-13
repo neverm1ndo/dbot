@@ -450,7 +450,7 @@ class ChatController {
           Collapse.getInstance(wrap).hide();
         }, 10);
       }
-      badge.innerText = `и еще ${wrap.children.length + 1}`
+      badge.innerText = `+ ${wrap.children.length + 1}`
       let alert = new ChatAlert(message, type, username);
       alert.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info')
       alert.classList.add('list-group-item');
