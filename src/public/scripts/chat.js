@@ -132,7 +132,7 @@ client.on('disconnected', (channel, self) => {
 client.on('join', (channel, username, self) => {
   if (self || chatterList.connected.includes(username) || channelSets.lurkers.includes(username)) return;
   chatterList.add(username);
-  chat.alert(`<b>${username}</b> подключился к чату`, 'success', username);
+  chat.alert(`<b>${username}</b> подключился`, 'success', username);
 });
 client.on('ban', (channel, username, reason, userstate) => {
   // Replaced with PubSub event handler

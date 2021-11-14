@@ -418,11 +418,11 @@ class ChatController {
   }
   alert(message, type, username) {
     if (this.chat.lastChild instanceof ChatAlert && this.chat.lastChild.type === type) {
-      const last = this.chat.children[this.chat.children.length - 1];
+      const last = this.chat.lastChild;
       let wrap;
       let btn;
       let badge;
-      if (last.children.length >= 4) {
+      if (last.children.length > 2) {
         wrap = last.lastChild;
         badge = last.getElementsByTagName('a')[0];
       } else {
