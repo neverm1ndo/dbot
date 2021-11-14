@@ -15,6 +15,12 @@ export const checkSession = ( req: any, res: any, next: any ) => {
       res.redirect('/');
     }
 }
+export const checkUser = ( req: any, res: any, next: any ) => {
+    if (req.user) next();
+    else {
+      res.sendStatus(401);
+    }
+}
 export const verifySignature = (messageSignature: any, messageID: any, messageTimestamp: any, body: any) => {
     let message = messageID + messageTimestamp + body
     let signature = crypto.createHmac('sha256', process.env.TWITCH_EVENTSUB_SECRET!).update(message) // Remember to use the same secret set at creation

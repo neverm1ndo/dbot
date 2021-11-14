@@ -4,7 +4,8 @@ import { checkSession } from '@shared/functions';
 const router = Router();
 
 router.get('/', checkSession, (req: Request, res: Response) => {
-  res.render('dashboard', { session: req.session });
+  res.set('Content-Security-Policy', 'default-src *')
+     .render('dashboard', { session: req.session });
 });
 
 export default router;
