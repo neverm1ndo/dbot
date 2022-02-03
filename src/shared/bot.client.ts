@@ -147,6 +147,10 @@ export class Bot {
         this.client.say(channel, `${tags.username} нароллил: ${RNG.randomize(0, 101)} BlessRNG`);
         break;
       }
+      case 'разбор': {
+        this.client.say(channel, 'Короткий разбор реплея без дискорда - 200р');
+        break;
+      }
       case 'хелп': {
         this.client.say(channel, `OhMyDog Список команд тут: https://apps.nmnd.ru/commands`);
         break;
