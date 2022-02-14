@@ -781,6 +781,7 @@ export class D2PT {
     "Pangolier": {
       "valid": [
         "pangolier",
+        "pango",
         "p"
       ]
     },
@@ -825,7 +826,7 @@ export class D2PT {
   private static URL_D2PT = 'https://dota2protracker.com/hero/';
   public static async getHeroWR(hero: string) {
     const validatedHero = this.validateHero(hero);
-    if (!validatedHero) Promise.reject('Персонаж не найден');
+    if (!validatedHero) return Promise.reject('Нет такого персонажа или в имени допущена ошибка');
     return axios.get(this.URL_D2PT + validatedHero).then((body) => {
       return parse(body.data).querySelector('.hero-stats-descr').rawText.replace(/ +(?= )/g,'')
     })

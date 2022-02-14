@@ -174,16 +174,14 @@ export class Bot {
       }
       case 'd2pt': {
         if (!!args) {
-          if (args) {
             const arg = args.join(' ');
             D2PT.getHeroWR(arg).then((msg: string) => {
               this.client.say(channel, msg);
             }).catch((err) => {
               this.client.say(channel, err);
             });
-          }
         } else {
-           this.client.say(channel, 'Нет имени персонажа или он введен неверно');
+           this.client.say(channel, 'Имя персонажа небыло введено. Правильно - !d2pt invoker');
         }
         break;
       }
