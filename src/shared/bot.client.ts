@@ -6,6 +6,7 @@ import { Chatter } from '@interfaces/chatter';
 import { Media } from '@shared/media';
 import { Schedule } from '@shared/bot.schedule';
 import { Dota2 } from '@shared/dota2';
+import { D2PT } from '@shared/D2Scraper';
 import { Twitch } from '@shared/twitch';
 import { Nuzhdiki } from '@shared/nuzhdiki';
 import { Aneki } from '@shared/aneki';
@@ -169,6 +170,15 @@ export class Bot {
         Aneki.getOne().then((anek: string) => {
           this.client.say(channel, anek);
         });
+        break;
+      }
+      case 'd2pt': {
+        if (!args) { this.client.say(channel, 'Нет имени персонажа'); }
+        else {
+          D2PT.getHeroWR(args[0]).then((msg: string) => {
+            this.client.say(channel, msg);
+          });
+        }
         break;
       }
       default: { break; }
