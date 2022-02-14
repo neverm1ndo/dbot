@@ -85,7 +85,7 @@ export class Bot {
       if(self || !message.startsWith(this.prefix)) return;
     	const args = message.slice(1).split(' ');
     	const command = args.shift()!.toLowerCase();
-      this.readChattersMessage(channel, tags, command);
+      this.readChattersMessage(channel, tags, command, args);
     });
   }
   /**
@@ -173,11 +173,17 @@ export class Bot {
         break;
       }
       case 'd2pt': {
-        if (!args) { this.client.say(channel, 'Нет имени персонажа'); }
-        else {
-          D2PT.getHeroWR(args[0]).then((msg: string) => {
-            this.client.say(channel, msg);
-          });
+        if (!!args) {
+          if (args) {
+            const arg = args.join(' ');
+            D2PT.getHeroWR(arg).then((msg: string) => {
+              this.client.say(channel, msg);
+            }).catch((err) => {
+              this.client.say(channel, err);
+            });
+          }
+        } else {
+           this.client.say(channel, 'Нет имени персонажа или он введен неверно');
         }
         break;
       }
