@@ -173,7 +173,7 @@ export class Bot {
         break;
       }
       case 'd2pt': {
-        if (!!args) {
+        if (args) {
             const arg = args.join(' ');
             D2PT.getHeroWR(arg).then((msg: string) => {
               this.client.say(channel, msg);

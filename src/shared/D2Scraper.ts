@@ -824,11 +824,15 @@ export class D2PT {
     }
   }
   private static URL_D2PT = 'https://dota2protracker.com/hero/';
-  public static async getHeroWR(hero: string) {
+  public static async getHeroWR(hero: string): Promise<string> {
     const validatedHero = this.validateHero(hero);
     if (!validatedHero) return Promise.reject('Нет такого персонажа или в имени допущена ошибка');
     return axios.get(this.URL_D2PT + validatedHero).then((body) => {
-      return parse(body.data).querySelector('.hero-stats-descr').rawText.replace(/ +(?= )/g,'')
+      const data  = parse(body.data).querySelector('.hero-stats-descr').rawText.replace(/ +(?= )/g,'');
+      const times = data.match(/(?<=Picked\s)\d+(?=\stimes?)/)![0];
+      const wr    = data.match(/(?<=\s)\d+\.\d+\%(?=\s)/)![0];
+      const days  = data.match(/(?<=last\s)\d+(?=\sdays)/)![0];
+      return Promise.resolve(`${validatedHero} был пикнут ${times} раз за последние ${days} дней, с винрейтом ${wr}`);
     })
   }
   static validateHero(hero: string) {
