@@ -138,11 +138,11 @@ class ChatMessage extends HTMLDivElement {
       }
     }
     if (!self && (tags.username !== user.username)) {
-      this.body.prepend(new MessageControlButton('btn-timeout', () => {
-        client.timeout(params.has('channel')?params.get('channel'):user.username, tags.username, 600, 'rediska');
-      }));
       this.body.prepend(new MessageControlButton('btn-control', () => {
         client.ban(params.has('channel')?params.get('channel'):user.username, tags.username);
+      }));
+      this.body.prepend(new MessageControlButton('btn-timeout', () => {
+        client.timeout(params.has('channel')?params.get('channel'):user.username, tags.username, 600, 'rediska');
       }));
     }
     this.append(this.body);
