@@ -562,14 +562,6 @@ export class D2PT {
         "magi"
       ]
     },
-    "Primal Beast": {
-      "valid": [
-        "primal beast",
-        "beast",
-        "primal",
-        "pb"
-      ]
-    },
     "Undying": {
       "valid": [
         "undying",
@@ -829,7 +821,15 @@ export class D2PT {
       "valid": [
         "marci"
       ]
-    }
+    },
+    "Primal Beast": {
+      "valid": [
+        "primal beast",
+        "beast",
+        "primal",
+        "pb"
+      ]
+    },
   }
   private static URL_D2PT = 'https://dota2protracker.com/hero/';
   public static async getHeroWR(hero: string): Promise<string> {
