@@ -562,6 +562,14 @@ export class D2PT {
         "magi"
       ]
     },
+    "Primal Beast": {
+      "valid": [
+        "primal beast",
+        "beast",
+        "primal",
+        "pb"
+      ]
+    },
     "Undying": {
       "valid": [
         "undying",

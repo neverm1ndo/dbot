@@ -6,7 +6,7 @@ import { Chatter } from '@interfaces/chatter';
 import { Media } from '@shared/media';
 import { Schedule } from '@shared/bot.schedule';
 import { Dota2 } from '@shared/dota2';
-import { D2PT } from '@shared/D2Scraper';
+import { D2PT } from '@shared/d2pt';
 import { Twitch } from '@shared/twitch';
 import { Nuzhdiki } from '@shared/nuzhdiki';
 import { Aneki } from '@shared/aneki';
