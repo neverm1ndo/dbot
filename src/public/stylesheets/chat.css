@@ -451,3 +451,20 @@ body .logo {
   padding-top: 5px!important;
   /* background: none!important; */
 }
+.first-msg-card {
+  background: #9146FF20;
+  border-radius: 0.3rem;
+  padding: 15px 5px 5px 5px!important;
+}
+.first-msg {
+  color: #fdfdfd;
+  font-size: 10px;
+  background: var(--twitch-main);
+  border-radius: 1rem;
+  padding: 2px 5px 2px 5px;
+}
+.highlighted-message {
+  color: #fff;
+  background: #755ebc;
+  border: 4px solid #755ebc;
+}

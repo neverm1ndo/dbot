@@ -91,7 +91,6 @@ Http.get(`https://api.twitch.tv/helix/users?login=${params.has('channel')?params
     Http.get(`/controls/chat/last?channel=${params.has('channel')?params.get('channel'):user.username}`),
   ])
 }).then(([badges, global, lastMessages]) => {
-  console.log(badges.data, global)
   channelSets.badges = [...badges.data, ...global.data];
   lastMessages.forEach((message) => {
     chat.add(message.tags, message.message, message.self, message.date);

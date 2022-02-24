@@ -104,22 +104,25 @@ class MessageControlButton extends HTMLButtonElement {
 class ChatMessage extends HTMLDivElement {
   constructor(tags, message, self, date) {
     super();
-    let splitter = ': ';
+    let separator = ': ';
     const color = tags.color?new HEX(tags.color):new HEX('FFFFFF');
     this.body = document.createElement('div');
     this.nickname = document.createElement('span');
+    this.message = document.createElement('span');
+    this.message.classList.add('card-body-msg');
     this.tags = tags;
     this.nickname.classList.add('nickname');
     this.nickname.innerHTML = tags['display-name'];
     this.nickname.style.color = color < 0x505050?color.brightness(70).contrast(30).toString():color.toString();
     if (tags['message-type'] === "action") {
       this.body.style.color = this.nickname.style.color;
-      splitter = '';
+      separator = '';
     };
     this.classList.add('card');
     this.body.classList.add('card-body');
     this.body.dataset.date = timestamp(date);
-    this.body.innerHTML = splitter + this.pretty(tags, message);
+    if (separator) this.body.innerHTML = separator;
+    this.message.innerHTML = this.pretty(tags, message);
     this.addTooltipsToEmotes();
     this.body.prepend(this.nickname);
     if (tags.badges) {
@@ -129,6 +132,17 @@ class ChatMessage extends HTMLDivElement {
         this.body.prepend(new ChatMessageBadge(badges[i]));
       }
     }
+    if (tags['first-msg'] == true) {
+      const firstMsgBadge = document.createElement('span');
+      firstMsgBadge.classList.add('first-msg');
+      firstMsgBadge.innerText = 'Первое сообщение от';
+      this.body.classList.add('first-msg-card');
+      this.body.prepend(firstMsgBadge, document.createElement('br'));
+    }
+    if (tags['msg-id'] == "highlighted-message") {
+      this.message.classList.add("highlighted-message");
+    }
+    this.body.append(this.message);
     if (!self && (tags.username !== user.username)) {
       this.body.prepend(new MessageControlButton('btn-control', () => {
         client.ban(params.has('channel')?params.get('channel'):user.username, tags.username);
