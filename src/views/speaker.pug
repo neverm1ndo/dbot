@@ -39,9 +39,10 @@ html
           div.compressor
             span Threshold
             input.ranger(type="range" min="-100" max="0" name="threshold" id="threshold")
-        div
-          label#vol_label2(for="volume2")
-            span(style="float: left; margin-left: 75px") Gain
-            span#gain_value(style={float: 'right', 'margin-right': '15px'}) 100
-          input#gain.slider(type="range" min="0" max="100" name="volume2" value="35")
+        div.col
+          div.compressor.gain
+            span
+              span(style={float: 'left', 'margin-right': '15px'}) Gain 
+              span#gain_value(style={float: 'right', 'margin-right': '15px'}) 100
+            input.ranger.w-100(type="range" min="0" max="100" name="volume2" value="35" id="gain")
     script(type="text/javascript" src="/scripts/speaker.bundle.js")
