@@ -6,14 +6,6 @@ import Collapse from 'bootstrap/js/dist/collapse';
 
 const defaultBadges = {
   'diktorbot': '/img/tank2.png',
-  'broadcaster': '/img/bc.png',
-  'moderator': '/img/cm.png',
-  'subscriber': '/img/sub.png',
-  'founder': '/img/sub.png',
-  'vip': '/img/vip.png',
-  'turbo': '/img/tur.png',
-  'verified': '/img/vf.png',
-  'prime': '/img/prime.png',
 };
 
 function timestamp (unix) {
