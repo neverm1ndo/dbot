@@ -97,15 +97,22 @@ Http.get(`https://api.twitch.tv/helix/users?login=${params.has('channel')?params
   });
 }).catch((err) => console.error(err));
 
-if (window.localStorage.getItem('lurkers')) {
-  channelSets.lurkers = [...new Set(...[JSON.parse(window.localStorage.getItem('lurkers')), channelSets.lurkers])];
-  JSON.parse(window.localStorage.getItem('lurkers')).forEach((lurker, index, arr) => {
-    if (Array.isArray(lurker)) {
-      channelSets.lurkers.splice(channelSets.lurkers.indexOf(lurker), 1);
-    }
-  })
-  window.localStorage.setItem('lurkers', JSON.stringify(channelSets.lurkers));
-}
+/**
+* Set lurkers IIFE
+*/
+(() => {
+  const storage = window.localStorage.getItem('lurkers');
+  if (storage) {
+    const lurkers = JSON.parse(storage);
+    channelSets.lurkers = [...new Set(...[lurkers, channelSets.lurkers])];
+    lurkers.forEach((lurker, index, arr) => {
+      if (Array.isArray(lurker)) {
+        channelSets.lurkers.splice(index, 1);
+      }
+    })
+    window.localStorage.setItem('lurkers', JSON.stringify(channelSets.lurkers));
+  }
+})();
 
 export const client = new tmi.Client({
   options: {
