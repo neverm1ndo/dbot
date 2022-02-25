@@ -64,7 +64,8 @@ html(lang="en")
                         path(fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0a6 6 0 11-12 0 6 6 0 0112 0z" clip-rule="evenodd")
                   div.dropdown-menu.dropdown-menu-dark.p-2.mb-3
                     div#emotes-list.emotes-list
-                input.form-control#text(type="text" placeholder="Отправить сообщение")
+                label.chatty-label(for="chatty")
+                input.form-control#text(type="text" name="chatty" placeholder="Отправить сообщение")
                 button.btn.btn-dark#send(type="button" disabled) Чат
       script(type="text/javascript" src="https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-umd-min.js")
       script(type="text/javascript" src="/scripts/polyfills.bundle.js")

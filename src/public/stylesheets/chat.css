@@ -380,10 +380,23 @@ body .card .card-body img {
 #text:focus {
   box-shadow: 0 0 0 0.25rem #9146ff30;
 }
+.chatty-label {
+  position: absolute;
+  top: 11px;
+  left: 10px;
+  z-index: 4;
+  transition: .2s ease-in-out;
+  width: 18px;
+  height: 18px;
+}
+.chatty-label img {
+  width: 100%;
+  height: 100%;
+}
 #text {
   padding-top: 10px;
   padding-bottom: 10px;
-  padding-left: 10px!important;
+  padding-left: 50px!important;
   padding-right: 50px!important;
   box-sizing: border-box!important;
   background-color: var(--bs-gray-dark);

@@ -130,6 +130,20 @@ export const client = new tmi.Client({
 });
 
 client.connect();
+
+/**
+* Set user badge
+*/
+(function() {
+  const label = document.querySelector('.chatty-label');
+  const img = new Image();
+  img.src = '/img/cm.png';
+  if (!params.has('channel')) {
+    img.src = '/img/bc.png';
+  }
+  label.append(img);
+})();
+
 client.on('connected', (channel, self) => {
   chat.alert('Добро пожаловать в чат!');
   chat.connected = true;
@@ -169,6 +183,7 @@ client.on('chat', (channel, tags, message, self) => {
     chat.add(tags, message, self);
     return;
   }
+  // console.log(tags)
   chat.add(tags, message, self);
 });
 client.on('subscription', (channel, username, methods, message, userstate) => {
