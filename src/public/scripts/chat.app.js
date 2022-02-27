@@ -369,7 +369,11 @@ class ChatController {
         'Client-ID': user.client
       }
     )
-    .then(data => { if (data.data.length > 0) this.addEmotes(data.data);})
+    .then(data => {
+        if (data.data.length > 0) {
+          this.addEmotes(data.data);
+        }
+      })
     .catch(err => console.error);
   }
   addEmotes(emotes) {

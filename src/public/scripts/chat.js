@@ -222,7 +222,8 @@ client.on('cheer', (channel, userstate, message) => {
   chat.alert(`<b>${username}</b> поддержал канал на <b>${userstate.bits}</b> Cheers`, 'info');
 });
 client.on('emotesets', (sets, obj) => {
-  if (trigger > 0) return;
   trigger++;
-  chat.getEmoteSet(sets.split(','));
+  if (trigger != 1) {  
+    chat.getEmoteSet(sets.split(','));
+  }
 });
