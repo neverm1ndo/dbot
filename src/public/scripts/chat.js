@@ -30,9 +30,9 @@ export const channelSets = {
 }
 
 const tag = document.createElement('script');
-tag.src = 'https://www.youtube.com/player_api';
+      tag.src = 'https://www.youtube.com/player_api';
 const firstScriptTag = document.getElementsByTagName('script')[0];
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 
 //** Define custom HTML elements **//
@@ -223,7 +223,7 @@ client.on('cheer', (channel, userstate, message) => {
 });
 client.on('emotesets', (sets, obj) => {
   trigger++;
-  if (trigger != 1) {  
+  if (trigger != 1) {
     chat.getEmoteSet(sets.split(','));
   }
 });

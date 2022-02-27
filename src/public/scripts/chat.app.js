@@ -382,7 +382,10 @@ class ChatController {
     this.text.addEventListener('focus', () => {
       quickpanel.show();
     })
-    this.text.addEventListener('blur', () => {
+    this.text.addEventListener('mouseenter', () => {
+      quickpanel.show();
+    })
+    this.quickpanel.addEventListener('mouseleave', () => {
       quickpanel.hide();
     })
   }
