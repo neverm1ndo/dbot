@@ -4,6 +4,9 @@ import { user, bttv, channelSets, chatterList, client, params, chat } from './ch
 import Tooltip from 'bootstrap/js/dist/tooltip';
 import Collapse from 'bootstrap/js/dist/collapse';
 
+/**
+* В целом код читается очень тяжело. Особенно вермишель из нагромождений запросов к DOM в конструкторах классов;
+*/
 const defaultBadges = {
   'diktorbot': '/img/tank2.png',
 };
@@ -70,7 +73,7 @@ class YTFrame extends HTMLDivElement {
     const rep = document.createElement('div');
     rep.id = String(url + Date.now()).hashCode();
     this.append(rep);
-    setTimeout(() => {
+    setTimeout(() => { // Зачемт тут этот макротаск уже сам не помню. Вроде фрейм не рендерился.
       new Promise((resolve) => {
         this.player = new YT.Player(rep.id, {
           videoId: YTFrame.getVideoID(url),
@@ -87,7 +90,7 @@ class YTFrame extends HTMLDivElement {
       });
     }, 2000);
   }
-  static getVideoID(url) {
+  static getVideoID(url) { // Обожаю статические методы
     const regExp = new RegExp(/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/);
     const match = url.match(regExp);
     return (match && match[7].length === 11) ? match[7] : console.warn('No YT video ID', match);
@@ -106,24 +109,30 @@ class ChatMessage extends HTMLDivElement {
     super();
     let separator = ': ';
     const color = tags.color?new HEX(tags.color):new HEX('FFFFFF');
-    this.body = document.createElement('div');
+    this.body = document.createElement('div'); // Запихнуть бы все эти переменные в один обжект
     this.nickname = document.createElement('span');
     this.message = document.createElement('span');
     this.message.classList.add('card-body-msg');
     this.tags = tags;
     this.nickname.classList.add('nickname');
     this.nickname.innerHTML = tags['display-name'];
+     /**
+     * В целом чейнинг ясен, но один из методов работает не совсем так, как задумывалось
+     */
     this.nickname.style.color = color < 0x505050?color.brightness(70).contrast(30).toString():color.toString();
     if (tags['message-type'] === "action") {
       this.body.style.color = this.nickname.style.color;
-      separator = '';
+      separator = ''; // Обязательные манипуляции???
     };
     this.classList.add('card');
     this.body.classList.add('card-body');
     this.body.dataset.date = timestamp(date);
     if (separator) this.body.innerHTML = separator;
-    this.message.innerHTML = this.pretty(tags, message);
+    this.message.innerHTML = this.pretty(tags, message); // innerHTML!
     this.addTooltipsToEmotes();
+    /**
+    * Ниже еще больше ультранасилия
+    */
     this.body.prepend(this.nickname);
     if (tags.badges) {
       const badges = Object.entries(tags.badges);
@@ -152,17 +161,23 @@ class ChatMessage extends HTMLDivElement {
       }));
     }
     this.append(this.body);
-    if (haveLinks(message)) { // FIXME: remove unnecessary variable (links), fix condition
+    if (haveLinks(message)) {
       const links = haveLinks(message);
       if (!YTFrame.getVideoID(links[0])) return;
       this.body.appendChild(new YTFrame(links[0]));
     }
-    this.nickname.addEventListener('click', () => { // ??? Exprerimental (may cause perfomance violation)
+    /**
+    * Хорошая ли идея навешать лиснер на каждый ник? Скорее нет, чем да.
+    */
+    this.nickname.addEventListener('click', () => {
       chat.text.value = chat.text.value + ' @' + tags.username + ' ';
       chat.text.focus();
     });
   }
 
+  /**
+  * Слишком много циклов, лучше парсить рекурсивно
+  */
   pretty(tags, message) {
     let notice = message.includes('@')?'@' + user.display_name: user.display_name;
     let splited = message.split(' ');
@@ -297,14 +312,14 @@ class ChattersListController {
       this.dom.list.innerHTML = '';
       for (let i = 0; i < this.connected.length; i++) {
         const card = document.createElement('div');
-        card.classList.add('card');
+              card.classList.add('card');
         const body = document.createElement('div');
-        body.classList.add('card-body', 'pt-0', 'pb-0');
-        body.innerText = this.connected[i];
-        let btn =
-        body.prepend(
+              body.classList.add('card-body', 'pt-0', 'pb-0');
+              body.innerText = this.connected[i];
+        let btn = body.prepend(
           new MessageControlButton('btn-lurk', () => {
             ChatAlert.addLurker(this.connected[i]);
+            // innerHTML!
             card.innerHTML = '<em>(<b>' + this.connected[i] + '</b> добавлен в черный список)</em>';
             this.remove(this.connected[i]);
             setTimeout(() => {
@@ -341,6 +356,7 @@ class ChatController {
     this.text = document.querySelector('#text');
     this.submit = document.querySelector('#send');
     this.emotes = document.querySelector("#emotes-list");
+    this.quickpanel = document.querySelector("#broadcaster-quickpanel")
     this.submit.addEventListener('click', () => {
       if (this.connected) this.send();
     });
@@ -352,14 +368,23 @@ class ChatController {
         this.selfEmotes = {};
       }
     });
-    this.emotes.addEventListener('click', (event) => {
+    const quickpanel = new Collapse(this.quickpanel, {
+      toggle: false
+    });
+    [this.emotes, this.quickpanel].map(panel => panel.addEventListener('click', (event) => {
       if (event.target.tagName !== 'IMG') return;
       if (typeof this.selfEmotes[event.target.dataset.id] !== 'object') {
         this.selfEmotes[event.target.dataset.id] = [];
       }
       this.selfEmotes[event.target.dataset.id].push(`${this.text.value.length}-${this.text.value.length + event.target.dataset.name.length}`);
       this.text.value = this.text.value + ' ' + event.target.dataset.name + ' ';
-    });
+    }));
+    this.text.addEventListener('focus', () => {
+      quickpanel.toggle();
+    })
+    this.text.addEventListener('blur', () => {
+      quickpanel.toggle();
+    })
   }
   getEmoteSet(id) {
     Http.get(
@@ -417,6 +442,11 @@ class ChatController {
           });
           container.append(title, avatar?avatar:'', subcont);
           subcont.append(img);
+        }
+        if (ownersInfo.data[i].display_name.toLowerCase() == (params.get('channel') || user.display_name)) {
+          setTimeout(() => { // Quickpanel macrotask
+            this.quickpanel.append(container);
+          }, 0);
         }
         this.emotes.append(container, document.createElement('hr'));
       }
