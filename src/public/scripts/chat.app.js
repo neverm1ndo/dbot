@@ -443,7 +443,7 @@ class ChatController {
           container.append(title, avatar?avatar:'', subcont);
           subcont.append(img);
         }
-        if (ownersInfo.data[i].display_name.toLowerCase() == (params.has('channel')?params.get('channel'):user.display_name)) {
+        if (ownersInfo.data[i].display_name.toLowerCase() == (params.has('channel')?params.get('channel'):user.username)) {
           setTimeout(() => { // Quickpanel macrotask
             this.quickpanel.append(container);
           }, 0);
