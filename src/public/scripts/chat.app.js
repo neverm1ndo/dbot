@@ -380,10 +380,10 @@ class ChatController {
       this.text.value = this.text.value + ' ' + event.target.dataset.name + ' ';
     }));
     this.text.addEventListener('focus', () => {
-      quickpanel.toggle();
+      quickpanel.show();
     })
     this.text.addEventListener('blur', () => {
-      quickpanel.toggle();
+      quickpanel.hide();
     })
   }
   getEmoteSet(id) {
