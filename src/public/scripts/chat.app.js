@@ -354,6 +354,7 @@ class ChatController {
     this.connected = false;
     this.selfEmotes = {};
     this.text = document.querySelector('#text');
+    this.text.disabled = true;
     this.submit = document.querySelector('#send');
     this.emotes = document.querySelector("#emotes-list");
     this.quickpanel = document.querySelector("#broadcaster-quickpanel")
@@ -447,11 +448,12 @@ class ChatController {
           subcont.append(img);
         }
         if (ownersInfo.data[i].display_name.toLowerCase() == (params.has('channel')?params.get('channel'):user.username)) {
-          setTimeout(() => { // Quickpanel macrotask
+          setTimeout(() => { // Quickpanel task
             this.quickpanel.append(container);
           }, 0);
+        } else {
+          this.emotes.append(container, document.createElement('hr'));
         }
-        this.emotes.append(container, document.createElement('hr'));
       }
     }).catch((err) => console.log(err))
   }

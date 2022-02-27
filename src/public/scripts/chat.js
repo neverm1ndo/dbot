@@ -148,11 +148,13 @@ client.on('connected', (channel, self) => {
   chat.alert('Добро пожаловать в чат!');
   chat.connected = true;
   chat.submit.disabled = false;
+  chat.text.disabled = false;
 });
 client.on('disconnected', (channel, self) => {
   chat.alert('Вы отсоединенны от чата', 'siren');
   chat.connected = false;
   chat.submit.disabled = true;
+  chat.text.disabled = true;
 });
 client.on('join', (channel, username, self) => {
   if (self || chatterList.connected.includes(username) || channelSets.lurkers.includes(username)) return;
