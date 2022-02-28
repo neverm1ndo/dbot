@@ -383,9 +383,6 @@ class ChatController {
     this.text.addEventListener('focus', () => {
       quickpanel.show();
     })
-    this.text.addEventListener('mouseenter', () => {
-      quickpanel.show();
-    })
     this.quickpanel.addEventListener('mouseleave', () => {
       quickpanel.hide();
     })
@@ -448,9 +445,11 @@ class ChatController {
           subcont.append(img);
         }
         if (ownersInfo.data[i].display_name.toLowerCase() == (params.has('channel')?params.get('channel'):user.username)) {
-          setTimeout(() => { // Quickpanel task
-            this.quickpanel.append(container);
-          }, 0);
+          if (this.quickpanel.children.length < 1) {
+            setTimeout(() => { // Quickpanel task
+              this.quickpanel.append(container);
+            }, 0);
+          }
         } else {
           this.emotes.append(container, document.createElement('hr'));
         }
