@@ -40,8 +40,10 @@ class TTVClip {
 
   static getSlug(link) {
     if (!link) return;
-    // https://clips.twitch.tv/TangentialPopularPorpoisePJSugar-DQNOMEcbFrdkPEgf
-    return link.match(/(?<=https:\/\/clips\.twitch\.tv\/)(.*)/)[0];
+    https://www.twitch.tv/diktor__/clip/InventiveCloudyHawkStrawBeary-cYeV7baTn09TAJ7z
+    const regex = new RegExp(/(?<=clip\/)(.*)/);
+    if (!regex.test(link)) return;
+    return link.match(regex)[0];
   }
 }
 
