@@ -98,4 +98,13 @@ export class Twitch {
       }
     })
   }
+  static getClip(slug: string) {
+    return axios({
+      method: 'get',
+      url: 'https://api.twitch.tv/kraken/clips/' + slug,
+      params: {
+        client_id: process.env.TWITCH_CLIENT_ID,
+      }
+    })
+  }
 }

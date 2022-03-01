@@ -65,5 +65,13 @@ router.get('/last', corsOpt, (req: Request, res: Response,) => {
     res.send(messages.reverse());
   });
 });
+router.get('/clip', corsOpt, (req: Request, res: Response,) => {
+  if (!req.query.slug) res.sendStatus(BAD_REQUEST);
+  Twitch.getClip(String(req.query.slug)).then( clip => {
+    res.send(clip)
+  }).catch(err => {
+    console.error(err.message)
+  })
+});
 
 export default router;

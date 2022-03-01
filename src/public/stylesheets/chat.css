@@ -498,3 +498,49 @@ body .logo {
   overflow: hidden;
   transition(height .2s ease;);
 }
+.not-like-this {
+  text-align: center;
+  background: var(--bs-dark);
+  padding: 10px;
+  border-radius: 0.3rem;
+  height: 100%;
+}
+.not-like-this img {
+  max-width: none!important;
+  width: 48px!important;
+  height: 48px;
+  margin-right: 15px;
+  border-radius: 0.3rem;
+  color: var(--bs-secondary);
+}
+.clip-frame {
+  border-radius: 0.2rem;
+  width: auto;
+  height: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  color: var(--bs-light);
+  text-decoration: none;
+}
+.clip-frame:hover {
+  background: var(--twitch-main);
+  color: var(--bs-light);
+  text-decoration: none;
+}
+.clip-frame > div {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+.clip-frame img {
+  border-radius: 0.3rem;
+  position: relative;
+  top: 0px;
+  z-index: 0;
+  max-width: none!important;
+  max-height: none!important;
+  width: auto;
+  height: 100px;
+  display: flex;
+}

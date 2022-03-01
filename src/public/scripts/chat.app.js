@@ -3,6 +3,7 @@ import HEX from './hex';
 import { user, bttv, channelSets, chatterList, client, params, chat } from './chat';
 import Tooltip from 'bootstrap/js/dist/tooltip';
 import Collapse from 'bootstrap/js/dist/collapse';
+import TTVClip from './ttv.clips.embed';
 
 /**
 * В целом код читается очень тяжело. Особенно вермишель из нагромождений запросов к DOM в конструкторах классов;
@@ -163,8 +164,27 @@ class ChatMessage extends HTMLDivElement {
     this.append(this.body);
     if (haveLinks(message)) {
       const links = haveLinks(message);
-      if (!YTFrame.getVideoID(links[0])) return;
-      this.body.appendChild(new YTFrame(links[0]));
+      if (YTFrame.getVideoID(links[0])) {
+        this.body.appendChild(new YTFrame(links[0]));
+        return;
+      }
+      const ttvClipSlug = TTVClip.getSlug(links[0]);
+      if (ttvClipSlug) {
+        Http.get('https://api.twitch.tv/helix/clips?id=' + ttvClipSlug,
+        {
+          'Authorization': 'Bearer ' + user.token,
+          'Client-ID': user.client
+        })
+        .then(data => {
+          const clip = data.data[0];
+          if (clip) {
+            this.body.append(new TTVClip(clip, 100, 100).valueOf());
+          } else {
+            this.body.append(TTVClip.notLikeThis('Клипа не существует'))
+          }
+        })
+        return;
+      }
     }
     /**
     * Хорошая ли идея навешать лиснер на каждый ник? Скорее нет, чем да.
