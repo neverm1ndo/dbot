@@ -177,6 +177,7 @@ class ChatMessage extends HTMLDivElement {
         })
         .then(data => {
           const clip = data.data[0];
+          [...this.body.getElementsByTagName('a')].map((link) => { link.remove(); });
           if (clip) {
             this.body.append(new TTVClip(clip, 100, 100).valueOf());
           } else {

@@ -14,7 +14,7 @@ class TTVClip {
     const title = document.createElement('div');
           title.innerHTML = '<b>' + clip.title + '</b>';
     const author = document.createElement('div');
-          author.innerText = `с канала ${clip.broadcaster_name} от ${clip.creator_name}` ;
+          author.innerHTML = `<small>с канала ${clip.broadcaster_name} от ${clip.creator_name}</small>` ;
     // const thumb = new Image();
     //       thumb.src = clip.thumbnail_url;
     const info = document.createElement('div');
