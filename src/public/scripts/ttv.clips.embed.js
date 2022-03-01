@@ -33,7 +33,7 @@ class TTVClip {
           wrap.classList.add('not-like-this');
     const img = new Image();
           img.src = "https://static-cdn.jtvnw.net/emoticons/v2/58765/default/light/3.0";
-          wrap.innerText = message;
+          wrap.innerHTML = `<small>${message}</small>`;
           wrap.prepend(img);
     return wrap;
   }
