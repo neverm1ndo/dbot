@@ -15,11 +15,11 @@ class TTVClip {
           title.innerHTML = '<b>' + clip.title + '</b>';
     const author = document.createElement('div');
           author.innerText = `с канала ${clip.broadcaster_name} от ${clip.creator_name}` ;
-    const thumb = new Image();
-          thumb.src = clip.thumbnail_url;
+    // const thumb = new Image();
+    //       thumb.src = clip.thumbnail_url;
     const info = document.createElement('div');
           info.append(title, author);
-    wrap.append(thumb, info);
+    wrap.append(info);
     wrap.classList.add('clip-frame')
     this.frame = wrap;
   }
