@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackPugPlugin = require('html-webpack-pug-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
@@ -33,6 +34,7 @@ module.exports = {
         { from: '../assets', to: 'assets' },
       ],
     }),
+    new MiniCssExtractPlugin(),
     new HtmlWebpackPlugin({
       template: './chat/chat.pug',
       filename: '../views/chat.pug',
@@ -80,10 +82,7 @@ module.exports = {
       },
       {
         test: /\.css$/i,
-        use: [
-          { loader: "style-loader", options: { injectType: "linkTag" }},
-          { loader: "file-loader" },
-        ],
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
     ],
   },
