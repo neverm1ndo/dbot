@@ -1,6 +1,7 @@
-import Http from './http';
-import { params, user, chat } from './chat';
+import Http from '@shared/http';
+import { params, chat } from './chat';
 import Tooltip from 'bootstrap/js/dist/tooltip';
+import _ from 'underscore';
 
 class BTTV {
   bttvEmotes = {
@@ -18,9 +19,9 @@ class BTTV {
   constructor() {};
   getEmotes() {
     console.log('Getting BTTV emotes');
-    Http.get(`chat/emotes?channel=${params.has('channel')?params.get('channel'):user.username}`)
+    Http.get(`chat/emotes?channel=${params.has('channel')?params.get('channel'):chat.user.username}`)
     .then((data) => {
-      console.log('Got BTTV global emotes \n', data);
+      console.log('Got BTTV global emotes');
       this.bttvEmotes = this.bttvEmotes.emotes.concat(data.channel.emotes.map(function(n) {
         n.global = true;
         return n;
@@ -32,7 +33,7 @@ class BTTV {
       this.bttvEmotes.subEmotesCodeList = _.chain(this.bttvEmotes.emotes).where({ global: true }).reject(function(n) { return _.isNull(n.channel); }).pluck('code').value();
     }).catch((err) => console.error)
     .then(() => {
-      this.addEmotes(this.bttvEmotes, params.has('channel')?params.get('channel'):user.username);
+      this.addEmotes(this.bttvEmotes, params.has('channel')?params.get('channel'):chat.user.username);
       this.addEmotes(this.globalEmotes, 'Global');
     })
   }

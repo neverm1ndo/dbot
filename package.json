@@ -7,10 +7,10 @@
     "start": "node -r module-alias/register ./dist",
     "nodemon:dev": "nodemon",
     "test": "nodemon --config ./spec/nodemon.json",
-    "build:web": "webpack --config ./webpack.frontend.prod.js",
-    "build:server": "webpack --config ./webpack.backend.prod.js",
-    "watch:web": "webpack --watch --config ./webpack.frontend.dev.js",
-    "watch:server": "webpack --watch --config ./webpack.backend.dev.js"
+    "build:web": "webpack --config ./webpack/webpack.frontend.prod.js",
+    "build:server": "webpack --config ./webpack/webpack.backend.prod.js",
+    "watch:web": "webpack --watch --config ./webpack/webpack.frontend.dev.js",
+    "watch:server": "webpack --watch --config ./webpack/webpack.backend.dev.js"
   },
   "nodemonConfig": {
     "watch": [
@@ -70,6 +70,7 @@
     "@types/ws": "^7.4.0",
     "axios": "^0.21.1",
     "bootstrap": "^5.1.2",
+    "bootstrap-icons": "^1.8.1",
     "command-line-args": "^5.1.1",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
@@ -91,7 +92,8 @@
     "passport-oauth2-refresh": "^2.1.0",
     "pug": "^3.0.2",
     "rxjs": "^6.6.6",
-    "tmi.js": "^1.7.2",
+    "tmi.js": "^1.8.5",
+    "underscore": "^1.13.2",
     "webpack": "^5.55.1",
     "ws": "^7.4.3"
   },
@@ -112,9 +114,10 @@
     "@typescript-eslint/eslint-plugin": "^4.15.2",
     "@typescript-eslint/parser": "^4.15.2",
     "copy-webpack-plugin": "^9.0.1",
-    "css-loader": "^6.3.0",
+    "css-loader": "^6.6.0",
     "dotenv-webpack": "^7.0.3",
     "eslint": "^7.20.0",
+    "file-loader": "^6.2.0",
     "find": "^0.3.0",
     "fs-extra": "^9.1.0",
     "html-webpack-plugin": "^5.3.2",

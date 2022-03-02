@@ -308,7 +308,7 @@ body .card .card-body img {
   position: absolute;
   margin-top: -9px;
   margin-left: -10px;
-  background: url('../img/robot.svg') no-repeat 0 0;
+  background: url('../../assets/robot.svg') no-repeat 0 0;
   filter: grayscale(1);
   background-size: 22px 22px;
   transition: .2s ease-in-out;
@@ -320,7 +320,7 @@ body .card .card-body img {
   position: absolute;
   margin-top: -7px;
   margin-left: -10px;
-  background: url('../img/timeout.svg') no-repeat 0 0;
+  background: url('../../assets/timeout.svg') no-repeat 0 0;
   filter: grayscale(0.9) brightness(30%) hue-rotate(145deg);
   background-size: 19px 19px;
   transition: .2s ease-in-out;
@@ -493,11 +493,6 @@ body .logo {
 #broadcaster-quickpanel > div {
   padding: 5px 10px 5px 10px;
 }
-.collapsing {
-  height: 0;
-  overflow: hidden;
-  transition(height .2s ease;);
-}
 .not-like-this {
   text-align: center;
   background: var(--bs-dark);
@@ -537,6 +532,9 @@ body .logo {
   display: flex;
   flex-direction: column;
   padding: 5px 10px 5px 10px;
+}
+.input-group > .btn {
+  padding: 11px;
 }
 /* .clip-frame img {
   border-radius: 0.3rem;

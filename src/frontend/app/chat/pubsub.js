@@ -1,13 +1,13 @@
-import { chat, user, channelSets } from './chat';
+import { chat } from './chat';
 
 const _SCOPE = 'user_read+chat_login';
 
 class PubSub {
-  ws
+  ws;
   moderation_actions = {
     'unban': 'разбанил',
     'ban': 'забанил'
-  }
+  };
   constructor() {}
   connect(id) {
     const heartbeatInterval = 1000 * 60;
@@ -60,8 +60,8 @@ class PubSub {
         type: 'LISTEN',
         nonce: nonce(15),
         data: {
-            topics: [`chat_moderator_actions.${user.id}.${id}`],
-            auth_token: user.token
+            topics: [`chat_moderator_actions.${chat.user.id}.${id}`],
+            auth_token: chat.user.token
         }
     };
     console.log('[PUBSUB] SENT: ' + JSON.stringify(message) + '\n');

@@ -1,0 +1,21 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
+    meta(http-equiv="Content-Security-Policy" content="default-src *; img-src * 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *")
+    title Diktorbot | Команды бота
+    link(rel="shortcut icon" href="/assets/tank2.png")
+  body
+    div.d-flex.flex-column.flex-nowrap.h-100.align-items-start.justify-content-stretch
+      div.d-flex.w-100
+        div.container
+          div.d-flex.flex-row.pt-4.pb-4
+            div.d-flex
+              img.logo(src="/assets/tank2.png")
+      main.d-flex.w-100.flex-fill.pb-4
+        div.container.h-100
+          h3 Функциональные команды
+          pre !ролл !ранг !анек !нуждики
+          h3 Звуковые команды
+          pre=commands

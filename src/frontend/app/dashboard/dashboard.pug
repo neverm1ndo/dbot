@@ -1,0 +1,35 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
+    meta(http-equiv="Content-Security-Policy" content="default-src *; img-src * 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *")
+    if session.passport
+      title=session.passport.user.data[0].login + ' dashboard'
+    else
+      title="neverm1nd_o apps"
+    link(rel="shortcut icon" href="/assets/tank2.png")
+  body
+    if session.passport
+      div.alert(role="alert")
+      div.d-flex.flex-column.flex-nowrap.h-100.align-items-start.justify-content-stretch
+        div.d-flex.w-100
+          div.container
+            div.d-flex.flex-row.justify-content-between.align-content-start.pt-4.pb-4
+              div.d-flex
+                img.logo(src="/assets/tank2.png")
+                button.save.btn.btn-dark.ml-3(name="save") Сохранить
+                a.tochat.btn.btn-dark.ml-3(name="tochat" href="/controls/chat") Чат
+              div.d-flex.flex-row.justify-content-start.align-items-center
+                img#avatar(src=session.passport.user.data[0].profile_image_url)
+                div
+                  span#user(data-id=session.passport.user.data[0].id)=session.passport.user.data[0].login
+        main.d-flex.w-100.flex-fill.pb-4
+          div.container.h-100
+            form.row.h-100
+              div.col-4.h-100
+                textarea.w-100.h-100.form-control#automessages
+              div.col-5.h-100
+                textarea.w-100.h-100.form-control#sounds
+              div.col-3.h-100
+                textarea.w-100.h-100.form-control#banwords

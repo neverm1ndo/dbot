@@ -9,8 +9,8 @@ import * as childProcess from 'child_process';
         // Remove current build
         await remove('./dist/');
 
-        await exec('webpack --config ./webpack.backend.prod.js', './');
-        await exec('webpack --config ./webpack.frontend.prod.js', './');
+        await exec('webpack --config ./webpack/webpack.backend.prod.js', './');
+        await exec('webpack --config ./webpack/webpack.frontend.prod.js', './');
         await copy('./src/public/sounds', './dist/public/sounds');
         await copy('./src/public/NuzhdikiSound', './dist/public/NuzhdikiSound');
     } catch (err) {

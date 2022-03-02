@@ -1,3 +1,6 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './dashboard.css';
+import Http from '@shared/http';
 /* eslint max-classes-per-file: ["error", 10] */
 let ws;
 const userId = document.querySelector('#user').dataset.id;
@@ -84,40 +87,40 @@ const alert = new Alert();
   };
 }());
 
-(async function getSettings() {
-  this.res = await fetch(`/api/user?id=${userId}`)
-    if (this.res.ok) {
-    this.conf = await res.json();
-    console.log(this.conf);
-  } else {
-    alert.error(`Ошибка HTTP: ${this.res.status}`);
-  }
-  document.querySelector('#automessages').value = JSON.stringify(this.conf.settings.automessages);
-  document.querySelector('#sounds').value = JSON.stringify(this.conf.settings.sounds);
-  document.querySelector('#banwords').value = JSON.stringify(this.conf.settings.banwords);
-})();
+// (async function getSettings() {
+//   this.res = await fetch(`/api/user?id=${userId}`)
+//     if (this.res.ok) {
+//     this.conf = await res.json();
+//     console.log(this.conf);
+//   } else {
+//     alert.error(`Ошибка HTTP: ${this.res.status}`);
+//   }
+// })();
+Http.get(`/api/user?id=${userId}`)
+    .then((data) => {
+        document.querySelector('#automessages').value = JSON.stringify(data.settings.automessages);
+        document.querySelector('#sounds').value = JSON.stringify(data.settings.sounds);
+        document.querySelector('#banwords').value = JSON.stringify(data.settings.banwords);
+    })
+    .catch((err) => {
+      alert.error(`Ошибка HTTP: ${err.status}`);
+    })
 async function saveSettings() {
-  this.res = await fetch(`/api/user/update-settings`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        id: userId,
-        settings: {
-          automessages: JSON.parse(document.querySelector('#automessages').value.toString()),
-          sounds: JSON.parse(document.querySelector('#sounds').value.toString()),
-          banwords: JSON.parse(document.querySelector('#banwords').value.toString())
-        }
-      })
+  const body = {
+    id: userId,
+    settings: {
+      automessages: JSON.parse(document.querySelector('#automessages').value.toString()),
+      sounds: JSON.parse(document.querySelector('#sounds').value.toString()),
+      banwords: JSON.parse(document.querySelector('#banwords').value.toString())
     }
-  )
-  if (this.res.ok) {
-    alert.success('Настройки сохранены');
-  } else {
-    alert.error(`Ошибка HTTP: ${this.res.status}`);
-  }
+  };
+  const headers = {
+    'Content-Type': 'application/json'
+  };
+  Http.post('/api/user/update-settings', body, headers)
+      .then(() => {
+        alert.success('Настройки сохранены');
+      })
 };
 document.querySelector('.save').addEventListener('click', () => {
   saveSettings();

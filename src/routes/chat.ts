@@ -48,7 +48,8 @@ router.get('/', corsOpt, (req: IGetUserAuthInfoRequest, res: Response,) => {
       logger.err(err, true); res.sendStatus(INTERNAL_SERVER_ERROR).json(err);
     })
   } else {
-    res.render('chat', { user: req.user });
+    // res.render('chat', { user: req.user });
+    res.redirect('/');
   }
 });
 router.get('/lurkers', corsOpt, (req: Request, res: Response,) => {

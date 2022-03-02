@@ -1,22 +1,11 @@
-/**
-<iframe
-    src="https://clips.twitch.tv/embed?clip=<slug>&parent=streamernews.example.com"
-    height="<height>"
-    width="<width>"
-    allowfullscreen="<allow full screen>">
-</iframe>
-*/
-
 class TTVClip {
   constructor(clip, width, height) {
     const wrap = document.createElement('a');
           wrap.href = clip.url;
     const title = document.createElement('div');
-          title.innerHTML = '<b>' + clip.title + '</b>';
+          title.innerHTML = `<i class="bi bi-film"></i><b>${clip.title}</b>`;
     const author = document.createElement('div');
-          author.innerHTML = `<small>с канала ${clip.broadcaster_name} от ${clip.creator_name}</small>` ;
-    // const thumb = new Image();
-    //       thumb.src = clip.thumbnail_url;
+          author.innerHTML = `<small>с канала ${clip.broadcaster_name} от ${clip.creator_name}</small>`;
     const info = document.createElement('div');
           info.append(title, author);
     wrap.append(info);

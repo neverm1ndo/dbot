@@ -1,97 +1,63 @@
-import {
-  ChatController,
-  ChattersListController,
-  ChatMessageBadge,
-  ChatMessage,
-  ChatAlert,
-  YTFrame,
-  MessageControlButton
-} from './chat.app';
-import Cookies from './cookies';
-import PubSub from './pubsub';
-import Http from './http';
+import { ChatController } from './chat.controller';
+import { ChattersListController } from './chatter-list.controller';
 import BTTV from './bttv';
+import PubSub from './pubsub';
+import Http from '@shared/http';
+import tmi from 'tmi.js';
 
-class User {
-  username = Cookies.get('nmnd_user_login');
-  display_name = Cookies.get('nmnd_user_display_name');
-  token = Cookies.get('nmnd_user_access_token');
-  id = Cookies.get('nmnd_user_id');
-  client = Cookies.get('nmnd_app_client_id');
-};
-
-export const user = new User();
-
-export const channelSets = {
-  badges: [],
-  lurkers: [],
-  sets: new Set(),
-  id: user.id,
-}
-
+/**
+* Add YouTube embed player API
+*/
 const tag = document.createElement('script');
       tag.src = 'https://www.youtube.com/player_api';
+
 const firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-
-//** Define custom HTML elements **//
-
-customElements.define('twitch-badge', ChatMessageBadge, { extends: 'div' });
-customElements.define('chat-message', ChatMessage, { extends: 'div' });
-customElements.define('chat-alert', ChatAlert, { extends: 'div' });
-customElements.define('yt-player', YTFrame, { extends: 'div' });
-customElements.define('control-button', MessageControlButton, { extends: 'button' });
-
-//*******************************//
 
 const parser = new DOMParser();
 export const chat = new ChatController('#chat');
 export const chatterList = new ChattersListController();
 export const params = new URLSearchParams(window.location.search);
 export const bttv = new BTTV(params);
-
+             bttv.getEmotes();
 const pubsub = new PubSub();
-
-bttv.getEmotes();
-
-let trigger = 0;
 
 const alerts = [];
 
-// if (params.has('channel')) {
 function handleStreamInfo(id) {
   setInterval(() => {
     Http.get(`https://api.twitch.tv/helix/streams?user_id=${id}`, {
-      'Authorization': 'Bearer ' + user.token,
-      'Client-ID': user.client
+      'Authorization': 'Bearer ' + chat.user.token,
+      'Client-ID': chat.user.client
     }).then((data) => {
       if (data.data[0]) {
         chatterList.dom.counter.innerHTML = data.data[0].viewer_count;
+      } else {
+        chatterList.dom.counter.innerHTML = 0;
       }
     })
   }, 120000);
 }
-Http.get(`https://api.twitch.tv/helix/users?login=${params.has('channel')?params.get('channel'):user.username}`, {
-  'Authorization': 'Bearer ' + user.token,
-  'Client-ID': user.client
+Http.get(`https://api.twitch.tv/helix/users?login=${params.has('channel')?params.get('channel'):chat.user.username}`, {
+  'Authorization': 'Bearer ' + chat.user.token,
+  'Client-ID': chat.user.client
 }).then((data) => {
-  channelSets.id = data.data[0].id;
-  pubsub.connect(channelSets.id);
-  handleStreamInfo(channelSets.id);
+  chat.settings.id = data.data[0].id;
+  pubsub.connect(chat.settings.id);
+  handleStreamInfo(chat.settings.id);
   return Promise.all([
-    Http.get(`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${channelSets.id}`, {
-      'Authorization': 'Bearer ' + user.token,
-      'Client-ID': user.client
+    Http.get(`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${chat.settings.id}`, {
+      'Authorization': 'Bearer ' + chat.user.token,
+      'Client-ID': chat.user.client
     }),
     Http.get(`https://api.twitch.tv/helix/chat/badges/global`, {
-      'Authorization': 'Bearer ' + user.token,
-      'Client-ID': user.client
+      'Authorization': 'Bearer ' + chat.user.token,
+      'Client-ID': chat.user.client
     }),
-    Http.get(`/controls/chat/last?channel=${params.has('channel')?params.get('channel'):user.username}`),
+    Http.get(`/controls/chat/last?channel=${params.has('channel')?params.get('channel'):chat.user.username}`),
   ])
 }).then(([badges, global, lastMessages]) => {
-  channelSets.badges = [...badges.data, ...global.data];
+  chat.settings.badges = [...badges.data, ...global.data];
   lastMessages.forEach((message) => {
     chat.add(message.tags, message.message, message.self, message.date);
   });
@@ -104,29 +70,30 @@ Http.get(`https://api.twitch.tv/helix/users?login=${params.has('channel')?params
   const storage = window.localStorage.getItem('lurkers');
   if (storage) {
     const lurkers = JSON.parse(storage);
-    channelSets.lurkers = [...new Set(...[lurkers, channelSets.lurkers])];
+    chat.settings.lurkers = [...new Set(...[lurkers, chat.settings.lurkers])];
     lurkers.forEach((lurker, index, arr) => {
       if (Array.isArray(lurker)) {
-        channelSets.lurkers.splice(index, 1);
+        chat.settings.lurkers.splice(index, 1);
       }
     })
-    window.localStorage.setItem('lurkers', JSON.stringify(channelSets.lurkers));
+    window.localStorage.setItem('lurkers', JSON.stringify(chat.settings.lurkers));
   }
 })();
 
+let trigger = 0; // ???
 export const client = new tmi.Client({
   options: {
     debug: true,
     messagesLogLevel: "info",
-    clientId: user.client,
+    clientId: chat.user.client,
     skipUpdatingEmotesets: true
   },
   connection: { reconnect: true, secure: true },
   identity: {
-    username: user.username,
-    password: 'oauth:' + user.token
+    username: chat.user.username,
+    password: 'oauth:' + chat.user.token
   },
-  channels: [params.has('channel')?params.get('channel'):user.username]
+  channels: [params.has('channel')?params.get('channel'):chat.user.username]
 });
 
 client.connect();
@@ -137,9 +104,9 @@ client.connect();
 (function() {
   const label = document.querySelector('.chatty-label');
   const img = new Image();
-  img.src = '/img/cm.png';
+  img.src = '/assets/cm.png';
   if (!params.has('channel')) {
-    img.src = '/img/bc.png';
+    img.src = '/assets/bc.png';
   }
   label.append(img);
 })();
@@ -157,13 +124,12 @@ client.on('disconnected', (channel, self) => {
   chat.text.disabled = true;
 });
 client.on('join', (channel, username, self) => {
-  if (self || chatterList.connected.includes(username) || channelSets.lurkers.includes(username)) return;
+  if (self || chatterList.connected.includes(username) || chat.settings.lurkers.includes(username)) return;
   chatterList.add(username);
   chat.alert(`<b>${username}</b> подключился`, 'success', username);
 });
 client.on('ban', (channel, username, reason, userstate) => {
   // Replaced with PubSub event handler
-  // chat.alert(`<b>${username}</b> забанен ${reason?': ' + reason:''}`, 'warning');
   chat.pseudoDelete(username);
 });
 client.on('timeout', (channel, username, reason, duration, userstate) => {
@@ -171,7 +137,7 @@ client.on('timeout', (channel, username, reason, duration, userstate) => {
   chat.pseudoDelete(username);
 });
 client.on('part', (channel, username, self) => {
-  if (self || channelSets.lurkers.includes(username)) return;
+  if (self || chat.settings.lurkers.includes(username)) return;
   setTimeout(() => {
     if (chatterList.connected.includes(username)) {
       chatterList.remove(username);
@@ -185,7 +151,6 @@ client.on('chat', (channel, tags, message, self) => {
     chat.add(tags, message, self);
     return;
   }
-  // console.log(tags)
   chat.add(tags, message, self);
 });
 client.on('subscription', (channel, username, methods, message, userstate) => {
