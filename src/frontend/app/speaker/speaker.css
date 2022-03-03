@@ -145,7 +145,7 @@ body, html {
   width: 100%;
 }
 .header {
-  background: url('/omd.png') 0 0 no-repeat;
+  background: url('../../assets/omd.png') 0 0 no-repeat;
   background-size: 10%;
   max-height: 25px;
 }

@@ -1,3 +1,5 @@
+import './speaker.css';
+
 let ws;
 class Player {
   constructor() {
