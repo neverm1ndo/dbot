@@ -53,6 +53,12 @@ export class ChatMessage extends HTMLDivElement {
     if (tags['msg-id'] == "highlighted-message") {
       this.message.classList.add("highlighted-message");
     }
+    if (message.startsWith('!')) {
+      const botCommand = document.createElement('span');
+            botCommand.innerText = 'Команда бота';
+            botCommand.classList.add('bot-command');
+      this.message.prepend(botCommand);
+    }
     this.body.append(this.message);
     if (!self && (tags.username !== chat.user.username)) {
       this.body.prepend(new MessageControlButton('btn-control', () => {
@@ -122,6 +128,7 @@ export class ChatMessage extends HTMLDivElement {
       }
       if (splited[i].toLowerCase() === chat.user.display_name.toLowerCase() || splited[i].toLowerCase() ==='@' + chat.user.username.toLowerCase()) {
         result.push(`<span class="notice">${notice}</span>`);
+        this.classList.add('card-notice')
         continue;
       }
       for (let k = 0; k < bttv.globalEmotes.length; k++) {
