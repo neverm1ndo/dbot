@@ -224,7 +224,8 @@ body .card .card-body img {
 .card-notice {
   background-color: #87232d45!important;
   margin-top: 3px;
-  margin-bottom: 6px;
+  margin-bottom: 6px!important;
+  padding-top: 8px;
 }
 .bot-command {
   font-size: 9px;
