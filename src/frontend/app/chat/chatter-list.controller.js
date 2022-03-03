@@ -27,7 +27,7 @@ export class ChattersListController {
               body.classList.add('card-body', 'pt-0', 'pb-0');
               body.innerText = this.connected[i];
         let btn = body.prepend(
-          new MessageControlButton('btn-lurk', () => {
+          new MessageControlButton(['bi', 'bi-robot', 'red'], () => {
             ChatAlert.addLurker(this.connected[i]);
             // innerHTML!
             card.innerHTML = '<em>(<b>' + this.connected[i] + '</b> добавлен в черный список)</em>';
