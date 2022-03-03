@@ -37,11 +37,13 @@ export class ChatMessage extends HTMLDivElement {
     */
     this.body.prepend(this.nickname);
     if (tags.badges) {
+      const container = document.createElement('span');
       const badges = Object.entries(tags.badges);
       if (tags.username === 'diktorbot') badges.push(['diktorbot', '1']);
       for (let i = 0; i < badges.length; i+=1) {
-        this.body.prepend(new ChatMessageBadge(badges[i]));
+        container.append(new ChatMessageBadge(badges[i]));
       }
+      this.body.prepend(container);
     }
     if (tags['first-msg'] == true) {
       const firstMsgBadge = document.createElement('span');
@@ -61,12 +63,14 @@ export class ChatMessage extends HTMLDivElement {
     }
     this.body.append(this.message);
     if (!self && (tags.username !== chat.user.username)) {
-      this.body.prepend(new MessageControlButton('btn-control', () => {
+      const controls = document.createElement('span');
+      controls.prepend(new MessageControlButton(['bi', 'bi-slash-circle', 'red'], () => {
         client.ban(params.has('channel')?params.get('channel'):chat.user.username, tags.username);
       }));
-      this.body.prepend(new MessageControlButton('btn-timeout', () => {
+      controls.prepend(new MessageControlButton(['bi', 'bi-clock', 'yellow'], () => {
         client.timeout(params.has('channel')?params.get('channel'):chat.user.username, tags.username, 600, 'rediska');
       }));
+      this.body.prepend(controls);
     }
     this.append(this.body);
     if (haveLinks(message)) {

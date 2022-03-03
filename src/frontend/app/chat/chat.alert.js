@@ -35,7 +35,7 @@ export class ChatAlert extends HTMLDivElement {
     this.msg.innerHTML = message;
     this.append(this.msg);
     if (username) {
-      let btn = new MessageControlButton('btn-lurk', (e) => {
+      let btn = new MessageControlButton(['bi', 'bi-robot', 'white'], (e) => {
         const msg = document.createElement('span');
         ChatAlert.addLurker(username);
         chatterList.remove(username);
