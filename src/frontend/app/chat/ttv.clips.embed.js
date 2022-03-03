@@ -3,12 +3,14 @@ class TTVClip {
     const wrap = document.createElement('a');
           wrap.href = clip.url;
     const title = document.createElement('div');
-          title.innerHTML = `<i class="bi bi-film"></i><b>${clip.title}</b>`;
+          title.innerHTML = `<i class="bi bi-camera-reels-fill"></i><b>${clip.title}</b>`;
+    const thumbnail = new Image();
+          thumbnail.src = clip.thumbnail_url;
     const author = document.createElement('div');
           author.innerHTML = `<small>с канала ${clip.broadcaster_name} от ${clip.creator_name}</small>`;
     const info = document.createElement('div');
           info.append(title, author);
-    wrap.append(info);
+    wrap.append(thumbnail, info);
     wrap.classList.add('clip-frame')
     this.frame = wrap;
   }
