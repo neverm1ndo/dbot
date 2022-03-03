@@ -20,20 +20,16 @@ module.exports = {
     alias: {
       '@app': path.resolve(__dirname, '../src/frontend/app'),
       '@shared': path.resolve(__dirname, '../src/frontend/app/shared'),
+      '@assets': path.resolve(__dirname, '../src/frontend/assets'),
     },
   },
   output: {
     path: path.resolve(__dirname, '../dist/public'),
     publicPath: '/',
-    filename: 'scripts/[name].[chunkhash].js',
+    filename: 'scripts/[name].js',
     chunkFilename: '[id].[chunkhash].js'
   },
   plugins: [
-    new CopyPlugin({
-      patterns: [
-        { from: '../assets', to: 'assets' },
-      ],
-    }),
     new MiniCssExtractPlugin(),
     new HtmlWebpackPlugin({
       template: './chat/chat.pug',
@@ -70,19 +66,16 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(png|svg|jpg|gif)$/i,
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              limit: 8192,
-            },
-          },
-        ],
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, { loader: 'css-loader', options: { url: true, sourceMap: true } }],
       },
       {
-        test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
+        test: /\.(png)$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          outputPath: 'assets',
+        }
       },
     ],
   },
