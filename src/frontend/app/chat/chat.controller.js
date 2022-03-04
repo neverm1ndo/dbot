@@ -2,6 +2,8 @@ import Http from '@shared/http';
 import { User } from './chat.user';
 import { ChatMessage } from './chat.message';
 import { ChatAlert } from './chat.alert';
+import { Marker } from './marker';
+import { secondsToTimestamp, timestamp } from './utils';
 import { bttv, chatterList, params, client } from './chat';
 import TTVClip from './ttv.clips.embed';
 import Collapse from 'bootstrap/js/dist/collapse';
@@ -15,6 +17,10 @@ export class ChatController {
   constructor(selector) {
     this.chat = document.querySelector(selector);
     this.user = new User();
+    this.live = false;
+    this.indicator = document.querySelector('.logo');
+    this.stream;
+    this.ws = new WebSocket(`wss://${window.location.host}`);
     this.settings = {
       badges: [],
       lurkers: [],
@@ -28,6 +34,17 @@ export class ChatController {
     this.submit = document.querySelector('#send');
     this.emotes = document.querySelector("#emotes-list");
     this.quickpanel = document.querySelector("#broadcaster-quickpanel")
+    this.marker = document.querySelector(".marker");
+    this.marker.disabled = true;
+    this.marker.addEventListener('click', () => {
+      if (this.connected) {
+        Marker.create(this.user).then((res) => {
+          this.alert(`Установлен маркер на позиции ${secondsToTimestamp(res.data[0].position_seconds)} ${res.data[0].description?'с описанием ' + res.data[0].description:''}`, 'twitch', '', ['bi', 'bi-vr']);
+        }).catch((err) => {
+          this.alert(`Не удалось создать маркер`, 'warning', '', ['bi', 'bi-exclamation-diamond-fill'])
+        })
+      }
+    });
     this.submit.addEventListener('click', () => {
       if (this.connected) this.send();
     });
@@ -56,6 +73,7 @@ export class ChatController {
     this.quickpanel.addEventListener('mouseleave', () => {
       quickpanel.hide();
     })
+    this.setWsConnection();
   }
   getEmoteSet(id) {
     Http.get(
@@ -130,7 +148,7 @@ export class ChatController {
     this.chat.append(new ChatMessage(tags, message, self, date));
     this.autoscroll();
   }
-  alert(message, type, username) {
+  alert(message, type, username, icon) {
     if (this.chat.lastChild instanceof ChatAlert && this.chat.lastChild.type === type) {
       const last = this.chat.lastChild;
       let wrap;
@@ -170,7 +188,7 @@ export class ChatController {
       alert.classList.add('list-group-item');
       wrap.append(alert);
     } else {
-      this.chat.append(new ChatAlert(message, type, username));
+      this.chat.append(new ChatAlert(message, type, username, icon));
     }
     setTimeout(() => {
       this.autoscroll();
@@ -192,10 +210,57 @@ export class ChatController {
       }
     }
   }
-  send() {
-    if (!this.text.value) return;
-    client.say(params.has('channel')?params.get('channel'):this.user.username, this.text.value);
+  send(message = '') {
+    if (!this.text.value && !message) return;
+    client.say(params.has('channel')?params.get('channel'):this.user.username, message || this.text.value);
     this.text.value = '';
     this.selfEmotes = {};
+  }
+  setLive(live) {
+    this.live = live;
+    this.marker.disabled = !live;
+  }
+  setWsConnection() {
+    this.ws.onopen = function() {
+      console.log("Соединение установлено.");
+      this.send(JSON.stringify({event: 'chat-connection'}));
+    };
+
+    this.ws.onclose = function(event) {
+      if (event.wasClean) {
+        console.log('Соединение закрыто чисто');
+      } else {
+        console.log('Обрыв соединения');
+        setTimeout(()=> {
+          setConnection();
+        }, 5000)
+      }
+      console.log('Code: ' + event.code + '\n Reason: ' + event.reason);
+    };
+
+    this.ws.onmessage = (event) => {
+      let depeche = JSON.parse(event.data);
+      console.log(depeche);
+      switch (depeche.event) {
+        case 'bot-status':
+          this.setLive(depeche.msg == 'works');
+        break;
+        case 'stream.online': {
+          this.setLive(true);
+          this.alert(`Стрим запущен. Время запуска ${timestamp(Date.now())}`, 'success', '', ['bi', 'bi-twitch']);
+          break;
+        }
+        case 'stream.offline': {
+          this.setLive(false);
+          this.alert(`Стрим окончен. Время трансляции ${secondsToTimestamp(Date.now() - new Date(this.stream.started_at))}`, 'success', '', ['bi', 'bi-twitch']);
+          break;
+        }
+        default: break;
+      }
+    }
+
+    this.ws.onerror = function(error) {
+      console.log("Ошибка " + error.message);
+    };
   }
 }

@@ -24,6 +24,7 @@ import logger from '@shared/Logger';
 import axios from 'axios';
 
 import { USER } from './schemas/user.schema';
+import { cm } from './routes/sockets'
 
 // import { verifySignature, rawBody } from '@shared/functions';
 
@@ -122,7 +123,7 @@ app.use('/commands', CommandsRouter);
 app.use('/api', express.json(), APIRouter);
 
 // Set route to start OAuth link, this is where you define scopes to request
-app.get('/auth/twitch', passport.authenticate('twitch', { scope: ['user_read', 'user_subscriptions', 'chat:read', 'chat:edit', 'channel:moderate'] }));
+app.get('/auth/twitch', passport.authenticate('twitch', { scope: ['user_read', 'user_subscriptions', 'channel_editor','chat:read', 'chat:edit', 'channel:moderate'] }));
 
 // Set route for OAuth redirect
 app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/controls/chat', failureRedirect: '/controls/chat' }));
@@ -132,8 +133,14 @@ app.post('/webhooks/callback/streams', express.json({ verify: (req: any, res: an
     if (req.header("Twitch-Eventsub-Message-Type") === "webhook_callback_verification") {
       res.send(req.body.challenge) // Returning a 200 status with the received challenge to complete webhook creation flow
     } else if (req.header("Twitch-Eventsub-Message-Type") === "notification") {
-      if (req.body.subscription.type == 'stream.online') bot.wakeup();
-      if (req.body.subscription.type == 'stream.offline') bot.shutdown();
+      if (req.body.subscription.type == 'stream.online') {
+        bot.wakeup();
+        cm.sendall(req.body.subscription.type);
+      }
+      if (req.body.subscription.type == 'stream.offline') {
+        bot.shutdown();
+        cm.sendall(req.body.subscription.type);
+      }
       res.status(OK).end();
     }
 });

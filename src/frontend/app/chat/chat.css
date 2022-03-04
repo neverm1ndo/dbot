@@ -288,6 +288,9 @@ body .card .card-body img {
 .alert .btn-control i {
   transition: none;
 }
+.alert span i {
+  margin-right: 10px;
+}
 .btn-control {
   transition: .1s ease-in-out;
   background: none;
@@ -547,13 +550,9 @@ body .logo {
 .input-group > .btn {
   padding: 11px;
 }
-/* .clip-frame img {
-  border-radius: 0.3rem;
-  position: relative;
-  top: 0px;
-  z-index: 0;
-  max-width: none!important;
-  max-height: none!important;
-  width: auto;
-  display: flex;
-} */
+.marker {
+  font-size: 18px!important;
+}
+.bg-purple {
+  background-color: var(--twitch-main);
+}

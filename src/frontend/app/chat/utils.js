@@ -17,3 +17,10 @@ export function linkify(text) {
   var replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
   return replacedText;
 }
+export function secondsToTimestamp(time) {
+  const hours = hours = Math.floor(time / 3600);
+        time = time - hours * 3600;
+  const minutes = Math.floor(time / 60);
+  const seconds = time - minutes * 60;
+  return `${hours}:${minutes}:${seconds}`;
+}

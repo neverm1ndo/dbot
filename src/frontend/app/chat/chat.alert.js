@@ -2,10 +2,15 @@ import { MessageControlButton } from './chat.message-control';
 import { chat, chatterList } from './chat';
 
 export class ChatAlert extends HTMLDivElement {
-  constructor(message, type = 'default', username = '') {
+  constructor(message, type = 'default', username = '', icon) {
     super();
     this.type = type;
     this.msg = document.createElement('span');
+    console.log(icon)
+    if (icon) {
+      this.icon = document.createElement('i');
+      this.icon.classList.add(...icon);
+    }
     this.classList.add('alert', 'mb-1');
     switch (type) {
       case 'success':
@@ -29,10 +34,14 @@ export class ChatAlert extends HTMLDivElement {
       case 'info':
         this.classList.add('bg-info', 'text-dark');
         break;
+      case 'twitch':
+        this.classList.add('bg-purple', 'text-light');
+        break;
       default:
         this.classList.add('text-muted');
     }
     this.msg.innerHTML = message;
+    if (icon) this.msg.prepend(this.icon);
     this.append(this.msg);
     if (username) {
       let btn = new MessageControlButton(['bi', 'bi-robot', 'white'], (e) => {

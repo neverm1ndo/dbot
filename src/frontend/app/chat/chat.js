@@ -30,8 +30,10 @@ function handleStreamInfo(id) {
       'Authorization': 'Bearer ' + chat.user.token,
       'Client-ID': chat.user.client
     }).then((data) => {
-      if (data.data[0]) {
-        chatterList.dom.counter.innerHTML = data.data[0].viewer_count;
+      const streamInfo = data.data[0];
+      if (streamInfo) {
+        chat.stream = streamInfo;
+        chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
       } else {
         chatterList.dom.counter.innerHTML = 0;
       }
