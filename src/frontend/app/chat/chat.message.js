@@ -1,4 +1,4 @@
-import { bttv, params, chat } from './chat';
+import { bttv, params, chat, client } from './chat';
 import { timestamp, haveLinks, linkify } from './utils';
 import { YTFrame } from './chat.ytframe';
 import { ChatAlert } from './chat.alert';
