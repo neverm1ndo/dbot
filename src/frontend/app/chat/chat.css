@@ -575,3 +575,6 @@ body .logo {
 .bg-purple {
   background-color: var(--twitch-main);
 }
+.btn-secondary:disabled {
+  background-color: #323538!important;
+}

@@ -135,7 +135,7 @@ client.on('ban', (channel, username, reason, userstate) => {
   chat.pseudoDelete(username);
 });
 client.on('timeout', (channel, username, reason, duration, userstate) => {
-  chat.alert(`<b>${username}</b> отстранен на ${duration} секунд ${reason?'по причине ' + reason:''}`, 'warning');
+  chat.alert(`<b>${username}</b> отстранен на ${duration} секунд ${reason?'по причине ' + reason:''}`, 'warning', '', ['bi', 'bi-clock']);
   chat.pseudoDelete(username);
 });
 client.on('part', (channel, username, self) => {
