@@ -156,7 +156,7 @@ client.on('chat', (channel, tags, message, self) => {
   chat.add(tags, message, self);
 });
 client.on('subscription', (channel, username, methods, message, userstate) => {
-  chat.alert(`<b>${username}</b> оформил подписку<br><small>${message}</small>`, 'info');
+  chat.alert(`<b>${username}</b> оформил подписку<br><small>${message}</small>`, 'info', '', ['bi', 'bi-twitch']);
 });
 client.on('notice', (channel, msgid, message) => {
   chat.alert(`<small>${message}</small>`);
@@ -173,13 +173,13 @@ client.on('resub', (channel, username, methods, message, userstate) => {
   chat.alert(`<b>${username}</b> оформил подписку<br><small>${message}</small>`, 'info');
 });
 client.on('subgift', (channel, username, streakMonths, recepient, methods, userstate) => {
-  chat.alert(`<b>${username}</b> подарил подписку <u>${recepient}</u>`, 'info');
+  chat.alert(`<b>${username}</b> подарил подписку <u>${recepient}</u>`, 'info', '', ['bi', 'bi-gift-fill']);
 });
 client.on('raided', (channel, username, viewers) => {
-  chat.alert(`<b>${username}</b> зарейдил канал на <b>${viewers}</b> зрителей`, 'info');
+  chat.alert(`<b>${username}</b> зарейдил канал на <b>${viewers}</b> зрителей`, 'info', '', ['bi', 'bi-twitch']);
 });
 client.on('hosted', (channel, username, viewers, autohost) => {
-  chat.alert(`<b>${username}</b> захостил канал на <b>${viewers}</b> зрителей`, 'info');
+  chat.alert(`<b>${username}</b> захостил канал на <b>${viewers}</b> зрителей`, 'info', '', ['bi', 'bi-twitch']);
 });
 client.on('whisper', (channel, tags, message, self) => {
   chat.add(tags, message, self);

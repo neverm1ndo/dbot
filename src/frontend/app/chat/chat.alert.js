@@ -6,7 +6,6 @@ export class ChatAlert extends HTMLDivElement {
     super();
     this.type = type;
     this.msg = document.createElement('span');
-    console.log(icon)
     if (icon) {
       this.icon = document.createElement('i');
       this.icon.classList.add(...icon);
