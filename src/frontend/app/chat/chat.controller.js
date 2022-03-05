@@ -226,13 +226,13 @@ export class ChatController {
       this.send(JSON.stringify({event: 'chat-connection'}));
     };
 
-    this.ws.onclose = function(event) {
+    this.ws.onclose = (event) => {
       if (event.wasClean) {
         console.log('Соединение закрыто чисто');
       } else {
         console.log('Обрыв соединения');
         setTimeout(()=> {
-          setConnection();
+          this.setWsConnection();
         }, 5000)
       }
       console.log('Code: ' + event.code + '\n Reason: ' + event.reason);

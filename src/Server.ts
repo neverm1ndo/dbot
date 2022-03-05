@@ -141,6 +141,9 @@ app.post('/webhooks/callback/streams', express.json({ verify: (req: any, res: an
         bot.shutdown();
         cm.sendall(req.body.subscription.type);
       }
+      if (req.body.subscription.type == 'channel.follow') {
+        cm.sendall({ event: 'channel.follow', msg: req.body.event });
+      }
       res.status(OK).end();
     }
 });

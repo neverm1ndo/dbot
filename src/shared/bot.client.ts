@@ -37,15 +37,19 @@ export class Bot {
     if (process.env.NODE_ENV !== 'development') {
       Twitch.getAppAccessToken().then((body: any) => {
         Twitch.getSubs(body.data.access_token).then((subsBody: any) => {
-          // subsBody.data.data.forEach(async (sub: any) => {
-            //   await Twitch.deleteSub(sub.id, body.data.access_token).then((bodyd) => {console.log(bodyd.data)});
-            // });
-            if (subsBody.data.total >= 2) { // FIXME: fix algorithm for checking existing subscribers
+            if (StartOptions.dsub) {
+              subsBody.data.data.forEach(async (sub: any) => {
+                await Twitch.deleteSub(sub.id, body.data.access_token).then((bodyd) => {console.log(bodyd.data)});
+              });
+            }
+            if (subsBody.data.total >= 3 && !StartOptions.dsub) { // FIXME: fix algorithm for checking existing subscribers
               logger.info('All subs already existing')
+              console.info(JSON.stringify(subsBody.data));
             } else {
               Promise.all([
                 Twitch.streamChanges('stream.online', Number(process.env.TWITCH_USER_ID), body.data.access_token),
-                Twitch.streamChanges('stream.offline', Number(process.env.TWITCH_USER_ID), body.data.access_token)
+                Twitch.streamChanges('stream.offline', Number(process.env.TWITCH_USER_ID), body.data.access_token),
+                Twitch.streamChanges('channel.follow', Number(process.env.TWITCH_USER_ID), body.data.access_token)
               ])
               .then(() => { logger.info('Subbed to all events')})
               .catch((err) => { logger.err(err, true) });
