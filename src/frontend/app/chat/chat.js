@@ -25,19 +25,21 @@ const pubsub = new PubSub();
 const alerts = [];
 
 function handleStreamInfo(id) {
-  setInterval(() => {
-    Http.get(`https://api.twitch.tv/helix/streams?user_id=${id}`, {
-      'Authorization': 'Bearer ' + chat.user.token,
-      'Client-ID': chat.user.client
-    }).then((data) => {
-      const streamInfo = data.data[0];
-      if (streamInfo) {
-        chat.stream = streamInfo;
-        chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
-      } else {
-        chatterList.dom.counter.innerHTML = 0;
-      }
-    })
+  let interval = setInterval(() => {
+    if (chat.live) {
+      Http.get(`https://api.twitch.tv/helix/streams?user_id=${id}`, {
+        'Authorization': 'Bearer ' + chat.user.token,
+        'Client-ID': chat.user.client
+      }).then((data) => {
+        const streamInfo = data.data[0];
+        if (streamInfo) {
+          chat.stream = streamInfo;
+          chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
+        } else {
+          chatterList.dom.counter.innerHTML = 0;
+        }
+      })
+    }
   }, 120000);
 }
 Http.get(`https://api.twitch.tv/helix/users?login=${params.has('channel')?params.get('channel'):chat.user.username}`, {
