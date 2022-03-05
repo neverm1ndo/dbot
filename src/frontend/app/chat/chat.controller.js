@@ -222,7 +222,7 @@ export class ChatController {
   }
   setWsConnection() {
     this.ws.onopen = function() {
-      console.log("Соединение установлено.");
+      console.log(`Соединение c ${window.location.host} установлено`);
       this.send(JSON.stringify({event: 'chat-connection'}));
     };
 

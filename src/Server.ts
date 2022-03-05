@@ -135,11 +135,11 @@ app.post('/webhooks/callback/streams', express.json({ verify: (req: any, res: an
     } else if (req.header("Twitch-Eventsub-Message-Type") === "notification") {
       if (req.body.subscription.type == 'stream.online') {
         bot.wakeup();
-        cm.sendall(req.body.subscription.type);
+        cm.sendall({ event: req.body.subscription.type, msg: req.body.event });
       }
       if (req.body.subscription.type == 'stream.offline') {
         bot.shutdown();
-        cm.sendall(req.body.subscription.type);
+        cm.sendall({ event: req.body.subscription.type, msg: req.body.event });
       }
       if (req.body.subscription.type == 'channel.follow') {
         cm.sendall({ event: 'channel.follow', msg: req.body.event });
