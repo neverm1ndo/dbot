@@ -133,6 +133,7 @@ app.post('/webhooks/callback/streams', express.json({ verify: (req: any, res: an
     if (req.header("Twitch-Eventsub-Message-Type") === "webhook_callback_verification") {
       res.send(req.body.challenge) // Returning a 200 status with the received challenge to complete webhook creation flow
     } else if (req.header("Twitch-Eventsub-Message-Type") === "notification") {
+      logger.imp(req.body.subscription.type);
       if (req.body.subscription.type == 'stream.online') {
         bot.wakeup();
         cm.sendall({ event: req.body.subscription.type, msg: req.body.event });
