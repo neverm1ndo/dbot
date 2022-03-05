@@ -170,7 +170,7 @@ client.on('mods', (channel, mods) => {
   chat.alert(`<small>${mods.length > 0?mods:'Список модераторов пуст'}</small>`);
 });
 client.on('resub', (channel, username, methods, message, userstate) => {
-  chat.alert(`<b>${username}</b> оформил подписку<br><small>${message}</small>`, 'info');
+  chat.alert(`<b>${username}</b> переоформил подписку<br><small>${message}</small>`, 'info', '', ['bi', 'bi-twitch']);
 });
 client.on('subgift', (channel, username, streakMonths, recepient, methods, userstate) => {
   chat.alert(`<b>${username}</b> подарил подписку <u>${recepient}</u>`, 'info', '', ['bi', 'bi-gift-fill']);

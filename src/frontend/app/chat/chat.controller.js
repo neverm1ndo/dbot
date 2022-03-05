@@ -250,6 +250,10 @@ export class ChatController {
           this.alert(`Стрим запущен. Время запуска ${timestamp(Date.now())}`, 'success', '', ['bi', 'bi-twitch']);
           break;
         }
+        case 'channel.follow': {
+          this.alert(`Новый фолловер`, 'info', '', ['bi', 'bi-twitch']);
+          break;
+        }
         case 'stream.offline': {
           this.setLive(false);
           this.alert(`Стрим окончен. Время трансляции ${secondsToTimestamp(Date.now() - new Date(this.stream.started_at))}`, 'success', '', ['bi', 'bi-twitch']);
