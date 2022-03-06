@@ -177,7 +177,7 @@ export class ChatController {
           collapse.toggle();
         })
       }
-      if (wrap.children.length + 1 >= 3) {
+      if (wrap.children.length + 1 >= 1) {
         setTimeout(() => {
           Collapse.getInstance(wrap).hide();
         }, 10);
