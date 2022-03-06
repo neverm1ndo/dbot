@@ -58,6 +58,9 @@ export class ChatAlert extends HTMLDivElement {
         this.msg.remove();
         msg.innerHTML = '<em>(<b>' + username + '</b> добавлен в черный список)</em>';
         this.prepend(msg);
+        setTimeout(() => {
+          this.remove()
+        }, 2000);
         e.preventDefault();
         e.stopPropagation();
       })

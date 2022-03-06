@@ -580,8 +580,14 @@ body .logo {
   background-color: #323538!important;
 }
 .connect b {
-  color: var(--bs-success);
+  color: var(--bs-light);
+  background-color: var(--bs-success);
+  border-radius: 2rem;
+  padding: 2px 10px;
 }
 .disconnect b {
-  color: var(--bs-danger);
+  color: var(--bs-light);
+  background-color: var(--bs-danger);
+  border-radius: 2rem;
+  padding: 2px 10px;
 }
