@@ -24,7 +24,10 @@ import logger from '@shared/Logger';
 import axios from 'axios';
 
 import { USER } from './schemas/user.schema';
-import { cm } from './routes/sockets'
+import { cm } from './routes/sockets';
+
+import { getHmac, getHmacMessage, verifyMessage } from '@shared/functions';
+import { HMAC_PREFIX, TWITCH_MESSAGE_SIGNATURE, MESSAGE_TYPE, MESSAGE_TYPE_NOTIFICATION, MESSAGE_TYPE_REVOCATION, MESSAGE_TYPE_VERIFICATION } from '@shared/constants';
 
 // import { verifySignature, rawBody } from '@shared/functions';
 
@@ -129,23 +132,54 @@ app.get('/auth/twitch', passport.authenticate('twitch', { scope: ['user_read', '
 app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/controls/chat', failureRedirect: '/controls/chat' }));
 
 // Set route for webhooks
-app.post('/webhooks/callback/streams', express.json({ verify: (req: any, res: any, buf: any) => { req.rawBody = buf }}), (req: any, res: Response) => {
-    if (req.header("Twitch-Eventsub-Message-Type") === "webhook_callback_verification") {
-      res.send(req.body.challenge) // Returning a 200 status with the received challenge to complete webhook creation flow
-    } else if (req.header("Twitch-Eventsub-Message-Type") === "notification") {
-      logger.imp(req.body.subscription.type);
-      if (req.body.subscription.type == 'stream.online') {
-        bot.wakeup();
-        cm.sendall({ event: req.body.subscription.type, msg: req.body.event });
-      }
-      if (req.body.subscription.type == 'stream.offline') {
-        bot.shutdown();
-        cm.sendall({ event: req.body.subscription.type, msg: req.body.event });
-      }
-      if (req.body.subscription.type == 'channel.follow') {
-        cm.sendall({ event: 'channel.follow', msg: req.body.event });
-      }
-      res.status(OK).end();
+app.use('/webhooks/callback/streams', express.raw({
+    type: 'application/json'
+}));
+app.post('/webhooks/callback/streams', (req: any, res: Response) => {
+    const secret = process.env.TWITCH_EVENTSUB_SECRET!;
+    const message = getHmacMessage(req);
+    console.log(message);
+    const hmac = HMAC_PREFIX + getHmac(secret, message);
+    console.log(secret, hmac)
+    console.log(req.headers[TWITCH_MESSAGE_SIGNATURE]);
+
+    if (true === verifyMessage(hmac, req.headers[TWITCH_MESSAGE_SIGNATURE])) {
+        logger.imp("Message signatures match");
+        let notification = req.body;
+
+        if (MESSAGE_TYPE_NOTIFICATION === req.headers[MESSAGE_TYPE]) {
+            logger.imp(notification.subscription.type);
+            switch (notification.subscription.type) {
+              case 'stream.online': {
+                bot.wakeup();
+                break;
+              };
+              case 'stream.offline': {
+                bot.shutdown();
+                break;
+              };
+              default: break;
+            }
+            cm.sendall({ event: notification.subscription.type, msg: req.body.event });
+            res.sendStatus(204);
+        }
+        else if (MESSAGE_TYPE_VERIFICATION === req.headers[MESSAGE_TYPE]) {
+            res.status(200).send(notification.challenge);
+        }
+        else if (MESSAGE_TYPE_REVOCATION === req.headers[MESSAGE_TYPE]) {
+            res.sendStatus(204);
+            logger.info(`${notification.subscription.type} notifications revoked!`);
+            logger.info(`reason: ${notification.subscription.status}`);
+            logger.info(`condition: ${JSON.stringify(notification.subscription.condition, null, 4)}`);
+        }
+        else {
+            res.sendStatus(204);
+            logger.warn(`Unknown message type: ${req.headers[MESSAGE_TYPE]}`);
+        }
+    }
+    else {
+      logger.err("Signatures didn't match: 403");    // Signatures didn't match.
+      res.sendStatus(403);
     }
 });
 // Print API errors

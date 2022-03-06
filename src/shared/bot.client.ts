@@ -46,11 +46,10 @@ export class Bot {
               logger.info('All subs already existing')
               console.info(JSON.stringify(subsBody.data));
             } else {
-              Promise.all([
-                Twitch.streamChanges('stream.online', Number(process.env.TWITCH_USER_ID), body.data.access_token),
-                Twitch.streamChanges('stream.offline', Number(process.env.TWITCH_USER_ID), body.data.access_token),
-                Twitch.streamChanges('channel.follow', Number(process.env.TWITCH_USER_ID), body.data.access_token)
-              ])
+              Promise.all(
+                ['stream.online', 'stream.offline', 'channel.follow']
+                .map((type) => Twitch.streamChanges(type, Number(process.env.TWITCH_USER_ID), body.data.access_token))
+              )
               .then(() => { logger.info('Subbed to all events')})
               .catch((err) => { logger.err(err, true) });
             }

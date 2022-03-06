@@ -20,7 +20,7 @@ export class Twitch {
       }
     })
   }
-  static streamChanges(type: 'stream.online' | 'stream.offline' | 'channel.follow', id: number, accessToken: string) {
+  static streamChanges(type: string, id: number, accessToken: string) {
     return axios({
       method: 'post',
       url: TWITCH_EVENTS_STREAMS,

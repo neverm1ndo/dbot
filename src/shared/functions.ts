@@ -1,5 +1,7 @@
 import logger from './Logger';
 import crypto from 'crypto';
+import { TWITCH_MESSAGE_ID, TWITCH_MESSAGE_TIMESTAMP } from '@shared/constants';
+
 export const pErr = (err: Error) => {
     if (err) {
         logger.err(err);
@@ -36,4 +38,17 @@ export const rawBody = (req: any, res: any, next: any) => {
       req.rawBody = data;
       next();
    })
+}
+export const getHmacMessage = (request:any) => {
+    return (request.headers[TWITCH_MESSAGE_ID] +
+        request.headers[TWITCH_MESSAGE_TIMESTAMP] +
+        JSON.stringify(request.body));
+}
+export const getHmac = (secret: string, message: any) => {
+    return crypto.createHmac('sha256', secret)
+    .update(message)
+    .digest('hex');
+}
+export const verifyMessage = (hmac: any, verifySignature: any) => {
+    return crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(verifySignature));
 }
