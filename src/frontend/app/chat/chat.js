@@ -130,7 +130,7 @@ client.on('disconnected', (channel, self) => {
 client.on('join', (channel, username, self) => {
   if (self || chatterList.connected.includes(username) || chat.settings.lurkers.includes(username)) return;
   chatterList.add(username);
-  chat.alert(`<b>${username}</b> подключился`, 'success', username);
+  chat.alert(`<b>${username}</b> подключился`, 'connect', username);
 });
 client.on('ban', (channel, username, reason, userstate) => {
   // Replaced with PubSub event handler
@@ -145,7 +145,7 @@ client.on('part', (channel, username, self) => {
   setTimeout(() => {
     if (chatterList.connected.includes(username)) {
       chatterList.remove(username);
-      chat.alert(`<b>${username}</b> отключился`, 'danger', username);
+      chat.alert(`<b>${username}</b> отключился`, 'disconnect', username);
     }
   }, 180000);
 });

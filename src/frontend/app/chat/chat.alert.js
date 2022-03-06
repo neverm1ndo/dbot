@@ -4,6 +4,7 @@ import { chat, chatterList } from './chat';
 export class ChatAlert extends HTMLDivElement {
   constructor(message, type = 'default', username = '', icon) {
     super();
+    this.username = username;
     this.type = type;
     this.msg = document.createElement('span');
     if (icon) {
@@ -35,6 +36,12 @@ export class ChatAlert extends HTMLDivElement {
         break;
       case 'twitch':
         this.classList.add('bg-purple', 'text-light');
+        break;
+      case 'connect':
+        this.classList.add('connect', 'text-light');
+        break;
+      case 'disconnect':
+        this.classList.add('disconnect', 'text-light');
         break;
       default:
         this.classList.add('text-muted');

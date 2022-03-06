@@ -309,10 +309,11 @@ body .card .card-body img {
   outline: none;
 }
 .alert .btn-control {
-  color: var(--bs-light);
+  color: var(--bs-gray-600);
   position: relative;
   left: -5px;
   width: 22px;
+  top: 0px;
 }
 .red:hover {
   color: var(--bs-red);
@@ -577,4 +578,10 @@ body .logo {
 }
 .btn-secondary:disabled {
   background-color: #323538!important;
+}
+.connect b {
+  color: var(--bs-success);
+}
+.disconnect b {
+  color: var(--bs-danger);
 }
