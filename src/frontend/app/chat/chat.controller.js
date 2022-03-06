@@ -251,7 +251,7 @@ export class ChatController {
           break;
         }
         case 'channel.follow': {
-          this.alert(`Новый фолловер`, 'info', '', ['bi', 'bi-twitch']);
+          this.alert(`Новый фолловер <b>${depeche.msg.user_name}</b>`, 'twitch', '', ['bi', 'bi-twitch']);
           break;
         }
         case 'stream.offline': {
