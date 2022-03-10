@@ -148,16 +148,16 @@ client.on('timeout', (channel, username, reason, duration, userstate) => {
 });
 client.on('part', (channel, username, self) => {
   if (self || chat.settings.lurkers.includes(username)) return;
-  if (chat.stream) {
-    if (chat.stream.viewer_count <= CDC_VIEWER_LIM) {
       setTimeout(() => {
         if (chatterList.connected.includes(username)) {
           chatterList.remove(username);
-          chat.alert(`<b>${username}</b> отключился`, 'disconnect', username);
+          if (chat.stream) {
+            if (chat.stream.viewer_count <= CDC_VIEWER_LIM) {
+              chat.alert(`<b>${username}</b> отключился`, 'disconnect', username);
+            }
+          }
         }
       }, 180000);
-    }
-  }
 });
 client.on('chat', (channel, tags, message, self) => {
   if (self) {
