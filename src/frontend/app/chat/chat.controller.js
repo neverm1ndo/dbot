@@ -149,6 +149,13 @@ export class ChatController {
     this.autoscroll();
   }
   alert(message, type, username, icon) {
+    const prevLast = this.chat.children[this.chat.children.length - 2];
+    if (this.chat.lastChild instanceof ChatAlert && prevLast instanceof ChatAlert) {
+      if ((prevLast.type == 'connect') && (this.chat.lastChild == 'disconnect') && (prevLast.username == this.chat.lastChild.username)) {
+        prevLast.remove();
+        this.chat.lastChild.remove();
+      }
+    }
     if (this.chat.lastChild instanceof ChatAlert && this.chat.lastChild.type === type) {
       const last = this.chat.lastChild;
       let wrap;

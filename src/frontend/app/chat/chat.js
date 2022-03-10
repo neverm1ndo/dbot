@@ -102,6 +102,8 @@ export const client = new tmi.Client({
 
 client.connect();
 
+const CDC_VIEWER_LIM = 35;
+
 /**
 * Set user badge
 */
@@ -130,7 +132,11 @@ client.on('disconnected', (channel, self) => {
 client.on('join', (channel, username, self) => {
   if (self || chatterList.connected.includes(username) || chat.settings.lurkers.includes(username)) return;
   chatterList.add(username);
-  chat.alert(`<b>${username}</b> подключился`, 'connect', username);
+  if (chat.stream) {
+    if (chat.stream.viewer_count <= CDC_VIEWER_LIM) {
+      chat.alert(`<b>${username}</b> подключился`, 'connect', username);
+    }
+  }
 });
 client.on('ban', (channel, username, reason, userstate) => {
   // Replaced with PubSub event handler
@@ -142,12 +148,16 @@ client.on('timeout', (channel, username, reason, duration, userstate) => {
 });
 client.on('part', (channel, username, self) => {
   if (self || chat.settings.lurkers.includes(username)) return;
-  setTimeout(() => {
-    if (chatterList.connected.includes(username)) {
-      chatterList.remove(username);
-      chat.alert(`<b>${username}</b> отключился`, 'disconnect', username);
+  if (chat.stream) {
+    if (chat.stream.viewer_count <= CDC_VIEWER_LIM) {
+      setTimeout(() => {
+        if (chatterList.connected.includes(username)) {
+          chatterList.remove(username);
+          chat.alert(`<b>${username}</b> отключился`, 'disconnect', username);
+        }
+      }, 180000);
     }
-  }, 180000);
+  }
 });
 client.on('chat', (channel, tags, message, self) => {
   if (self) {
