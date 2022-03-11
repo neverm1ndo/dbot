@@ -121,7 +121,7 @@ export class Bot {
     }
   }
   readChattersMessage(channel: any, tags: ChatUserstate, command?: string, args?: string[]): void {
-    if (!tags.username || (this.status === 'sleeps') || !command) return;
+    if (!tags.username || !command) return;
     // SOUNDS
     this.opts.schedules.sounds.forEach((sound: { command: string, path: string }) => {
       if (command === sound.command) {
@@ -129,7 +129,14 @@ export class Bot {
         return;
       }
     });
-    // COMMANDS
+    // CUSTOM COMMANDS
+    this.opts.schedules.commands.forEach((customCommand) => {
+      if (command === customCommand.name) {
+        this.client.say(channel, customCommand.response);
+        return;
+      }
+    });
+    // BUILT-IN COMMANDS
     switch (command) {
       case 'ранг': {
         Promise.all([
@@ -149,10 +156,6 @@ export class Bot {
       }
       case 'ролл': {
         this.client.say(channel, `${tags.username} нароллил: ${RNG.randomize(0, 101)} BlessRNG`);
-        break;
-      }
-      case 'разбор': {
-        this.client.say(channel, 'Короткий разбор реплея без дискорда - 200р');
         break;
       }
       case 'хелп': {

@@ -1,0 +1,18 @@
+div.container-fluid.popout.automode
+  div.d-flex.flex-column.justify-content-center.align-items-center.h-100
+    div.card.gray.text-light.col-12.col-md-8.col-lg-6.shadow
+      div.card-body
+        div.d-flex.flex-row.justify-content-between
+          h5.card-title
+            i.bi.bi-robot.mr-3
+            span Автомод
+          button.btn-close(type="button" aria-label="close")
+        hr
+        p.card-text Автоматический бан пользователя, если в его сообщении будут обнаружены добавленные в правило слова или фразы.
+        p.card-text Удалить правило можно нажав на крестик в блоке правила.
+        hr
+        div.badges-container#container
+        textarea.textarea(placeholder="Добавить текст правила...")
+        button#submit.btn.btn-dark
+          i.bi.bi-plus.mr-2
+          small Добавить

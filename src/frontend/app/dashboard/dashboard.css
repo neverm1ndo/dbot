@@ -1,10 +1,33 @@
 html {
   height: 100vh;
 }
-body, textarea, button {
-  font-family: 'Arial', sans;
+body {
+  font-family: "Segoe UI";
   font-size: 14px!important;
   height: 100vh;
+}
+h5, h6 {
+  font-weight: 200!important;
+}
+html body div::-webkit-scrollbar {
+ background: var(--bs-gray-dark);
+ width: 3px;
+ border-radius: 3px;
+}
+html body div::-webkit-scrollbar-corner {
+  background:var(--bs-gray-dark);
+}
+html body div::-webkit-scrollbar-thumb {
+  background: var(--bs-gray);
+  cursor: default!important;
+  transition: 1s ease-in-out;
+  border-radius: 3px;
+}
+html body div::-webkit-scrollbar-thumb:hover {
+  background: var(--bs-gray-400);
+}
+html body div::-webkit-scrollbar-thumb:active, html body div::-webkit-scrollbar-thumb:active:focus {
+  opacity: 0.5;
 }
 body .logo {
   width: 32px;
@@ -24,4 +47,60 @@ body .logo {
 .save, .tochat {
   margin-left: 30px;
   max-height: 32px;
+}
+.gray {
+  background-color: var(--bs-gray-800);
+}
+.bg-darkest {
+  background: #1d2022;
+}
+.popout {
+  position: fixed;
+  inset: 0;
+  background-color: #000000b0;
+}
+.mr-3 {
+  margin-right: 1.5rem;
+}
+.mr-2 {
+  margin-right: 0.7rem;
+}
+.mr-1 {
+  margin-right: 0.3rem;
+}
+.h-95 {
+  max-height: 95%;
+}
+.textarea, .input-dark {
+  width: 100%;
+  background-color: var(--bs-gray-900);
+  border-radius: 0.5rem;
+  border: none;
+  padding: 15px;
+  color: var(--bs-light)!important;
+  transition: .2s linear;
+  resize: none;
+  margin-bottom: 0.3rem;
+  font-size: inherit;
+}
+.textarea:focus, .textarea:active, .input-dark:focus , .input-dark:active {
+  outline: none;
+  box-shadow: 0 0 0 0.25rem #dfdfdf30;
+  background-color: var(--bs-gray-900);
+}
+.badges-container {
+  margin-bottom: 1.2rem;
+}
+.badges-container .badge {
+  font-size: inherit;
+  font-weight: lighter;
+  color: var(--bs-light);
+}
+.badges-container .badge-close {
+  color: inherit;
+  padding: 0px;
+  margin-right: 0px;
+  margin-left: 5px;
+  border: none;
+  background: none;
 }

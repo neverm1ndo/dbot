@@ -1,0 +1,23 @@
+div.container-fluid.popout.automode
+  div.d-flex.flex-column.justify-content-center.align-items-center.h-100
+    div.card.gray.text-light.col-12.col-md-9.col-lg-8.shadow
+      div.card-body
+        div.d-flex.flex-row.justify-content-between
+          h5.card-title
+            i.bi.bi-exclamation-lg.mr-3
+            span Кастомные команды
+          button.btn-close(type="button" aria-label="close")
+        hr
+        p.card-text Добавляйте свои команды и указывайте тип ответа на команду 
+        hr
+        div.col-12
+          div.row#container
+        hr
+        h6
+          i.bi.bi-clipboard-plus.mr-2 
+          span Добавить новую команду
+        input.form-control.input-dark.mb-2.mt-3#command-name(type="text" placeholder="Команда для бота")
+        textarea.form-control.textarea.mb-2(placeholder="Ответ на команду...")
+        button#submit.btn.btn-dark
+          i.bi.bi-plus.mr-2
+          small Добавить

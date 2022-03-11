@@ -77,6 +77,10 @@ module.exports = {
           outputPath: 'assets',
         }
       },
+      // {
+      //   test: /\.(pug)$/,
+      //   loader: 'pug-loader',
+      // },
     ],
   },
 };

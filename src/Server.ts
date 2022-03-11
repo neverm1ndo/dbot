@@ -129,7 +129,11 @@ app.use('/api', express.json(), APIRouter);
 app.get('/auth/twitch', passport.authenticate('twitch', { scope: ['user_read', 'user_subscriptions', 'channel_editor','chat:read', 'chat:edit', 'channel:moderate'] }));
 
 // Set route for OAuth redirect
-app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/controls/chat', failureRedirect: '/controls/chat' }));
+app.get('/auth/twitch/callback', passport.authenticate('twitch',
+{
+  successRedirect: '/controls/chat',
+  failureRedirect: '/controls/chat'
+}));
 
 // Set route for webhooks
 app.use('/webhooks/callback/streams', express.raw({

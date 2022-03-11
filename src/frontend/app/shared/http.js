@@ -4,16 +4,20 @@ class Http {
       if (res.ok) {
        return await res.json();
     } else {
-      alert.error(`Ошибка HTTP: ${this.res.status}`);
+      console.error(`Ошибка HTTP: ${this.res.status}`);
     }
   }
   static async post(url, data, headers) {
-    const res= await fetch(url, {
+    const res = await fetch(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(data)
     });
-    return await res.json();
+    if (res.ok) {
+      return await res;
+    } else {
+      console.error(`Ошибка HTTP: ${this.res.status}`);
+    }
   }
 }
 export default Http;

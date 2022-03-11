@@ -26,6 +26,12 @@ export const USER = model('User', new Schema ({
         command: { type: String },
         path: { type: String }
       }
+    ],
+    commands: [
+      {
+        name: { type: String },
+        response: { type: String }
+      }
     ]
   }
 }));

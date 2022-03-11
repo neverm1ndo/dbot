@@ -5,6 +5,7 @@ interface UserSettings {
   automessages: string[];
   banwords: string[];
   sounds: any[];
+  commands: any[];
 }
 interface Chatter {
   username: string;
@@ -19,7 +20,8 @@ export class Schedule {
   schedules: UserSettings = {
     automessages: [],
     banwords: [],
-    sounds: []
+    sounds: [],
+    commands: []
   };
   chatters: Chatters = {
     regulars: [],
@@ -61,6 +63,10 @@ export class Schedule {
 
   get dictionary(): string[] {
     return this.schedules.banwords;
+  }
+
+  get customCommands(): any[] {
+    return this.schedules.commands;
   }
 
   set dictionary(newdict) {
