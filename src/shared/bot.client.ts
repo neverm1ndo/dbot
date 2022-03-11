@@ -32,7 +32,7 @@ export class Bot {
   private readonly prefix: string = '!';
 
   constructor() {
-    this.opts = new Schedule('neverm1nd_o');
+    this.opts = new Schedule(process.env.BOT_CHANNEL!);
     this.announcer = new Announcer(900000);
     if (process.env.NODE_ENV !== 'development') {
       Twitch.getAppAccessToken().then((body: any) => {
