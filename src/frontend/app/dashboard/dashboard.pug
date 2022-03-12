@@ -10,68 +10,22 @@ html(lang="ru")
       title="neverm1nd_o apps"
     link(rel="shortcut icon" href="/assets/tank2.png")
   body
-    div.container-fluid.h-100
-      div.row.h-100
-        div.col-1.pt-3.bg-dark
-          div.row
-            div.col-12
-              div.col-12.bg-success.d-flex.align-items-center.justify-content-center.p-2.rounded
-                img(src='/assets/tank2.png')
-            div.col-12.mt-3
-              div.d-flex.flex-column
-                div.btn-group-vertical
-                  button#btn-custom-commands.btn.btn-dark
-                    i.bi.bi-exclamation-lg
-                  button#btn-sounds.btn.btn-dark
-                    i.bi.bi-music-note
-                  button#btn-automode.btn.btn-dark
-                    i.bi.bi-robot
-                  button#btn-announcer.btn.btn-dark
-                    i.bi.bi-chat-left-dots-fill
-        div.col-4.ml-0
-          div.row.h-100.bg-dark
+    div.container-fluid.h-100.p-0
+      div.d-flex.flex-row.h-100.w-100
+        aside.d-flex.flex-column.pt-3.bg-dark
+          div.bg-success.d-flex.align-items-center.justify-content-center.p-2.rounded
+            img(src='/assets/tank2.png')
+          div.d-flex.flex-fill.mt-3
+            div.d-flex.flex-column.flex-fill
+              div.btn-group-vertical
+                button#btn-custom-commands.btn.btn-dark
+                  i.bi.bi-exclamation-lg
+                button#btn-sounds.btn.btn-dark
+                  i.bi.bi-music-note
+                button#btn-automode.btn.btn-dark
+                  i.bi.bi-robot
+                button#btn-announcer.btn.btn-dark
+                  i.bi.bi-chat-left-dots-fill
+        div.d-flex.flex-fill.ml-0
+          div.d-flex.w-100.h-100.bg-dark
             iframe.d-flex.flex-fill(src='/controls/chat')
-        div.col-7.bg-dark.text-light.d-flex.flex-column
-          //- div.col-12.mt-3.gray.p-3.rounded
-            div.row
-              div.col-12
-                div.row
-                  div.col-8.d-flex.align-items-center
-                    h5.mb-0 Список кастомных команд
-                  //- div.col-4
-                  //-   button.btn.btn-dark.w-100
-                  //-     i.bi.bi-clipboard-plus.m-3
-                  //-     small Добавить команду
-            div.row
-              div.col-12.mt-3
-                table.table.align-middle.table-dark.rounded
-                  tr
-                    td 
-                      h6.mb-0
-                        div.badge.rounded-pill.bg-success !разбор
-                    td Разбор реплея без дискорда 200р
-                    td
-                      button.w-100.btn.btn-dark.btn-small
-                        i.bi.bi-pencil-fill
-                    td
-                      button.w-100.btn.btn-dark.btn-small
-                        i.bi.bi-trash
-                  tr
-                    td 
-                      h6.mb-0
-                        div.badge.rounded-pill.bg-success !ролл
-                    td Кручу верчу запутать хочу
-                    td
-                      button.w-100.btn.btn-dark.btn-small
-                        i.bi.bi-pencil-fill
-                    td
-                      button.w-100.btn.btn-dark.btn-small
-                        i.bi.bi-trash
-          div.col-12.mt-3.gray.p-3.rounded
-            iframe.d-flex.flex-fill.w-100.rounded(src="/controls/speaker")
-          //- div.col-12.mt-3.gray.p-3.rounded.d-flex.flex-fill.mb-3
-            //- sounds#sounds
-      //- automode-rules#automode.d-none
-      //- custom-commands#commands.d-none
-      //- custom-announcer#announcer.d-none
-      //- sounds-list#sounds.d-none

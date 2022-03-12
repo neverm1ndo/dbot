@@ -10,12 +10,6 @@ import { AnnouncerController } from './announcer/announcer.ctrl';
 import { SoundsController } from './sounds/sounds.ctrl';
 import { SoundComponent } from './sounds/sound';
 
-// const popouts = {
-//   automode: document.querySelector('#automode'),
-//   commands: document.querySelector('#commands'),
-//   sounds: document.querySelector('#sounds'),
-//   announcer: document.querySelector('#announcer'),
-// };
 const side = {
   automode: {
     btn: document.querySelector('#btn-automode'),
@@ -38,7 +32,7 @@ const side = {
   announcer: {
     btn: document.querySelector('#btn-announcer'),
     body: () => {
-      return new AnnounceComponent();
+      return new AnnouncerController();
     }
   },
 };
@@ -58,49 +52,6 @@ customElements.define('custom-announcer', AnnouncerController);
 customElements.define('sounds-list', SoundsController);
 customElements.define('sound-item', SoundComponent);
 
-// import Http from '@shared/http';
-// /* eslint max-classes-per-file: ["error", 10] */
-// let ws;
-// const userId = document.querySelector('#user').dataset.id;
-//
-// class Alert {
-//   constructor() {
-//     this.box = document.querySelector('.alert');
-//   }
-//
-//   success(message) {
-//     this.box.innerHTML = message;
-//     this.box.classList.add('alert-success');
-//     this.box.style.display = 'block';
-//     setTimeout(() => {
-//       this.box.classList.remove('alert-success');
-//       this.closeAlert();
-//     }, 2000);
-//   }
-//
-//   error(message) {
-//     this.box.innerHTML = `<span>Произошла ошибка: ${message}</span>`;
-//     this.box.style.display = 'block';
-//     this.box.classList.add('alert-danger');
-//     setTimeout(() => {
-//       this.box.classList.remove('alert-danger');
-//       this.closeAlert();
-//     }, 2000);
-//   }
-//
-//   warn(message) {
-//     this.box.innerHTML = `<span>Обрыв соединения: ${message}</span>`;
-//     this.box.style.display = 'block';
-//     this.box.classList.add('alert-warning');
-//   }
-//
-//   closeAlert() {
-//     this.box.style.display = 'none';
-//   }
-// }
-//
-// const alert = new Alert();
-//
 // (function setConnection() {
 //   ws = new WebSocket(`wss://${window.location.host}`);
 //   ws.onopen = () => {
@@ -144,42 +95,3 @@ customElements.define('sound-item', SoundComponent);
 //     console.log(`Ошибка ${error.message}`);
 //   };
 // }());
-//
-// // (async function getSettings() {
-// //   this.res = await fetch(`/api/user?id=${userId}`)
-// //     if (this.res.ok) {
-// //     this.conf = await res.json();
-// //     console.log(this.conf);
-// //   } else {
-// //     alert.error(`Ошибка HTTP: ${this.res.status}`);
-// //   }
-// // })();
-// Http.get(`/api/user?id=${userId}`)
-//     .then((data) => {
-//         document.querySelector('#automessages').value = JSON.stringify(data.settings.automessages);
-//         document.querySelector('#sounds').value = JSON.stringify(data.settings.sounds);
-//         document.querySelector('#banwords').value = JSON.stringify(data.settings.banwords);
-//     })
-//     .catch((err) => {
-//       alert.error(`Ошибка HTTP: ${err.status}`);
-//     })
-// async function saveSettings() {
-//   const body = {
-//     id: userId,
-//     settings: {
-//       automessages: JSON.parse(document.querySelector('#automessages').value.toString()),
-//       sounds: JSON.parse(document.querySelector('#sounds').value.toString()),
-//       banwords: JSON.parse(document.querySelector('#banwords').value.toString())
-//     }
-//   };
-//   const headers = {
-//     'Content-Type': 'application/json'
-//   };
-//   Http.post('/api/user/update-settings', body, headers)
-//       .then(() => {
-//         alert.success('Настройки сохранены');
-//       })
-// };
-// document.querySelector('.save').addEventListener('click', () => {
-//   saveSettings();
-// })

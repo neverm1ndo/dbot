@@ -29,6 +29,9 @@ html body div::-webkit-scrollbar-thumb:hover {
 html body div::-webkit-scrollbar-thumb:active, html body div::-webkit-scrollbar-thumb:active:focus {
   opacity: 0.5;
 }
+aside {
+  width: 60px;
+}
 body .logo {
   width: 32px;
   height: 32px;
@@ -56,6 +59,7 @@ body .logo {
 }
 .popout {
   position: fixed;
+  z-index: 10;
   inset: 0;
   background-color: #000000b0;
 }
