@@ -41,11 +41,12 @@ export class AnnouncerController extends Popout {
   // }
 
   isEmpty() {
-    if (this._messages.length > 0 && this.container.children.length > 0) {
-      this.container.querySelector('#empty').remove();
+    if (this._messages.length > 0) {
+      const empty = this.container.querySelector('#empty');
+      if (empty) empty.remove();
       return;
     }
-    this.container.innerHTML = emptyList({ message: 'Список пуст'});
+    this.container.innerHTML = emptyList({ message: 'Список кастомных команд пуст' });
   }
 
   getAllMessages() {
