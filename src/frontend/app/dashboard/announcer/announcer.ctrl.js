@@ -12,7 +12,6 @@ export class AnnouncerController extends Popout {
     this.innerHTML = template();
     this.closeBtn  = this.querySelector('.btn-close');
     this.container = this.querySelector('#container');
-    // this.name      = this.querySelector('#command-name');
     this.textarea  = this.querySelector('.textarea');
     this.submit    = this.querySelector('#submit');
     this.closeBtn.addEventListener('click', () => {
@@ -30,15 +29,6 @@ export class AnnouncerController extends Popout {
       });
     });
   }
-
-  // close() {
-  //   // this.classList.add('d-none');
-  //   this.remove();
-  // }
-  // open() {
-  //   this.classList.remove('d-none');
-  //   this.name.focus();
-  // }
 
   isEmpty() {
     if (this._messages.length > 0) {

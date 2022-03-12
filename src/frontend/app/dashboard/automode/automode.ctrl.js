@@ -30,22 +30,11 @@ export class AutomodeController extends Popout {
     });
   }
 
-  // close() {
-  //   this.classList.add('d-none');
-  // }
-  // open() {
-  //   this.classList.remove('d-none');
-  //   this.textarea.focus();
-  // }
-
   getRulesRaw() {
     return this._rules.map(rule => rule.value);
   }
 
   addRule(ruleRaw) {
-    /*
-    Add rule to stack then save rules in db
-    */
     return Http.post('/api/user/update-automode-rules',
       {
         rules: this.getRulesRaw().push(ruleRaw)
@@ -60,9 +49,6 @@ export class AutomodeController extends Popout {
       });
   }
   removeRule(rule) {
-    /*
-    Remove rule from stack then save rules in db
-    */
     return Http.post('/api/user/update-automode-rules',
       {
         rules: this.getRulesRaw().filter((r) => r != rule.value )
@@ -86,9 +72,6 @@ export class AutomodeController extends Popout {
   }
   getRules() {
     return Http.get('/api/user/automode-rules').then((rules) => {
-      /*
-        Add rules to stack
-      */
       this._rules = rules.map(rule => new AutomodeRuleComponent(rule));
       this._rules.forEach((rule) => {
         this.container.append(rule);
@@ -97,9 +80,6 @@ export class AutomodeController extends Popout {
         });
       });
     }).catch((err) => {
-      /*
-      Show error alert
-      */
       console.error(err);
     });
   }

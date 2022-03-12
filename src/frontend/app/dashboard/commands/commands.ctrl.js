@@ -47,17 +47,11 @@ export class CommandsController extends Popout {
 
   getAllCommands() {
     return Http.get('/api/user/commands').then((commands) => {
-      /*
-        Add rules to stack
-      */
       commands.forEach((command) => {
         this.addCommandToListView(command);
       });
       this.isEmpty();
     }).catch((err) => {
-      /*
-      Show error alert
-      */
       console.error(err);
     });
   }

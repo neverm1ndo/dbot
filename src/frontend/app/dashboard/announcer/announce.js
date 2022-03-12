@@ -7,10 +7,6 @@ export class AnnounceComponent extends HTMLElement {
   constructor(index, message) {
     super();
     this.timing = index*15;
-    // this.innerHTML = template({
-    //   timing: this.timing,
-    //   message
-    // });
     this.editForm = document.createElement('div');
     this.value = message;
     this.editForm.innerHTML = editFormTemplate({ message });

@@ -13,7 +13,6 @@ export class SoundsController extends Popout {
     this.closeBtn  = this.querySelector('.btn-close');
     this.container = this.querySelector('#container');
     this.name      = this.querySelector('#command-name');
-    // this.textarea  = this.querySelector('.textarea');
     this.submit    = this.querySelector('#submit');
     this.closeBtn.addEventListener('click', () => {
       this.close();
@@ -46,17 +45,11 @@ export class SoundsController extends Popout {
 
   getAllSounds() {
     return Http.get('/api/user/sounds').then((sounds) => {
-      /*
-        Add rules to stack
-      */
       sounds.forEach((sound) => {
         this.addSoundToListView(sound);
       });
       this.isEmpty();
     }).catch((err) => {
-      /*
-      Show error alert
-      */
       console.error(err);
     });
   }
