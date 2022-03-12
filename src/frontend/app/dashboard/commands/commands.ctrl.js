@@ -1,9 +1,10 @@
 import Http from '@shared/http';
+import { Popout } from '../popout';
 import template from 'pug-loader!./commands.tpl.pug';
 import emptyList from 'pug-loader!./empty-commands-list.tpl.pug';
 import { CustomCommandComponent } from './custom-command';
 
-export class CommandsController extends HTMLElement {
+export class CommandsController extends Popout {
   _commands = [];
   constructor() {
     super();
@@ -35,18 +36,10 @@ export class CommandsController extends HTMLElement {
     });
   }
 
-  close() {
-    this.classList.add('d-none');
-  }
-  open() {
-    this.classList.remove('d-none');
-    this.name.focus();
-  }
-
   isEmpty() {
-    if (this._commands.length > 0 && this.container.children.length > 0) {
+    if (this._commands.length > 0) {
       const empty = this.container.querySelector('#empty');
-      if (empty) empty.querySelector('#empty').remove();
+      if (empty) empty.remove();
       return;
     }
     this.container.innerHTML = emptyList({ message: 'Список кастомных команд пуст' });

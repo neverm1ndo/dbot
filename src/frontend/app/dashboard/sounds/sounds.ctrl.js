@@ -1,9 +1,10 @@
 import Http from '@shared/http';
+import { Popout } from '../popout';
 import template from 'pug-loader!./sounds.tpl.pug';
 import emptyList from 'pug-loader!../commands/empty-commands-list.tpl.pug';
 import { SoundComponent } from './sound';
 
-export class SoundsController extends HTMLElement {
+export class SoundsController extends Popout {
   _sounds = [];
   constructor() {
     super();
@@ -34,18 +35,10 @@ export class SoundsController extends HTMLElement {
     });
   }
 
-  close() {
-    this.classList.add('d-none');
-  }
-  open() {
-    this.classList.remove('d-none');
-    this.name.focus();
-  }
-
   isEmpty() {
-    if (this._sounds.length > 0 && this.container.children.length > 0) {
+    if (this._sounds.length > 0) {
       const empty = this.container.querySelector('#empty');
-      if (empty) empty.querySelector('#empty').remove();
+      if (empty) empty.remove();
       return;
     }
     this.container.innerHTML = emptyList({ message: 'Список звуков пуст' });

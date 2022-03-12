@@ -1,8 +1,9 @@
 import Http from '@shared/http';
+import { Popout } from '../popout';
 import template from 'pug-loader!./automode.tpl.pug';
 import { AutomodeRuleComponent } from './automode.rule';
 
-export class AutomodeController extends HTMLElement {
+export class AutomodeController extends Popout {
   _rules;
   constructor() {
     super();
@@ -29,13 +30,13 @@ export class AutomodeController extends HTMLElement {
     });
   }
 
-  close() {
-    this.classList.add('d-none');
-  }
-  open() {
-    this.classList.remove('d-none');
-    this.textarea.focus();
-  }
+  // close() {
+  //   this.classList.add('d-none');
+  // }
+  // open() {
+  //   this.classList.remove('d-none');
+  //   this.textarea.focus();
+  // }
 
   getRulesRaw() {
     return this._rules.map(rule => rule.value);

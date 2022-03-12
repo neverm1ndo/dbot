@@ -10,21 +10,42 @@ import { AnnouncerController } from './announcer/announcer.ctrl';
 import { SoundsController } from './sounds/sounds.ctrl';
 import { SoundComponent } from './sounds/sound';
 
-const popouts = {
-  automode: document.querySelector('#automode'),
-  commands: document.querySelector('#commands'),
-  sounds: document.querySelector('#sounds'),
-  announcer: document.querySelector('#announcer'),
-};
+// const popouts = {
+//   automode: document.querySelector('#automode'),
+//   commands: document.querySelector('#commands'),
+//   sounds: document.querySelector('#sounds'),
+//   announcer: document.querySelector('#announcer'),
+// };
 const side = {
-  automode: document.querySelector('#btn-automode'),
-  commands: document.querySelector('#btn-custom-commands'),
-  sounds: document.querySelector('#btn-sounds'),
-  announcer: document.querySelector('#btn-announcer'),
+  automode: {
+    btn: document.querySelector('#btn-automode'),
+    body: () => {
+      return new AutomodeController();
+    }
+  },
+  commands: {
+    btn: document.querySelector('#btn-custom-commands'),
+    body: () => {
+      return new CommandsController();
+    }
+  },
+  sounds: {
+    btn: document.querySelector('#btn-sounds'),
+    body: () => {
+      return new SoundsController();
+    }
+  },
+  announcer: {
+    btn: document.querySelector('#btn-announcer'),
+    body: () => {
+      return new AnnounceComponent();
+    }
+  },
 };
 Object.entries(side).forEach((btn) => {
-  btn[1].addEventListener('click', () => {
-    popouts[btn[0]].open();
+  const component = btn[1];
+  component.btn.addEventListener('click', () => {
+    document.body.append(component.body());
   });
 })
 

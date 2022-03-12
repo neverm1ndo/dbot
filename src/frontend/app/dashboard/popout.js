@@ -3,10 +3,9 @@ export class Popout extends HTMLElement {
     super();
   }
   close() {
-    this.classList.add('d-none');
+    this.remove();
   }
-  open() {
-    this.classList.remove('d-none');
-    this.textarea.focus();
+  open(callback) {
+    if (callback) callback();
   }
 }

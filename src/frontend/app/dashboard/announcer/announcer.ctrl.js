@@ -1,9 +1,10 @@
 import Http from '@shared/http';
+import { Popout } from '../popout';
 import template from 'pug-loader!./announcer.tpl.pug';
 import emptyList from 'pug-loader!../commands/empty-commands-list.tpl.pug';
 import { AnnounceComponent } from './announce';
 
-export class AnnouncerController extends HTMLElement {
+export class AnnouncerController extends Popout {
   _messages = [];
   constructor() {
     super();
@@ -30,13 +31,14 @@ export class AnnouncerController extends HTMLElement {
     });
   }
 
-  close() {
-    this.classList.add('d-none');
-  }
-  open() {
-    this.classList.remove('d-none');
-    this.name.focus();
-  }
+  // close() {
+  //   // this.classList.add('d-none');
+  //   this.remove();
+  // }
+  // open() {
+  //   this.classList.remove('d-none');
+  //   this.name.focus();
+  // }
 
   isEmpty() {
     if (this._messages.length > 0 && this.container.children.length > 0) {
