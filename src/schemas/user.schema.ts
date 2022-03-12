@@ -24,7 +24,8 @@ export const USER = model('User', new Schema ({
       {
         _id : false,
         command: { type: String },
-        path: { type: String }
+        path: { type: String },
+        gain: { type: Number }
       }
     ],
     commands: [
