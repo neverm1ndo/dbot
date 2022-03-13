@@ -29,7 +29,7 @@ export class Queue {
     this.queue = [];
   }
   public static checkWhitelist(user: ChatUserstate) {
-    if (!user.username) { return false; };
+    if (!user.username) return false;
     return this.whitelist.includes(user.username);
   }
   countTime(user: ChatUserstate) {
@@ -45,45 +45,44 @@ export class Queue {
   }
   check(user: ChatUserstate) {
     for (let i = 0; i < this.queue.length; i+=1) {
-      if (this.queue[i].username === user.username) {
-        return true;
-      }
+      if (this.queue[i].username === user.username) return true;
     }
     return false;
   }
   addTime(user: ChatUserstate, time: number): void {
     if (this.global) return;
-    for (let i = 0; i <= this.queue.length; i+=1 ) {
-       if (this.queue[i].username === user.username) {
-         this.queue[i].start = (Date.now() - (time * 60000));
-         console.log('> ', user.username, ' added to queue for ', time, ' minutes');
-         break;
-       }
+    for (let i = 0; i < this.queue.length; i+=1 ) {
+       if (this.queue[i].username !== user.username) continue;
+       this.queue[i].start = (Date.now() - (time * 60000));
+       logger.info(`Added ${time} minutes for ${user.username}`);
+       break;
     }
-    if (this.options.global) {
-      this.global = true;
-      setTimeout(() => {
-        this.global = false;
-      }, 30000)
-    }
+    if (!this.options.global) return;
+    this.global = true;
+    setTimeout(() => {
+      this.global = false;
+    }, 30000);
   }
   toTimeout(user: ChatUserstate) {
     if (this.global) return;
-    if (user.username) {
-      const now = Date.now();
-      this.queue.push({ username: user.username, start: now });
-      setTimeout(() => {
-        this.removeFromQueue(user);
-      }, this.options.cooldown);
-    }
+    if (!user.username) return;
+    const now = Date.now();
+    this.queue.push({ username: user.username, start: now });
+    setTimeout(() => {
+      this.removeFromQueue(user);
+    }, this.options.cooldown);
+    if (!this.options.global) return;
+    this.global = true;
+    setTimeout(() => {
+      this.global = false;
+    }, 30000);
   }
   removeFromQueue(user: ChatUserstate) {
     for (let i = 0; i < this.queue.length; i+=1) {
-      if (this.queue[i].username === user.username) {
-        this.queue.splice(i, i + 1);
-        logger.info('Chatter ' + user.username + ' removed from queue ' + this.queue);
-        break;
-      }
+      if (this.queue[i].username !== user.username) continue;
+      this.queue.splice(i, 1);
+      logger.info('Chatter ' + user.username + ' removed from queue');
+      break;
     };
   }
 }
