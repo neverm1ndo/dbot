@@ -44,24 +44,19 @@ export class Queue {
     });
   }
   check(user: ChatUserstate) {
+    if (this.global) return true;
     for (let i = 0; i < this.queue.length; i+=1) {
       if (this.queue[i].username === user.username) return true;
     }
     return false;
   }
   addTime(user: ChatUserstate, time: number): void {
-    if (this.global) return;
     for (let i = 0; i < this.queue.length; i+=1 ) {
        if (this.queue[i].username !== user.username) continue;
        this.queue[i].start = (Date.now() - (time * 60000));
        logger.info(`Added ${time} minutes for ${user.username}`);
        break;
     }
-    if (!this.options.global) return;
-    this.global = true;
-    setTimeout(() => {
-      this.global = false;
-    }, 30000);
   }
   toTimeout(user: ChatUserstate) {
     if (this.global) return;
