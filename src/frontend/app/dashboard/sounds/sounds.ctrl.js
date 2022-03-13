@@ -89,7 +89,11 @@ export class SoundsController extends Popout {
       this.player.play(event.target.value);
     });
     sound.addEventListener('delete', (event) => {
-      this._sounds.splice(this._sounds.indexOf(event.target.value), 1);
+      for (let i = 0; i < this.sounds.length; i++) {
+        if (this.sounds[i].value.command !== event.target.value.command) continue;
+        this.sounds.splice(i, 1);
+        break;
+      };
       this.saveCommands().then(() => {
         console.log('deleted');
         this.isEmpty();
