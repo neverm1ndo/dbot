@@ -67,6 +67,7 @@ export class SoundsController extends Popout {
       })
       .then(() => {
         this.addSoundToListView(soundRaw);
+        autoscroll(this.container.parentElement);
       })
       .catch((err) => {
         console.error(err);

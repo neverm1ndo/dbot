@@ -65,6 +65,7 @@ export class AnnouncerController extends Popout {
       })
       .then(() => {
         this.addMessageToListView(messageRaw);
+        autoscroll(this.container.parentElement);
       })
       .catch((err) => {
         console.error(err);

@@ -3,6 +3,7 @@ import { Popout } from '../popout';
 import template from 'pug-loader!./commands.tpl.pug';
 import emptyList from 'pug-loader!./empty-commands-list.tpl.pug';
 import { CustomCommandComponent } from './custom-command';
+import { autoscroll } from '@shared/scroller';
 
 export class CommandsController extends Popout {
   _commands = [];
@@ -66,6 +67,7 @@ export class CommandsController extends Popout {
       })
       .then(() => {
         this.addCommandToListView(commandRaw);
+        autoscroll(this.container.parentElement);
       })
       .catch((err) => {
         console.error(err);

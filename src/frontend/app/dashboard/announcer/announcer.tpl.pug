@@ -1,7 +1,7 @@
 div.container-fluid.popout.automode
   div.d-flex.flex-column.justify-content-center.align-items-center.h-100
-    div.card.gray.text-light.col-12.col-md-9.col-lg-8.shadow
-      div.card-body
+    div.card.gray.text-light.col-12.col-md-9.col-lg-8.shadow.h-95
+      div.card-body.d-flex.flex-column.h-100
         div.d-flex.flex-row.justify-content-between
           h5.card-title
             i.bi.bi-chat-left-dots-fill.mr-3
@@ -9,15 +9,16 @@ div.container-fluid.popout.automode
           button.btn-close.btn-close-white(type="button" aria-label="close")
         hr
         p.card-text Добавляйте сообщения, которые будут отправлены ботом в чат с интервалом в 15 минут
-        p.card-text Бот не воспроизводит сообщения, пока ваш стрим оффлайн
+        span.card-text Бот не воспроизводит сообщения, пока ваш стрим оффлайн
+        hr
+        div.col-12.overflow-auto.d-flex.flex-fill
+          div.d-flex.flex-column.flex-fill.p-2#container
         hr
         div.col-12
-          div.row#container
-        hr
-        h6
-          i.bi.bi-chat-left-heart-fill.mr-2 
-          span Добавить новое автосообщение
-        textarea.form-control.textarea.mb-2(placeholder="Я @ ты @ я @ ты @...")
-        button#submit.btn.btn-dark
-          i.bi.bi-plus.mr-2
-          small Добавить
+          h6
+            i.bi.bi-chat-left-heart-fill.mr-2 
+            span Добавить новое автосообщение
+          textarea.form-control.textarea.mb-2(placeholder="Я @ ты @ я @ ты @...")
+          button#submit.btn.btn-dark
+            i.bi.bi-plus.mr-2
+            small Добавить
