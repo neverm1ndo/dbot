@@ -10,36 +10,26 @@ import { AnnouncerController } from './announcer/announcer.ctrl';
 import { SoundsController } from './sounds/sounds.ctrl';
 import { SoundComponent } from './sounds/sound';
 
-const side = {
-  automode: {
+[
+  {
     btn: document.querySelector('#btn-automode'),
-    body: () => {
-      return new AutomodeController();
-    }
+    controller: AutomodeController
   },
-  commands: {
+  {
     btn: document.querySelector('#btn-custom-commands'),
-    body: () => {
-      return new CommandsController();
-    }
+    controller: CommandsController
   },
-  sounds: {
+  {
     btn: document.querySelector('#btn-sounds'),
-    body: () => {
-      return new SoundsController();
-    }
+    controller: SoundsController
   },
-  announcer: {
+  {
     btn: document.querySelector('#btn-announcer'),
-    body: () => {
-      return new AnnouncerController();
-    }
-  },
-};
-Object.entries(side).forEach((btn) => {
-  const component = btn[1];
+    controller: AnnouncerController
+  }
+].forEach((component) => {
   component.btn.addEventListener('click', () => {
-    document.body.append(component.body());
+    document.body.append(new component.controller());
   });
 });
 
