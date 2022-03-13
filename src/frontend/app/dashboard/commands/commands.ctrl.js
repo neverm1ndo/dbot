@@ -89,6 +89,7 @@ export class CommandsController extends Popout {
       for (let i = 0; i < this._commands.length; i++) {
         if (this._commands[i]._id !== event.target._id) continue;
         this._commands.splice(i, 1);
+        break;
       }
       this.saveCommands().then(() => {
         console.log('deleted');
