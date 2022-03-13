@@ -1,5 +1,5 @@
 export interface WSMessage {
   event: string;
-  msg?: string;
+  msg?: any;
   options?: any;
 }

@@ -9,7 +9,7 @@ import { Dota2 } from '@shared/dota2';
 import { D2PT } from '@shared/d2pt';
 import { Twitch } from '@shared/twitch';
 import { Nuzhdiki } from '@shared/nuzhdiki';
-import { Aneki } from '@shared/aneki';
+// import { Aneki } from '@shared/aneki';
 import { MESSAGE } from '../schemas/message.schema';
 import StartOptions from '../pre-start';
 type BotStatus = 'works' | 'sleeps';
@@ -123,9 +123,9 @@ export class Bot {
   readChattersMessage(channel: any, tags: ChatUserstate, command?: string, args?: string[]): void {
     if (!tags.username || !command) return;
     // SOUNDS
-    this.opts.schedules.sounds.forEach((sound: { command: string, path: string }) => {
+    this.opts.schedules.sounds.forEach((sound: { command: string, path: string, gain?: number }) => {
       if (command === sound.command) {
-        this.media.playSound(tags, sound.path);
+        this.media.playSound(tags, sound);
         return;
       }
     });
@@ -168,16 +168,16 @@ export class Bot {
       }
       case 'нуждики': {
         Nuzhdiki.getOne().then((path: string) => {
-          this.media.playSound(tags, path);
+          this.media.playSound(tags, { path });
         });
         break;
       }
-      case 'анек': {
-        Aneki.getOne().then((anek: string) => {
-          this.client.say(channel, anek);
-        });
-        break;
-      }
+      // case 'анек': {
+      //   Aneki.getOne().then((anek: string) => {
+      //     this.client.say(channel, anek);
+      //   });
+      //   break;
+      // }
       case 'd2pt': {
         if (args) {
             const arg = args.join(' ');

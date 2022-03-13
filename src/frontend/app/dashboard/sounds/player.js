@@ -15,7 +15,6 @@ export class Player {
     this.audio.volume = volume;
   }
   play (sound) {
-    console.log('playing:', sound.command);
     this.source = null;
     this.source = this.ctx.createBufferSource();
     if (!sound.gain) sound.gain = 1;
