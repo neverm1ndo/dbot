@@ -41,7 +41,7 @@ Object.entries(side).forEach((btn) => {
   component.btn.addEventListener('click', () => {
     document.body.append(component.body());
   });
-})
+});
 
 customElements.define('automode-rule', AutomodeRuleComponent);
 customElements.define('automode-rules', AutomodeController);
