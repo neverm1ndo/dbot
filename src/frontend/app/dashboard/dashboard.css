@@ -108,3 +108,48 @@ body .logo {
   border: none;
   background: none;
 }
+/*-----------------------------------------------*/
+
+/* The slider itself */
+.ranger {
+  /* margin-left: 60px; */
+  margin: 0px 0px 0px 0px;
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 100%; /* Full-width */
+  height: 2px; /* Specified height */
+  background: #4a4a4a; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+}
+
+/* Mouse-over effects */
+.ranger:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+.ranger:disabled {
+  opacity: .2; /* Fully shown on mouse-over */
+}
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.ranger::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 12px; /* Set a specific slider handle width */
+  height: 12px; /* Slider handle height */
+  background: var(--bs-light); /* Green background */
+  cursor: pointer; /* Cursor on hover */
+  border-radius: 100%;
+}
+
+.ranger::-moz-range-thumb {
+  width: 12px; /* Set a specific slider handle width */
+  height: 12px; /* Slider handle height */
+  background: var(--bs-light); /* Green background */
+  cursor: pointer; /* Cursor on hover */
+  border-radius: 100%;
+}
+
+/*-----------------------------------------------*/

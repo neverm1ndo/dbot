@@ -3,6 +3,7 @@ import { Popout } from '../popout';
 import template from 'pug-loader!./sounds.tpl.pug';
 import emptyList from 'pug-loader!../commands/empty-commands-list.tpl.pug';
 import { SoundComponent } from './sound';
+import { Player } from './player';
 
 export class SoundsController extends Popout {
   _sounds = [];
@@ -14,9 +15,10 @@ export class SoundsController extends Popout {
     this.container = this.querySelector('#container');
     this.name      = this.querySelector('#command-name');
     this.submit    = this.querySelector('#submit');
+    this.player = new Player();
     this.closeBtn.addEventListener('click', () => {
       this.close();
-    })
+    });
     this.submit.addEventListener('click', () => {
       if (!this.textarea.value && !this.name.value) return;
       console.log(this.textarea.value, this.name.value);
@@ -70,15 +72,18 @@ export class SoundsController extends Popout {
   }
 
   addSoundToListView(soundRaw) {
-    const sound = new SoundComponent(soundRaw.command);
+    const sound = new SoundComponent(soundRaw);
     this._sounds.push(sound);
     this.container.append(sound);
     this.isEmpty();
     sound.addEventListener('save', (event) => {
-      console.log(event);
-      this.saveCommands().then(() => {
+      this.saveSounds().then(() => {
         console.log('saved');
       });
+    });
+    sound.addEventListener('play', (event) => {
+      console.log(event)
+      this.player.play(event.target.value);
     });
     sound.addEventListener('delete', (event) => {
       this._sounds.splice(this._sounds.indexOf(event.target.value), 1);
@@ -89,10 +94,10 @@ export class SoundsController extends Popout {
     });
   }
 
-  saveCommands() {
-    return Http.post('/api/user/update-sound',
+  saveSounds() {
+    return Http.post('/api/user/update-sounds',
       {
-        commands: this.getSoundsRaw()
+        sounds: this.getSoundsRaw()
       }, {
         'Content-Type': 'application/json'
       })

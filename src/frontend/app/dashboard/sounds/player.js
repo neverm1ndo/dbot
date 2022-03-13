@@ -1,4 +1,4 @@
-class Player {
+export class Player {
   constructor() {
     this.ctx = new (window.AudioContext || window.webkitAudioContext)();
     this.source = this.ctx.createBufferSource();
@@ -14,15 +14,17 @@ class Player {
   set vol(volume) {
     this.audio.volume = volume;
   }
-  play (path, gain) {
+  play (sound) {
+    console.log('playing:', sound.command);
     this.source = null;
     this.source = this.ctx.createBufferSource();
-    if (gain > 100) gain = 100;
-    if (gain < 0) gain = 0;
-    this.vol = gain;
+    if (!sound.gain) sound.gain = 1;
+    if (sound.gain > 100) sound.gain = 100;
+    if (sound.gain < 0) sound.gain = 0;
+    this.gainNode.gain.value = Math.round(sound.gain/100);
     new Promise((resolve, reject) => {
       var request = new XMLHttpRequest();
-      request.open('GET', path, true);
+      request.open('GET', sound.path, true);
       request.responseType = 'arraybuffer';
       request.onload = () => {
         console.log(request.response)
