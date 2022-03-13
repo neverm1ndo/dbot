@@ -14,21 +14,23 @@ export class SoundsController extends Popout {
     this.closeBtn  = this.querySelector('.btn-close');
     this.container = this.querySelector('#container');
     this.name      = this.querySelector('#command-name');
+    this.path      = this.querySelector('#new-sound-path');
     this.submit    = this.querySelector('#submit');
     this.player = new Player();
     this.closeBtn.addEventListener('click', () => {
       this.close();
     });
     this.submit.addEventListener('click', () => {
-      if (!this.textarea.value && !this.name.value) return;
-      console.log(this.textarea.value, this.name.value);
+      if (!this.path.value && !this.name.value) return;
       this.addSound({
-        name: this.name.value.toLowerCase(),
-        path: this.textarea.value
+        command: this.name.value.toLowerCase(),
+        path: this.path.value,
+        gain: 50,
       })
       .then(() => {
         console.log('saved');
         this.name.value = '';
+        this.path.value = '';
       })
       .catch((err) => {
         console.error(err);

@@ -21,7 +21,7 @@ export class Player {
     if (!sound.gain) sound.gain = 1;
     if (sound.gain > 100) sound.gain = 100;
     if (sound.gain < 0) sound.gain = 0;
-    this.gainNode.gain.value = Math.round(sound.gain/100);
+    this.gainNode.gain.value = sound.gain/100;
     new Promise((resolve, reject) => {
       var request = new XMLHttpRequest();
       request.open('GET', sound.path, true);
