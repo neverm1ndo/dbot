@@ -211,7 +211,7 @@ app.use(express.static(staticDir));
 app.use('/.well-known/acme-challenge', express.static(join(__dirname, 'public/.well-known/acme-challenge')));
 app.get('*', validateAccessToken, (req: any, res: Response) => {
   if (req.session.passport) {
-    res.set("Content-Security-Policy", "default-src *; img-src data: 'self'")
+    res.set("Content-Security-Policy", "default-src *; img-src * data: 'self'")
        .render('dashboard', { session: req.session });
     return;
   }
