@@ -28,27 +28,12 @@ export class ChatComponent extends HTMLElement {
       sets: new Set(),
       id: this.user.id,
     };
-    this.getChannelProperties();
     this.innerHTML = template({ user: {
         profile_image_url: this.user.profile_image_url
     }});
     this.pubsub = new PubSub(this);
     this.chatterList = new ChattersListController(this);
     this.ws = new WebSocket(`wss://${window.location.host}`);
-    this.client = new tmi.Client({
-      options: {
-        debug: true,
-        messagesLogLevel: "info",
-        clientId: this.user.client,
-        skipUpdatingEmotesets: true
-      },
-      connection: { reconnect: true, secure: true },
-      identity: {
-        username: this.user.username,
-        password: 'oauth:' + this.user.token
-      },
-      channels: [this.channel]
-    });
     const tag = document.createElement('script');
           tag.src = 'https://www.youtube.com/player_api';
     document.body.append(tag);
@@ -61,6 +46,21 @@ export class ChatComponent extends HTMLElement {
     this.marker        = this.querySelector(".marker");
     this.marker.disabled = true;
     this.channel = this.getChannelName();
+                   this.getChannelProperties(this.channel);
+    this.client = new tmi.Client({
+       options: {
+         debug: true,
+         messagesLogLevel: "info",
+         clientId: this.user.client,
+         skipUpdatingEmotesets: true
+       },
+       connection: { reconnect: true, secure: true },
+       identity: {
+         username: this.user.username,
+         password: 'oauth:' + this.user.token
+       },
+       channels: [this.channel]
+    });
     this.bttv = new BTTV();
     this.bttv.getEmotes(this.channel, this.emotes);
     this.marker.addEventListener('click', () => {
@@ -438,8 +438,8 @@ export class ChatComponent extends HTMLElement {
       }
     }, 120000);
   }
-  getChannelProperties () {
-    Http.get(`https://api.twitch.tv/helix/users?login=${this.channel}`, {
+  getChannelProperties (channel) {
+    Http.get(`https://api.twitch.tv/helix/users?login=${channel}`, {
       'Authorization': 'Bearer ' + this.user.token,
       'Client-ID': this.user.client
     }).then((data) => {
@@ -456,7 +456,7 @@ export class ChatComponent extends HTMLElement {
           'Authorization': 'Bearer ' + this.user.token,
           'Client-ID': this.user.client
         }),
-        Http.get(`/controls/chat/last?channel=${this.channel}`),
+        Http.get(`/controls/chat/last?channel=${channel}`),
       ])
     }).then(([badges, global, lastMessages]) => {
       this.settings.badges = [...badges.data, ...global.data];

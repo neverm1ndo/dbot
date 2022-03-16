@@ -16,7 +16,6 @@ import { ChatComponent } from '../chat/chat.component';
 import '@assets/bc.png';
 import '@assets/cm.png';
 import '@assets/tank2.png';
-import '../chat/chat';
 import '../chat/element.defines';
 
 customElements.define('automode-rule', AutomodeRuleComponent);
@@ -54,12 +53,12 @@ customElements.define('omd-chat', ChatComponent);
 
 document.body.querySelector('#chat')
              .append(new ChatComponent());
-// if ('serviceWorker' in navigator) {
-//   navigator.serviceWorker.register('/service-worker.js')
-//   .then(function(registration) {
-//     console.log('Registration successful, scope is:', registration.scope);
-//   })
-//   .catch(function(error) {
-//     console.log('Service worker registration failed, error:', error);
-//   });
-// }
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js')
+  .then(function(registration) {
+    console.log('Registration successful, scope is:', registration.scope);
+  })
+  .catch(function(error) {
+    console.log('Service worker registration failed, error:', error);
+  });
+}

@@ -18,7 +18,7 @@ class BTTV {
   constructor() {};
   getEmotes(channel, emotesContainer) {
     console.log('Getting BTTV emotes');
-    Http.get(`chat/emotes?channel=${channel}`)
+    Http.get(`/controls/chat/emotes?channel=${channel}`)
     .then((data) => {
       console.log('Got BTTV global emotes');
       this.bttvEmotes = this.bttvEmotes.emotes.concat(data.channel.emotes.map(function(n) {
