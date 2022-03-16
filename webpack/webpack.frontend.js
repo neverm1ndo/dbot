@@ -48,7 +48,7 @@ module.exports = {
       template: './dashboard/dashboard.pug',
       filename: '../views/dashboard.pug',
       minify: false,
-      chunks: ['dashboard']
+      chunks: ['dashboard', 'polyfills']
     }),
     new HtmlWebpackPlugin({
       template: './speaker/speaker.pug',
