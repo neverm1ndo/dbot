@@ -214,8 +214,8 @@ app.get('*', validateAccessToken, (req: any, res: Response) => {
     res.render('dashboard', { session: req.session });
     return;
   }
-  res.set("Content-Security-Policy", "default-src *")
-     .render('index', { user: req.user });
+  // res.set("Content-Security-Policy", "default-src *")
+    res.render('index', { user: req.user });
 });
 // Export express instance
 export default app;
