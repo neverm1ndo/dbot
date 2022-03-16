@@ -3,7 +3,6 @@ html(lang="ru")
   head
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
-    meta(http-equiv="Content-Security-Policy" content="default-src *; img-src * 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *")
     meta(name="theme-color")
     if session.passport
       title=session.passport.user.login + ' dashboard'
@@ -30,5 +29,3 @@ html(lang="ru")
                   i.bi.bi-chat-left-dots-fill
         div.d-flex.flex-fill.ml-0
           div#chat.d-flex.w-100.h-100.bg-dark
-            //- omd-chat
-            //- iframe.d-flex.flex-fill(src='/controls/chat')
