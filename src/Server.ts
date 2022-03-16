@@ -211,11 +211,12 @@ app.use(express.static(staticDir));
 app.use('/.well-known/acme-challenge', express.static(join(__dirname, 'public/.well-known/acme-challenge')));
 app.get('*', validateAccessToken, (req: any, res: Response) => {
   if (req.session.passport) {
-    res.render('dashboard', { session: req.session });
+    res.set("Content-Security-Policy", "default-src *")
+       .render('dashboard', { session: req.session });
     return;
   }
-  // res.set("Content-Security-Policy", "default-src *")
-    res.render('index', { user: req.user });
+  res.set("Content-Security-Policy", "default-src *")
+     .render('index', { user: req.user });
 });
 // Export express instance
 export default app;
