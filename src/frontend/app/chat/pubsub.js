@@ -1,5 +1,3 @@
-import { chat } from './chat';
-
 const _SCOPE = 'user_read+chat_login';
 
 class PubSub {
@@ -8,7 +6,9 @@ class PubSub {
     'unban': 'разбанил',
     'ban': 'забанил'
   };
-  constructor() {}
+  constructor(chat) {
+    this.chat = chat;
+  }
   connect(id) {
     const heartbeatInterval = 1000 * 60;
     const reconnectInterval = 1000 * 3;
@@ -31,7 +31,10 @@ class PubSub {
         if (message.type == 'MESSAGE') {
           const msg = JSON.parse(message.data.message).data;
           if (!this.moderation_actions[msg.moderation_action]) return;
-          chat.alert(`<b>${msg.created_by}</b> ${this.moderation_actions[msg.moderation_action]} <b>${msg.args[0]}</b> ${msg.args[1]?'по причине: ' + msg.args[1]:''}`, msg.moderation_action);
+          // this.dispatchEvent('message', () => {
+          //   message:`<b>${msg.created_by}</b> ${this.moderation_actions[msg.moderation_action]} <b>${msg.args[0]}</b> ${msg.args[1]?'по причине: ' + msg.args[1]:''}`,
+          //   action: msg.moderation_action
+          // });
         }
         if (message.type == 'RECONNECT') {
             console.log('[PUBSUB] INFO: Reconnecting...\n');
@@ -60,8 +63,8 @@ class PubSub {
         type: 'LISTEN',
         nonce: nonce(15),
         data: {
-            topics: [`chat_moderator_actions.${chat.user.id}.${id}`],
-            auth_token: chat.user.token
+            topics: [`chat_moderator_actions.${this.chat.user.id}.${id}`],
+            auth_token: this.chat.user.token
         }
     };
     console.log('[PUBSUB] SENT: ' + JSON.stringify(message) + '\n');

@@ -4,10 +4,12 @@ html(lang="ru")
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
     meta(http-equiv="Content-Security-Policy" content="default-src *; img-src * 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *")
+    meta(name="theme-color")
     if session.passport
-      title=session.passport.user.data[0].login + ' dashboard'
+      title=session.passport.user.login + ' dashboard'
     else
       title="neverm1nd_o apps"
+    link(rel="manifest" href="/manifest.webmanifest")
     link(rel="shortcut icon" href="/assets/tank2.png")
   body
     div.container-fluid.h-100.p-0
@@ -27,5 +29,6 @@ html(lang="ru")
                 button#btn-announcer.btn.btn-dark
                   i.bi.bi-chat-left-dots-fill
         div.d-flex.flex-fill.ml-0
-          div.d-flex.w-100.h-100.bg-dark
-            iframe.d-flex.flex-fill(src='/controls/chat')
+          div#chat.d-flex.w-100.h-100.bg-dark
+            //- omd-chat
+            //- iframe.d-flex.flex-fill(src='/controls/chat')

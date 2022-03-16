@@ -2,18 +2,18 @@ import { ChatAlert } from './chat.alert';
 import { MessageControlButton } from './chat.message-control';
 
 export class ChattersListController {
-  dom = {
-    box: document.querySelector('#chatters-list'),
-    list: document.querySelector('#list'),
-    counter: document.querySelector('#chatters-counter'),
-    altCounter: document.querySelector('#chatters-counter-alt'),
-    buttons: {
-      open: document.querySelector('#open-chatters-list'),
-      close: document.querySelector('#close')
-    }
-  };
   connected = [];
-  constructor() {
+  constructor(target) {
+    this.dom = {
+      box: target.querySelector('#chatters-list'),
+      list: target.querySelector('#list'),
+      counter: target.querySelector('#chatters-counter'),
+      altCounter: target.querySelector('#chatters-counter-alt'),
+      buttons: {
+        open: target.querySelector('#open-chatters-list'),
+        close: target.querySelector('#close')
+      }
+    };
     this.dom.buttons.close.addEventListener('click', () => {
       this.close();
     });
@@ -28,7 +28,7 @@ export class ChattersListController {
               body.innerText = this.connected[i];
         let btn = body.prepend(
           new MessageControlButton(['bi', 'bi-robot', 'red'], () => {
-            ChatAlert.addLurker(this.connected[i]);
+            // ChatAlert.addLurker(this.connected[i]);
             // innerHTML!
             card.innerHTML = '<em>(<b>' + this.connected[i] + '</b> добавлен в черный список)</em>';
             this.remove(this.connected[i]);

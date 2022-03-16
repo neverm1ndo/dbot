@@ -1,5 +1,4 @@
 import Http from '@shared/http';
-import { params, chat } from './chat';
 import Tooltip from 'bootstrap/js/dist/tooltip';
 import _ from 'underscore';
 
@@ -17,9 +16,9 @@ class BTTV {
     emotes: []
   }
   constructor() {};
-  getEmotes() {
+  getEmotes(channel, emotesContainer) {
     console.log('Getting BTTV emotes');
-    Http.get(`chat/emotes?channel=${params.has('channel')?params.get('channel'):chat.user.username}`)
+    Http.get(`chat/emotes?channel=${channel}`)
     .then((data) => {
       console.log('Got BTTV global emotes');
       this.bttvEmotes = this.bttvEmotes.emotes.concat(data.channel.emotes.map(function(n) {
@@ -33,8 +32,8 @@ class BTTV {
       this.bttvEmotes.subEmotesCodeList = _.chain(this.bttvEmotes.emotes).where({ global: true }).reject(function(n) { return _.isNull(n.channel); }).pluck('code').value();
     }).catch((err) => console.error)
     .then(() => {
-      this.addEmotes(this.bttvEmotes, params.has('channel')?params.get('channel'):chat.user.username);
-      this.addEmotes(this.globalEmotes, 'Global');
+      this.addEmotes(this.bttvEmotes, channel, emotesContainer);
+      this.addEmotes(this.globalEmotes, 'Global', emotesContainer);
     })
   }
   mergeEmotes(data, channel) {
@@ -58,10 +57,10 @@ class BTTV {
       };
     }));
   }
-  addEmotes(emotes, titleof) {
+  addEmotes(emotes, titleof, emotesContainer) {
     const container = document.createElement('div');
-    const subcont = document.createElement('div');
-    const title = document.createElement('b');
+    const subcont   = document.createElement('div');
+    const title     = document.createElement('b');
     title.innerText = 'BTTV ' + titleof;
     for (let i = 0; i < emotes.length; i++) {
       const img = document.createElement('img');
@@ -73,12 +72,12 @@ class BTTV {
       img.dataset.name = emotes[i].code;
       img.dataset.id = emotes[i].id;
       new Tooltip(img, {
-        boundary: chat.emotes.parentNode
+        boundary: emotesContainer.parentNode
       });
       subcont.append(img);
     }
     container.append(title, subcont);
-    chat.emotes.append(container, document.createElement('hr'));
+    emotesContainer.append(container, document.createElement('hr'));
   }
 }
 

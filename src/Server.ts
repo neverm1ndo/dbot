@@ -9,7 +9,6 @@ import express, { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 import passport from 'passport';
 import refresh from 'passport-oauth2-refresh';
-// import cors from 'cors';
 import OAuth2Strategy from 'passport-oauth2';
 
 import StatusCodes from 'http-status-codes';
@@ -26,13 +25,13 @@ import axios from 'axios';
 import { USER } from './schemas/user.schema';
 import { cm } from './routes/sockets';
 
-import { getHmac, getHmacMessage, verifyMessage } from '@shared/functions';
+import { getHmac, getHmacMessage, verifyMessage, validateAccessToken } from '@shared/functions';
 import { HMAC_PREFIX, TWITCH_MESSAGE_SIGNATURE, MESSAGE_TYPE, MESSAGE_TYPE_NOTIFICATION, MESSAGE_TYPE_REVOCATION, MESSAGE_TYPE_VERIFICATION } from '@shared/constants';
 
 // import { verifySignature, rawBody } from '@shared/functions';
 
 const app = express();
-const { BAD_REQUEST, OK } = StatusCodes;
+const { BAD_REQUEST } = StatusCodes;
 
 export const bot = new Bot();
 
@@ -45,7 +44,8 @@ export const bot = new Bot();
 app.use(session({
   secret: process.env.SESSION_SECRET!,
   resave: true,
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: { maxAge: 525600*60000 }
 }));
 app.set('view engine', 'pug');
 app.use(express.json());
@@ -75,12 +75,14 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(u: any, done) {
-    USER.findOne({ 'user.id': u.data[0].id }, function(err: any, user: any) {
-        done(null, { data: [u.data[0]],
-        accessToken: user.accessToken,
-        refreshToken: user.refreshToken,
-      });
+  USER.findOne({ 'user.id': u.id }, function(err: any, user: any) {
+    if (err) logger.err(err);
+    done(null, {
+      user: user.user,
+      accessToken: user.accessToken,
+      refreshToken: user.refreshToken,
     });
+  });
 });
 
 const strategy = new OAuth2Strategy({
@@ -101,7 +103,7 @@ const strategy = new OAuth2Strategy({
       refreshToken: refreshToken,
     }, { upsert: true, setDefaultsOnInsert: true }, (err: any) => {
       if (err) return logger.err(err);
-      done(null, profile);
+      done(null, profile.data[0]);
     });
   });
 passport.use('twitch',  strategy);
@@ -111,14 +113,11 @@ refresh.use('twitch', strategy);
 connect(process.env.MONGO!, { useNewUrlParser: true, useUnifiedTopology: true });
 
 // Show routes called in console during development
-if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'));
-}
+if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
+
 
 // Security
-if (process.env.NODE_ENV === 'production') {
-    app.use(helmet());
-}
+if (process.env.NODE_ENV === 'production') app.use(helmet());
 
 // Add APIs
 app.use('/controls', BaseRouter);
@@ -131,8 +130,8 @@ app.get('/auth/twitch', passport.authenticate('twitch', { scope: ['user_read', '
 // Set route for OAuth redirect
 app.get('/auth/twitch/callback', passport.authenticate('twitch',
 {
-  successRedirect: '/controls/chat',
-  failureRedirect: '/controls/chat'
+  successRedirect: '/',
+  failureRedirect: '/'
 }));
 
 // Set route for webhooks
@@ -210,9 +209,13 @@ export const staticDir = join(__dirname, 'public');
 app.use(express.static(staticDir));
 
 app.use('/.well-known/acme-challenge', express.static(join(__dirname, 'public/.well-known/acme-challenge')));
-app.get('*', (req: Request, res: Response) => {
-  res.set("Content-Security-Policy", "default-src *");
-  res.render('index', { user: req.user });
+app.get('*', validateAccessToken, (req: any, res: Response) => {
+  if (req.session.passport) {
+    res.render('dashboard', { session: req.session });
+    return;
+  }
+  res.set("Content-Security-Policy", "default-src *")
+     .render('index', { user: req.user });
 });
 // Export express instance
 export default app;

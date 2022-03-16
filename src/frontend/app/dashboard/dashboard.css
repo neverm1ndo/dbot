@@ -32,14 +32,12 @@ html body div::-webkit-scrollbar-thumb:active, html body div::-webkit-scrollbar-
 aside {
   width: 60px;
 }
+:host(omd-chat) {
+  width: 100%;
+}
 body .logo {
   width: 32px;
   height: 32px;
-}
-.alert {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
 }
 #avatar {
   border-radius: 100%;

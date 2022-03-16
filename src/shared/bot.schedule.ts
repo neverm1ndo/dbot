@@ -1,5 +1,5 @@
 import { USER } from '../schemas/user.schema';
-import { CHATTER } from '../schemas/chatters.schema';
+// import { CHATTER } from '../schemas/chatters.schema';
 
 interface UserSettings {
   automessages: string[];
@@ -48,13 +48,14 @@ export class Schedule {
   ];
   constructor(username: string) {
     USER.findOne({'user.login': username}, (err: any, user: any) => {
+      console.log('user');
       if (err || !user) return;
       this.schedules = user.settings;
     });
-    CHATTER.find({}, (err: any, chatters: any) => {
-      if (err || !chatters) return;
-      this.chatters = chatters;
-    });
+    // CHATTER.find({}, (err: any, chatters: any) => {
+    //   if (err || !chatters) return;
+    //   this.chatters = chatters;
+    // });
   }
 
   get sounds(): string[] {

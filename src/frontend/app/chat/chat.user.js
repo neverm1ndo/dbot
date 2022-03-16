@@ -6,4 +6,5 @@ export class User {
   token = Cookies.get('nmnd_user_access_token');
   id = Cookies.get('nmnd_user_id');
   client = Cookies.get('nmnd_app_client_id');
+  profile_image_url = Cookies.get('nmnd_user_avatar');
 };

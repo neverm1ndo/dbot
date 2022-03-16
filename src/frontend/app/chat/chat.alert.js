@@ -1,5 +1,4 @@
 import { MessageControlButton } from './chat.message-control';
-import { chat, chatterList } from './chat';
 
 export class ChatAlert extends HTMLDivElement {
   constructor(message, type = 'default', username = '', icon) {
@@ -50,10 +49,10 @@ export class ChatAlert extends HTMLDivElement {
     if (icon) this.msg.prepend(this.icon);
     this.append(this.msg);
     if (username) {
-      let btn = new MessageControlButton(['bi', 'bi-robot', 'white'], (e) => {
+      let btn = new MessageControlButton(['bi', 'bi-robot', 'white'], (event) => {
         const msg = document.createElement('span');
-        ChatAlert.addLurker(username);
-        chatterList.remove(username);
+        // ChatAlert.addLurker(username);
+        // chatterList.remove(username);
         btn.remove();
         this.msg.remove();
         msg.innerHTML = '<em>(<b>' + username + '</b> добавлен в черный список)</em>';
@@ -61,14 +60,10 @@ export class ChatAlert extends HTMLDivElement {
         setTimeout(() => {
           this.remove()
         }, 2000);
-        e.preventDefault();
-        e.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
       })
       this.prepend(btn);
     }
-  }
-  static addLurker(username) {
-    chat.settings.lurkers.push(username);
-    window.localStorage.setItem('lurkers', JSON.stringify([...new Set(chat.settings.lurkers)]));
   }
 }

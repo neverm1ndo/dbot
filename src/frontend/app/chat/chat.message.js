@@ -1,4 +1,3 @@
-import { bttv, params, chat, client } from './chat';
 import { timestamp, haveLinks, linkify } from './utils';
 import { YTFrame } from './chat.ytframe';
 import { ChatAlert } from './chat.alert';
@@ -7,16 +6,17 @@ import { MessageControlButton } from './chat.message-control';
 import TTVClip from './ttv.clips.embed';
 import HEX from '@shared/hex';
 import Http from '@shared/http';
+import Cookies from '@shared/cookies';
 
 
 export class ChatMessage extends HTMLDivElement {
-  constructor(tags, message, self, date) {
+  constructor(channel, displayName, tags, message, self, date, chat) {
     super();
     let separator = ': ';
     const color = tags.color?new HEX(tags.color):new HEX('FFFFFF');
-    this.body = document.createElement('div'); // Запихнуть бы все эти переменные в один обжект
+    this.body     = document.createElement('div'); // Запихнуть бы все эти переменные в один обжект
     this.nickname = document.createElement('span');
-    this.message = document.createElement('span');
+    this.message  = document.createElement('span');
     this.message.classList.add('card-body-msg');
     this.tags = tags;
     this.nickname.classList.add('nickname');
@@ -30,18 +30,15 @@ export class ChatMessage extends HTMLDivElement {
     this.body.classList.add('card-body');
     this.body.dataset.date = timestamp(date);
     if (separator) this.body.innerHTML = separator;
-    this.message.innerHTML = this.pretty(tags, message); // innerHTML!
+    this.message.innerHTML = this.pretty(channel, displayName, tags, message, chat.bttv); // innerHTML!
     this.addTooltipsToEmotes();
-    /**
-    * Ниже еще больше ультранасилия
-    */
     this.body.prepend(this.nickname);
     if (tags.badges) {
       const container = document.createElement('span');
       const badges = Object.entries(tags.badges);
       if (tags.username === 'diktorbot') badges.push(['diktorbot', '1']);
-      for (let i = 0; i < badges.length; i+=1) {
-        container.append(new ChatMessageBadge(badges[i]));
+      for (let i = 0; i < badges.length; i++) {
+        container.append(new ChatMessageBadge(badges[i], chat.settings));
       }
       this.body.prepend(container);
     }
@@ -98,21 +95,14 @@ export class ChatMessage extends HTMLDivElement {
         return;
       }
     }
-    /**
-    * Хорошая ли идея навешать лиснер на каждый ник? Скорее нет, чем да.
-    */
-    this.nickname.addEventListener('click', () => {
-      chat.text.value = chat.text.value + ' @' + tags.username + ' ';
-      chat.text.focus();
-    });
   }
 
   /**
   * Слишком много циклов, лучше парсить рекурсивно
   */
-  pretty(tags, message) {
-    let notice = message.includes('@')?'@' + chat.user.display_name: chat.user.display_name;
-    let splited = message.split(' ');
+  pretty(channel, displayName, tags, message, bttv) {
+    let notice = message.includes('@')?'@' + displayName: displayName;
+    let splited = message.split(/\s/);
     let result = [];
     let position = 0;
     let emotes = [];
@@ -130,31 +120,30 @@ export class ChatMessage extends HTMLDivElement {
         result.push(linkify(splited[i]));
         continue;
       }
-      if (splited[i].toLowerCase() === chat.user.display_name.toLowerCase() || splited[i].toLowerCase() ==='@' + chat.user.username.toLowerCase()) {
+      if (splited[i].toLowerCase() === displayName.toLowerCase() || splited[i].toLowerCase() ==='@' + channel.toLowerCase()) {
         result.push(`<span class="notice">${notice}</span>`);
         this.classList.add('card-notice')
         continue;
       }
       for (let k = 0; k < bttv.globalEmotes.length; k++) {
-        if (bttv.globalEmotes[k].code === splited[i]) {
-          emoted = true;
-          result.push('<img data-bs-toggle="tooltip" alt="'+ splited[i] +'" title="'+ splited[i] +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.globalEmotes[k].id +'/1x">')
-        }
+        if (bttv.globalEmotes[k].code !== splited[i]) continue;
+        emoted = true;
+        result.push('<img data-bs-toggle="tooltip" alt="'+ splited[i] +'" title="'+ splited[i] +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.globalEmotes[k].id +'/1x">')
+        break;
       }
       if (emoted) continue;
       for (let k = 0; k < bttv.bttvEmotes.length; k++) {
-        if (bttv.bttvEmotes[k].code === splited[i]) {
-          emoted = true;
-          result.push('<img data-bs-toggle="tooltip" alt="'+ splited[i] +'" title="'+ splited[i] +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.bttvEmotes[k].id +'/1x">')
-        }
+        if (bttv.bttvEmotes[k].code !== splited[i]) continue;
+        emoted = true;
+        result.push('<img data-bs-toggle="tooltip" alt="'+ splited[i] +'" title="'+ splited[i] +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.bttvEmotes[k].id +'/1x">')
+        break;
       }
       if (emoted) continue;
       for (let j = 0; j < emotes.length; j++ ) {
-        if (position === emotes[j][1] + emotes[j][2] + 1) {
-          emoted = true;
-            result.push('<img data-bs-toggle="tooltip" alt="'+ splited[i] +'" title="'+ splited[i] +'" class="emoticon" src="https://static-cdn.jtvnw.net/emoticons/v2/' + emotes[j][0] + '/default/dark/3.0">');
-            break;
-        }
+        if (position !== emotes[j][1] + emotes[j][2] + 1) continue;
+        emoted = true;
+        result.push('<img data-bs-toggle="tooltip" alt="'+ splited[i] +'" title="'+ splited[i] +'" class="emoticon" src="https://static-cdn.jtvnw.net/emoticons/v2/' + emotes[j][0] + '/default/dark/3.0">');
+        break;
       }
       if (emoted) continue;
       result.push(splited[i]);
