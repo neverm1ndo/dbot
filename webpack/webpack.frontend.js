@@ -42,7 +42,7 @@ module.exports = {
       template: './index.pug',
       filename: '../views/index.pug',
       minify: false,
-      chunks: ['index', 'bg']
+      chunks: ['index']
     }),
     new HtmlWebpackPlugin({
       template: './dashboard/dashboard.pug',

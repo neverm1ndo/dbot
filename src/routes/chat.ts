@@ -21,8 +21,8 @@ const router = Router();
 
 router.get('/', corsOpt, validateAccessToken, (req: IGetUserAuthInfoRequest, res: Response,) => {
   console.log(req.user);
-  // res.set('Content-Security-Policy', 'default-src *')
-     res.render('chat', req.user);
+  res.set("Content-Security-Policy", "default-src *; img-src * data: 'self'")
+     .render('chat', req.user);
 });
 router.get('/lurkers', corsOpt, (req: Request, res: Response,) => {
   res.send(bot.opts.blacklist);
