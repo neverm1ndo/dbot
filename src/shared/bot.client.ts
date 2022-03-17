@@ -130,8 +130,9 @@ export class Bot {
       }
     });
     // CUSTOM COMMANDS
-    this.opts.schedules.commands.forEach((customCommand) => {
+    this.opts.customCommands.forEach((customCommand) => {
       if (command === customCommand.name) {
+        console.log(customCommand);
         this.client.say(channel, customCommand.response);
         return;
       }
