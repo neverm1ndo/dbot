@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import logger from '@shared/Logger';
 import { bot } from '@server';
 import { corsOpt } from '@shared/constants';
-import { validateAccessToken } from '@shared/functions';
+import { validateAccessToken, checkSession } from '@shared/functions';
 import { MESSAGE } from '../schemas/message.schema';
 // import { USER } from '../schemas/user.schema';
 import StatusCodes from 'http-status-codes';
@@ -19,9 +19,8 @@ export interface IGetUserAuthInfoRequest extends Request {
 
 const router = Router();
 
-router.get('/', corsOpt, validateAccessToken, (req: IGetUserAuthInfoRequest, res: Response,) => {
-  console.log(req.user);
-  res.set("Content-Security-Policy", "default-src *; img-src * data: 'self'")
+router.get('/', corsOpt, checkSession, validateAccessToken, (req: IGetUserAuthInfoRequest, res: Response,) => {
+  res.set("Content-Security-Policy", "default-src *; img-src * data: 'self'; script-src-elem *; connect-src *")
      .render('chat', req.user);
 });
 router.get('/lurkers', corsOpt, (req: Request, res: Response,) => {
