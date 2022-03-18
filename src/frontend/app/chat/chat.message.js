@@ -98,10 +98,10 @@ export class ChatMessage extends HTMLDivElement {
   }
 
   /**
-  * Слишком много циклов, лучше парсить рекурсивно
+  * Слишком много циклов
   */
   pretty(channel, displayName, tags, message, bttv) {
-    let notice = message.includes('@')?'@' + displayName: displayName;
+    let notice = message.includes('@')?'@' + channel: channel;
     let splited = message.split(/\s/);
     let result = [];
     let position = 0;
@@ -115,38 +115,40 @@ export class ChatMessage extends HTMLDivElement {
     }
     for (let i = 0; i < splited.length; i++) { // FIXME
       let emoted = false;
-      position+= splited[i].length + 1;
-      if (haveLinks(splited[i])) {
-        result.push(linkify(splited[i]));
+      let word = splited[i];
+      position+= word.length + 1;
+      if (haveLinks(word)) {
+        result.push(linkify(word));
         continue;
       }
-      if (splited[i].toLowerCase() === displayName.toLowerCase() || splited[i].toLowerCase() ==='@' + channel.toLowerCase()) {
+      if (word.toLowerCase() === channel.toLowerCase() || word.toLowerCase() ==='@' + channel.toLowerCase()) {
         result.push(`<span class="notice">${notice}</span>`);
         this.classList.add('card-notice')
         continue;
       }
       for (let k = 0; k < bttv.globalEmotes.length; k++) {
-        if (bttv.globalEmotes[k].code !== splited[i]) continue;
+        if (bttv.globalEmotes[k].code !== word) continue;
         emoted = true;
-        result.push('<img data-bs-toggle="tooltip" alt="'+ splited[i] +'" title="'+ splited[i] +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.globalEmotes[k].id +'/1x">')
+        result.push('<img data-bs-toggle="tooltip" alt="'+ word +'" title="'+ word +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.globalEmotes[k].id +'/1x">')
         break;
       }
       if (emoted) continue;
       for (let k = 0; k < bttv.bttvEmotes.length; k++) {
-        if (bttv.bttvEmotes[k].code !== splited[i]) continue;
+        if (bttv.bttvEmotes[k].code !== word) continue;
         emoted = true;
-        result.push('<img data-bs-toggle="tooltip" alt="'+ splited[i] +'" title="'+ splited[i] +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.bttvEmotes[k].id +'/1x">')
+        result.push('<img data-bs-toggle="tooltip" alt="'+ word +'" title="'+ word +'" class="emoticon" src="https://cdn.betterttv.net/emote/'+ bttv.bttvEmotes[k].id +'/1x">')
         break;
       }
       if (emoted) continue;
       for (let j = 0; j < emotes.length; j++ ) {
-        if (position !== emotes[j][1] + emotes[j][2] + 1) continue;
+        const emote = emotes[j];
+        if (position !== emote[1] + emote[2] + 1) continue;
         emoted = true;
-        result.push('<img data-bs-toggle="tooltip" alt="'+ splited[i] +'" title="'+ splited[i] +'" class="emoticon" src="https://static-cdn.jtvnw.net/emoticons/v2/' + emotes[j][0] + '/default/dark/3.0">');
+        result.push('<img data-bs-toggle="tooltip" alt="'+ word +'" title="'+ word +'" class="emoticon" src="https://static-cdn.jtvnw.net/emoticons/v2/' + emote[0] + '/default/dark/3.0">');
         break;
       }
       if (emoted) continue;
-      result.push(splited[i]);
+      result.push(word);
     }
     return result.join(' ');
   }
