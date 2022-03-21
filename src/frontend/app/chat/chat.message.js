@@ -101,7 +101,7 @@ export class ChatMessage extends HTMLDivElement {
   * Слишком много циклов
   */
   pretty(channel, displayName, tags, message, bttv) {
-    let notice = message.includes('@')?'@' + this.user.display_name: this.user.display_name;
+    let notice = message.includes('@')?'@' + chat.user.display_name: chat.user.display_name;
     let splited = message.split(/\s/);
     let result = [];
     let position = 0;
