@@ -121,7 +121,7 @@ export class ChatMessage extends HTMLDivElement {
         result.push(linkify(word));
         continue;
       }
-      if (word.toLowerCase() === channel.toLowerCase() || word.toLowerCase() ==='@' + channel.toLowerCase()) {
+      if (word.toLowerCase() === displayName.toLowerCase() || word.toLowerCase() ==='@' + displayName.toLowerCase()) {
         result.push(`<span class="notice">${notice}</span>`);
         this.classList.add('card-notice')
         continue;
