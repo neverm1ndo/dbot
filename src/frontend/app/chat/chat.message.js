@@ -30,7 +30,7 @@ export class ChatMessage extends HTMLDivElement {
     this.body.classList.add('card-body');
     this.body.dataset.date = timestamp(date);
     if (separator) this.body.innerHTML = separator;
-    this.message.innerHTML = this.pretty(channel, displayName, tags, message, chat.bttv); // innerHTML!
+    this.message.innerHTML = this.pretty(channel, chat.user.display_name, tags, message, chat.bttv); // innerHTML!
     this.addTooltipsToEmotes();
     this.body.prepend(this.nickname);
     if (tags.badges) {
@@ -101,7 +101,7 @@ export class ChatMessage extends HTMLDivElement {
   * Слишком много циклов
   */
   pretty(channel, displayName, tags, message, bttv) {
-    let notice = message.includes('@')?'@' + chat.user.display_name: chat.user.display_name;
+    let notice = message.includes('@')?'@' + displayName: displayName;
     let splited = message.split(/\s/);
     let result = [];
     let position = 0;
