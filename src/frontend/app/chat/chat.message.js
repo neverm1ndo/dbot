@@ -62,10 +62,10 @@ export class ChatMessage extends HTMLDivElement {
     if (!self && (tags.username !== chat.user.username)) {
       const controls = document.createElement('span');
       controls.prepend(new MessageControlButton(['bi', 'bi-slash-circle', 'red'], () => {
-        client.ban(params.has('channel')?params.get('channel'):chat.user.username, tags.username);
+        this.client.ban(this.channel, tags.username);
       }));
       controls.prepend(new MessageControlButton(['bi', 'bi-clock', 'yellow'], () => {
-        client.timeout(params.has('channel')?params.get('channel'):chat.user.username, tags.username, 600, 'rediska');
+        this.client.timeout(this.channel, tags.username, 600, 'rediska');
       }));
       this.body.prepend(controls);
     }
@@ -101,7 +101,7 @@ export class ChatMessage extends HTMLDivElement {
   * Слишком много циклов
   */
   pretty(channel, displayName, tags, message, bttv) {
-    let notice = message.includes('@')?'@' + channel: channel;
+    let notice = message.includes('@')?'@' + this.user.display_name: this.user.display_name;
     let splited = message.split(/\s/);
     let result = [];
     let position = 0;
