@@ -31,10 +31,12 @@ class PubSub {
         if (message.type == 'MESSAGE') {
           const msg = JSON.parse(message.data.message).data;
           if (!this.moderation_actions[msg.moderation_action]) return;
+
           // this.dispatchEvent('message', () => {
           //   message:`<b>${msg.created_by}</b> ${this.moderation_actions[msg.moderation_action]} <b>${msg.args[0]}</b> ${msg.args[1]?'по причине: ' + msg.args[1]:''}`,
           //   action: msg.moderation_action
           // });
+          this.alert(`<b>${msg.created_by}</b> ${this.moderation_actions[msg.moderation_action]} <b>${msg.args[0]}</b> ${msg.args[1]?'по причине: ' + msg.args[1]:''}`, 'warning', username);
         }
         if (message.type == 'RECONNECT') {
             console.log('[PUBSUB] INFO: Reconnecting...\n');

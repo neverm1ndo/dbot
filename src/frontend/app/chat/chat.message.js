@@ -62,10 +62,10 @@ export class ChatMessage extends HTMLDivElement {
     if (!self && (tags.username !== chat.user.username)) {
       const controls = document.createElement('span');
       controls.prepend(new MessageControlButton(['bi', 'bi-slash-circle', 'red'], () => {
-        this.client.ban(this.channel, tags.username);
+        chat.client.ban(channel, tags.username);
       }));
       controls.prepend(new MessageControlButton(['bi', 'bi-clock', 'yellow'], () => {
-        this.client.timeout(this.channel, tags.username, 600, 'rediska');
+        chat.client.timeout(channel, tags.username, 600, 'rediska');
       }));
       this.body.prepend(controls);
     }
