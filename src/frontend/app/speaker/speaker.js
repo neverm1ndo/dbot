@@ -72,6 +72,7 @@ class Player {
     this.source = null;
     this.source = this.ctx.createBufferSource();
     sound.gain = sound.gain ?? this.gainNode.gain.value*100;
+    if (sound.gain === 0) sound.gain = this.gainNode.gain.value*100;
     this.gainNode.gain.value = sound.gain/100;
     new Promise((resolve, reject) => {
       var request = new XMLHttpRequest();
