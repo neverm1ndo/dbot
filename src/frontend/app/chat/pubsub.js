@@ -36,7 +36,7 @@ class PubSub {
           //   message:`<b>${msg.created_by}</b> ${this.moderation_actions[msg.moderation_action]} <b>${msg.args[0]}</b> ${msg.args[1]?'по причине: ' + msg.args[1]:''}`,
           //   action: msg.moderation_action
           // });
-          this.alert(`<b>${msg.created_by}</b> ${this.moderation_actions[msg.moderation_action]} <b>${msg.args[0]}</b> ${msg.args[1]?'по причине: ' + msg.args[1]:''}`, 'warning', '');
+          this.chat.alert(`<b>${msg.created_by}</b> ${this.moderation_actions[msg.moderation_action]} <b>${msg.args[0]}</b> ${msg.args[1]?'по причине: ' + msg.args[1]:''}`, 'warning', '');
         }
         if (message.type == 'RECONNECT') {
             console.log('[PUBSUB] INFO: Reconnecting...\n');
