@@ -9,10 +9,10 @@ export interface ServerGameMode {
     max: number;
   },
   private: boolean;
-  rules?: ServerRule[];
+  rules?: ServerRules;
   playersList?: ServerPlayer[];
 }
-interface ServerRule {
+interface ServerRules {
   [rule: string]: string
 }
 interface ServerPlayer {
@@ -95,7 +95,7 @@ class Samp {
                 resolve(gameModeInfo);
               } else if (opcode === 'r') {
                   offset += 2;
-                  const rules: ServerRule[] = [
+                  const rules: ServerRules = [
                       ...new Array(message.readUInt16LE(offset - 2))
                           .fill({})
                   ].map(() => {
@@ -110,7 +110,9 @@ class Samp {
                       })();
 
                       return { [property]: propertyvalue }
-                  })
+                  }).reduce((acc: ServerRules, curr: ServerRules) => {
+                    return Object.assign(acc, curr);
+                  }, {});                  
                   resolve(rules);
               } else if (opcode === 'd') {
                   offset += 2;
