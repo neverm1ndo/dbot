@@ -405,7 +405,7 @@ export class ChatComponent extends HTMLElement {
         }
         case 'stream.offline': {
           this.setLive(false);
-          this.alert(`Стрим окончен. Время трансляции ${secondsToTimestamp(Date.now() - new Date(this.stream.started_at)*1000)}`, 'success', '', ['bi', 'bi-twitch']);
+          this.alert(`Стрим окончен. Время трансляции ${secondsToTimestamp(Date.now() - new Date(this.stream.started_at).getTime()/1000)}`, 'success', '', ['bi', 'bi-twitch']);
           break;
         }
         default: break;
