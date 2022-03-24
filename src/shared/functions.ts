@@ -37,8 +37,8 @@ export const verifySignature = (messageSignature: any, messageID: any, messageTi
 }
 
 export const validateAccessToken = (req: any, res: any, next: any) => {
-  if (!req.user) next();
-  if (!req.user.accessToken) next();
+  if (!req.user) return next();
+  if (!req.user.accessToken) return next();
   Twitch.validateToken(req.user.accessToken)
   .then((validated) => {
     logger.info(req.user.user.login + ' have valid access token ( expires_in: ' + validated.data.expires_in + ' )');
