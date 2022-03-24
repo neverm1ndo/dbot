@@ -1,6 +1,6 @@
+import logger from '@shared/Logger';
 import { Client, ChatUserstate } from 'tmi.js';
 import { RNG } from '@shared/rng'
-import logger from '@shared/Logger';
 import { Announcer } from '@shared/bot.announcer';
 import { Chatter } from '@interfaces/chatter';
 import { Media } from '@shared/media';
@@ -9,10 +9,13 @@ import { Dota2 } from '@shared/dota2';
 import { D2PT } from '@shared/d2pt';
 import { Twitch } from '@shared/twitch';
 import { Nuzhdiki } from '@shared/nuzhdiki';
-// import { Aneki } from '@shared/aneki';
 import { MESSAGE } from '../schemas/message.schema';
 import StartOptions from '../pre-start';
-type BotStatus = 'works' | 'sleeps';
+
+enum BotStatus {
+  SLEEPS,
+  WORKS,
+}
 
 export class Bot {
   opts: Schedule;
@@ -26,61 +29,69 @@ export class Bot {
       },
       channels: [process.env.BOT_CHANNEL!]
     });
-  announcer: Announcer | undefined;
+  announcer: Announcer | null;
 
-  public status: BotStatus = 'sleeps';
+  public status: BotStatus = BotStatus.SLEEPS; // sleeps by default
   private readonly prefix: string = '!';
 
   constructor() {
     this.opts = new Schedule(process.env.BOT_CHANNEL!);
     this.announcer = new Announcer(900000);
     if (process.env.NODE_ENV !== 'development') {
-      Twitch.getAppAccessToken().then((body: any) => {
-        Twitch.getSubs(body.data.access_token).then((subsBody: any) => {
-            if (StartOptions.dsub) {
-              subsBody.data.data.forEach(async (sub: any) => {
-                await Twitch.deleteSub(sub.id, body.data.access_token).then((bodyd) => {console.log(bodyd.data)});
-              });
-            }
-            if (subsBody.data.total >= 3 && !StartOptions.dsub) { // FIXME: fix algorithm for checking existing subscribers
-              logger.info('All subs already existing')
-              console.info(JSON.stringify(subsBody.data));
-            } else {
-              Promise.all(
-                ['stream.online', 'stream.offline', 'channel.follow']
-                .map((type) => Twitch.streamChanges(type, Number(process.env.TWITCH_USER_ID), body.data.access_token))
-              )
-              .then(() => { logger.info('Subbed to all events')})
-              .catch((err) => { logger.err(err, true) });
-            }
-          })
-        }).catch((err) => logger.err(err, true));
+      this.checkEventSubscriptions();
     }
     if (StartOptions.works) {
       this.wakeup();
     }
   }
 
+  private checkEventSubscriptions(): void {
+    const eventsubs = ['stream.online', 'stream.offline', 'channel.follow'];
+    Twitch.getAppAccessToken().then((body: any) => {
+      Twitch.getSubs(body.data.access_token).then((subsBody: any) => {
+        if (StartOptions.dsub) {
+          subsBody.data.data.forEach(async (sub: any) => {
+            await Twitch.deleteSub(sub.id, body.data.access_token).then((bodyd) => {console.log(bodyd.data)});
+          });
+        }
+        if (subsBody.data.total >= eventsubs.length && !StartOptions.dsub) { // FIXME: fix algorithm for checking existing subscribers
+          logger.info('All subs already existing');
+        } else {
+          Promise.all(eventsubs.map((type) => Twitch.streamChanges(type, Number(process.env.TWITCH_USER_ID), body.data.access_token)))
+                 .then(() => { logger.info('Subbed to all events')})
+                 .catch((err) => { logger.err(err, true) });
+        }
+      })
+    }).catch((err) => logger.err(err, true));
+  }
+
+  /**
+  * Not Implemented
+  **/
+  private spawnSchedules(): void {
+    // TODO: make multiple schedules for every user
+  }
+
+  // TODO: make users own statuses, now its global
   public shutdown(): void {
-    if (this.status === 'sleeps') return;
-    this.status = 'sleeps';
-    if (this.announcer) {
-      this.announcer.start.unsubscribe();
-      delete this.announcer;
-    }
+    if (this.status === BotStatus.SLEEPS) return;
+    this.status = BotStatus.SLEEPS;
+    // if (!this.announcer) return;
+    // this.announcer.start.unsubscribe();
+    // this.announcer = null;
   }
 
   public wakeup(): void {
-    if (this.status === 'works') return;
-    this.status = 'works';
-    if (!this.announcer) {
-      this.announcer = new Announcer(900000);
-    }
+    if (this.status === BotStatus.WORKS) return;
+    this.status = BotStatus.WORKS;
+    if (this.announcer) return;
+    this.announcer = new Announcer(900000);
   }
 
   public init(): void {
     logger.info('Bot status: ' + this.status);
     this.client.connect();
+    // TODO: join for every connected user
     this.client.on('message', (channel: string, tags: ChatUserstate, message: string, self: boolean) => {
       this.banSpam(channel, tags, message, self);
       let msg = new MESSAGE({channel, tags, message, self, date: Date.now()});
@@ -120,7 +131,7 @@ export class Bot {
       };
     }
   }
-  readChattersMessage(channel: any, tags: ChatUserstate, command?: string, args?: string[]): void {
+  private readChattersMessage(channel: any, tags: ChatUserstate, command?: string, args?: string[]): void {
     if (!tags.username || !command) return;
     // SOUNDS
     this.opts.schedules.sounds.forEach((sound: { command: string, path: string, gain?: number }) => {
@@ -139,6 +150,7 @@ export class Bot {
     });
     // BUILT-IN COMMANDS
     switch (command) {
+      //TODO: make this command optional
       case 'ранг': {
         Promise.all([
           Dota2.getRatings(120494497),
@@ -173,12 +185,7 @@ export class Bot {
         });
         break;
       }
-      // case 'анек': {
-      //   Aneki.getOne().then((anek: string) => {
-      //     this.client.say(channel, anek);
-      //   });
-      //   break;
-      // }
+      //TODO: make this command optional
       case 'd2pt': {
         if (args) {
             const arg = args.join(' ');

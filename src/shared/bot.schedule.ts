@@ -1,5 +1,4 @@
 import { USER } from '../schemas/user.schema';
-// import { CHATTER } from '../schemas/chatters.schema';
 
 interface UserSettings {
   automessages: string[];
@@ -52,10 +51,6 @@ export class Schedule {
       if (err || !user) return;
       this.schedules = user.settings;
     });
-    // CHATTER.find({}, (err: any, chatters: any) => {
-    //   if (err || !chatters) return;
-    //   this.chatters = chatters;
-    // });
   }
 
   get sounds(): string[] {

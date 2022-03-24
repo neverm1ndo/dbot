@@ -141,7 +141,6 @@ app.use('/webhooks/callback/streams', express.raw({
 app.post('/webhooks/callback/streams', (req: any, res: Response) => {
     const secret = process.env.TWITCH_EVENTSUB_SECRET!;
     const message = getHmacMessage(req);
-    console.log(message);
     const hmac = HMAC_PREFIX + getHmac(secret, message);
     console.log(secret, hmac)
     console.log(req.headers[TWITCH_MESSAGE_SIGNATURE]);
@@ -185,6 +184,7 @@ app.post('/webhooks/callback/streams', (req: any, res: Response) => {
       res.sendStatus(403);
     }
 });
+
 // Print API errors
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -194,7 +194,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     });
 });
 
-
+// Init tmi.js client
 bot.init();
 
 
@@ -221,5 +221,6 @@ app.get('/', validateAccessToken, (req: any, res: Response) => {
 app.get('*', (req: Request, res: Response) => {
   res.sendStatus(404);
 });
+
 // Export express instance
 export default app;

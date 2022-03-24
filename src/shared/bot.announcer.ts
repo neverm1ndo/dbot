@@ -9,7 +9,7 @@ export class Announcer {
     this.delay = delay;
     this.start = timer(delay, delay)
     .pipe(
-      takeWhile(() => bot.status === 'works')
+      takeWhile(() => bot.status === 1) // take while works
     ).pipe(
       map(e => bot.opts.schedules.automessages[e % bot.opts.schedules.automessages.length])
     ).subscribe((announce: string) => {

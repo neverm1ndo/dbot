@@ -9,7 +9,7 @@ export class Client {
   }
 }
 
-
+// TODO: implement with socket.io
 export class ClientManager {
   public pool: Client[] = [];
   private getClientFromPool(ws: WebSocket): Client | undefined {
