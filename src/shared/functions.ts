@@ -37,7 +37,6 @@ export const verifySignature = (messageSignature: any, messageID: any, messageTi
 }
 
 export const validateAccessToken = (req: any, res: any, next: any) => {
-  console.log(req.user);
   if (!req.user) next();
   Twitch.validateToken(req.user.accessToken)
   .then((validated) => {
@@ -54,7 +53,7 @@ export const validateAccessToken = (req: any, res: any, next: any) => {
           logger.info(req.user.user.login + ' updated access token');
         });
       });
-    })
+    });
   }).then((accessToken) => {
     res.cookie('nmnd_app_client_id', process.env.TWITCH_CLIENT_ID)
        .cookie('nmnd_user_access_token', accessToken)
@@ -65,7 +64,7 @@ export const validateAccessToken = (req: any, res: any, next: any) => {
     next();
   }).catch((err) => {
     logger.err(err, true); res.sendStatus(INTERNAL_SERVER_ERROR).json(err);
-  })
+  });
 }
 
 export const rawBody = (req: any, res: any, next: any) => {
