@@ -31,7 +31,7 @@ class TTVClip {
 
   static getSlug(link) {
     if (!link) return;
-    const regex = new RegExp(/(?<=clip\/)(.*)/);
+    const regex = new RegExp(/(?<=(clip|clips\.twitch\.tv)\/)(.*)/);
     if (!regex.test(link)) return;
     return link.match(regex)[0];
   }

@@ -66,14 +66,14 @@ class BTTV {
       const img = document.createElement('img');
       img.title = emotes[i].code;
       img.classList.add('emote');
-      img.setAttribute('data-bs-toggle', 'tooltip');
-      img.setAttribute('data-bs-placement', 'top');
+      // img.setAttribute('data-bs-toggle', 'tooltip');
+      // img.setAttribute('data-bs-placement', 'top');
       img.src = `https://cdn.betterttv.net/emote/${emotes[i].id}/1x`;
       img.dataset.name = emotes[i].code;
       img.dataset.id = emotes[i].id;
-      new Tooltip(img, {
-        boundary: emotesContainer.parentNode
-      });
+      // new Tooltip(img, {
+      //   boundary: emotesContainer.parentNode
+      // });
       subcont.append(img);
     }
     container.append(title, subcont);
