@@ -42,6 +42,7 @@ export class ChatComponent extends HTMLElement {
     this.text.disabled = true;
     this.submit        = this.querySelector('#send');
     this.emotes        = this.querySelector("#emotes-list");
+    this.emotesBtn     = this.querySelector('#emotes');
     this.quickpanel    = this.querySelector("#broadcaster-quickpanel")
     this.marker        = this.querySelector(".marker");
     this.marker.disabled = true;
@@ -62,13 +63,13 @@ export class ChatComponent extends HTMLElement {
        channels: [this.channel]
     });
     this.bttv = new BTTV();
-    this.bttv.getEmotes(this.channel, this.emotes);
+    this.bttv.getEmotes(this.channel, this.quickpanel);
     this.marker.addEventListener('click', () => {
       if (this.connected) {
         Marker.create(this.user).then((res) => {
           this.alert(`Установлен маркер на позиции ${secondsToTimestamp(res.data[0].position_seconds)} ${res.data[0].description?'с описанием ' + res.data[0].description:''}`, 'twitch', '', ['bi', 'bi-vr']);
         }).catch((err) => {
-          this.alert(`Не удалось создать маркер`, 'warning', '', ['bi', 'bi-exclamation-diamond-fill'])
+          this.alert(`Не удалось создать маркер`, 'warning', '', ['bi', 'bi-exclamation-diamond-fill']);
         })
       }
     });
@@ -86,7 +87,10 @@ export class ChatComponent extends HTMLElement {
     const quickpanel = new Collapse(this.quickpanel, {
       toggle: false
     });
-    [this.emotes, this.quickpanel].map(panel => panel.addEventListener('click', (event) => {
+    this.emotesBtn.addEventListener('click', () => {
+      quickpanel.toggle();
+    });
+    [this.quickpanel].map(panel => panel.addEventListener('click', (event) => {
       if (event.target.tagName !== 'IMG') return;
       if (typeof this.selfEmotes[event.target.dataset.id] !== 'object') {
         this.selfEmotes[event.target.dataset.id] = [];
@@ -94,12 +98,12 @@ export class ChatComponent extends HTMLElement {
       this.selfEmotes[event.target.dataset.id].push(`${this.text.value.length}-${this.text.value.length + event.target.dataset.name.length}`);
       this.text.value = this.text.value + ' ' + event.target.dataset.name + ' ';
     }));
-    this.text.addEventListener('focus', () => {
-      quickpanel.show();
-    })
-    this.quickpanel.addEventListener('mouseleave', () => {
-      quickpanel.hide();
-    })
+    // this.text.addEventListener('focus', () => {
+    //   quickpanel.show();
+    // })
+    // this.quickpanel.addEventListener('mouseleave', () => {
+    //   quickpanel.hide();
+    // })
     this.setWsConnection();
     this.getLurkersFromStorage();
     this.connectTmiClient();
@@ -202,8 +206,9 @@ export class ChatComponent extends HTMLElement {
       this.alert(`<b>${username}</b> поддержал канал на <b>${userstate.bits}</b> Cheers`, 'info');
     });
     this.client.on('emotesets', (sets, obj) => {
-      trigger++;
-      if (trigger != 1) this.getEmoteSet(sets.split(','));
+      // trigger++;
+      // if (trigger != 1)
+      this.getEmoteSet(sets.split(','));
     });
   }
   getLurkersFromStorage() {
@@ -259,26 +264,26 @@ export class ChatComponent extends HTMLElement {
           const img = document.createElement('img');
           img.title = owners[ownersInfo.data[i].id][j].name;
           img.classList.add('emote');
-          img.setAttribute('data-bs-toggle', 'tooltip');
-          img.setAttribute('data-bs-placement', 'top');
+          // img.setAttribute('data-bs-toggle', 'tooltip');
+          // img.setAttribute('data-bs-placement', 'top');
           img.src = `https://static-cdn.jtvnw.net/emoticons/v2/${owners[ownersInfo.data[i].id][j].id}/default/light/3.0`;
           img.dataset.name = owners[ownersInfo.data[i].id][j].name;
           img.dataset.id = owners[ownersInfo.data[i].id][j].id;
-          new Tooltip(img, {
-            boundary: this.emotes.parentNode
-          });
+          // new Tooltip(img, {
+          //   boundary: this.quickpanel
+          // });
           container.append(title, avatar?avatar:'', subcont);
           subcont.append(img);
         }
-        if (ownersInfo.data[i].display_name.toLowerCase() == this.user.display_name) {
-          if (this.quickpanel.children.length < 1) {
+        // if (ownersInfo.data[i].display_name.toLowerCase() == this.user.display_name) {
+        //   if (this.quickpanel.children.length < 1) {
             // setTimeout(() => { // Quickpanel task
-              queueMicrotask(this.quickpanel.append(container));
+            //   queueMicrotask(this.quickpanel.append(container));
             // }, 0);
-          }
-        } else {
-          this.emotes.append(container, document.createElement('hr'));
-        }
+        //   }
+        // } else {
+          this.quickpanel.append(container, document.createElement('hr'));
+        // }
       }
     }).catch((err) => console.log(err))
   }
