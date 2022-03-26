@@ -152,11 +152,4 @@ export class ChatMessage extends HTMLDivElement {
     }
     return result.join(' ');
   }
-
-  addTooltipsToEmotes() {
-    let tooltipTriggerList = [].slice.call(this.body.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new Tooltip(tooltipTriggerEl);
-    });
-  }
 }
