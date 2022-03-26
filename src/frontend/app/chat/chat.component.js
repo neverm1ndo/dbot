@@ -106,7 +106,7 @@ export class ChatComponent extends HTMLElement {
     const label = this.querySelector('.chatty-label');
     const img = new Image();
     img.src = '/assets/cm.png';
-    if (this.user.login !== this.channel) img.src = '/assets/bc.png';
+    if (this.user.login == this.channel) img.src = '/assets/bc.png';
     label.append(img);
   }
   connectTmiClient() {
