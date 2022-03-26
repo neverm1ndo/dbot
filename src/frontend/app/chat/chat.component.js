@@ -386,7 +386,7 @@ export class ChatComponent extends HTMLElement {
       let depeche = JSON.parse(event.data);
       switch (depeche.event) {
         case 'bot-status':
-          this.setLive(depeche.msg == 'works');
+          this.setLive(depeche.msg == 1);
         break;
         case 'stream.online': {
           this.setLive(true);
