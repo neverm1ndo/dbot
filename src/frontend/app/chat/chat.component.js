@@ -65,13 +65,12 @@ export class ChatComponent extends HTMLElement {
     this.bttv = new BTTV();
     this.bttv.getEmotes(this.channel, this.quickpanel);
     this.marker.addEventListener('click', () => {
-      if (this.connected) {
-        Marker.create(this.user).then((res) => {
-          this.alert(`Установлен маркер на позиции ${secondsToTimestamp(res.data[0].position_seconds)} ${res.data[0].description?'с описанием ' + res.data[0].description:''}`, 'twitch', '', ['bi', 'bi-vr']);
-        }).catch((err) => {
-          this.alert(`Не удалось создать маркер`, 'warning', '', ['bi', 'bi-exclamation-diamond-fill']);
-        })
-      }
+      if (!this.connected) return;
+      Marker.create(this.user).then((res) => {
+        this.alert(`Установлен маркер на позиции ${secondsToTimestamp(res.data[0].position_seconds)} ${res.data[0].description?'с описанием ' + res.data[0].description:''}`, 'twitch', '', ['bi', 'bi-vr']);
+      }).catch((err) => {
+        this.alert(`Не удалось создать маркер ${err.message}`, 'warning', '', ['bi', 'bi-exclamation-diamond-fill']);
+      });
     });
     this.submit.addEventListener('click', () => {
       if (this.connected) this.send();
