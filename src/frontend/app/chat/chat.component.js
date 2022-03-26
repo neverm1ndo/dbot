@@ -79,9 +79,7 @@ export class ChatComponent extends HTMLElement {
       if (event.code === 'Enter') this.send();
     });
     this.text.addEventListener('input', (event) => {
-      if (this.text.value === '') {
-        this.selfEmotes = {};
-      }
+      if (this.text.value === '') this.selfEmotes = {};
     });
     const quickpanel = new Collapse(this.quickpanel, {
       toggle: false
@@ -199,8 +197,6 @@ export class ChatComponent extends HTMLElement {
       this.alert(`<b>${username}</b> поддержал канал на <b>${userstate.bits}</b> Cheers`, 'info');
     });
     this.client.on('emotesets', (sets, obj) => {
-      // trigger++;
-      // if (trigger != 1)
       this.getEmoteSet(sets.split(','));
     });
   }
@@ -267,7 +263,16 @@ export class ChatComponent extends HTMLElement {
       }
     }).catch((err) => console.log(err))
   }
+  /**
+  * @param {number} amount - max chat lenght
+  * DOM optimization
+  * Removes old messages and alerts from chat container
+  */
+  removeOldMessages(amount) {
+    if (this.chat.children.length >= amount) this.chat.children[0].remove();
+  }
   add(tags, message, self, date = Date.now()) {
+    this.removeOldMessages(800);
     const messageComponent = new ChatMessage(this.channel, this.user.display_name, tags, message, self, date, this);
           messageComponent.nickname.addEventListener('click', () => {
             this.text.value = this.text.value + ' @' + tags.username + ' ';
@@ -277,6 +282,7 @@ export class ChatComponent extends HTMLElement {
     this.autoscroll();
   }
   alert(message, type, username, icon) {
+    this.removeOldMessages(800);
     const prevLast = this.chat.children[this.chat.children.length - 2];
     if (this.chat.lastChild instanceof ChatAlert && prevLast instanceof ChatAlert) {
       if ((prevLast.type == 'connect') && (this.chat.lastChild == 'disconnect') && (prevLast.username == this.chat.lastChild.username)) {
@@ -371,7 +377,7 @@ export class ChatComponent extends HTMLElement {
         console.log('Обрыв соединения');
         setTimeout(()=> {
           this.setWsConnection();
-        }, 5000)
+        }, 5000);
       }
       console.log('Code: ' + event.code + '\n Reason: ' + event.reason);
     };

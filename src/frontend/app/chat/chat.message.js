@@ -31,7 +31,6 @@ export class ChatMessage extends HTMLDivElement {
     this.body.dataset.date = timestamp(date);
     if (separator) this.body.innerHTML = separator;
     this.message.innerHTML = this.pretty(channel, chat.user.display_name, tags, message, chat.bttv); // innerHTML!
-    this.addTooltipsToEmotes();
     this.body.prepend(this.nickname);
     if (tags.badges) {
       const container = document.createElement('span');
@@ -77,23 +76,22 @@ export class ChatMessage extends HTMLDivElement {
         return;
       }
       const ttvClipSlug = TTVClip.getSlug(links[0]);
-      if (ttvClipSlug) {
-        Http.get('https://api.twitch.tv/helix/clips?id=' + ttvClipSlug,
-        {
-          'Authorization': 'Bearer ' + chat.user.token,
-          'Client-ID': chat.user.client
-        })
-        .then(data => {
-          const clip = data.data[0];
-          [...this.body.getElementsByTagName('a')].map((link) => { link.remove(); });
-          if (clip) {
-            this.body.append(new TTVClip(clip, 100, 100).valueOf());
-          } else {
-            this.body.append(TTVClip.notLikeThis('Клипа не существует'))
-          }
-        })
-        return;
-      }
+      if (!ttvClipSlug) return;
+      Http.get('https://api.twitch.tv/helix/clips?id=' + ttvClipSlug,
+      {
+        'Authorization': 'Bearer ' + chat.user.token,
+        'Client-ID': chat.user.client
+      })
+      .then(data => {
+        const clip = data.data[0];
+        [...this.body.getElementsByTagName('a')].map((link) => { link.remove(); });
+        if (clip) {
+          this.body.append(new TTVClip(clip, 100, 100).valueOf());
+        } else {
+          this.body.append(TTVClip.notLikeThis('Клипа не существует'))
+        }
+        chat.autoscroll();
+      });
     }
   }
 
