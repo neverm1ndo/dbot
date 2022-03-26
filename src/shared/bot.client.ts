@@ -10,6 +10,7 @@ import { D2PT } from '@shared/d2pt';
 import { Twitch } from '@shared/twitch';
 import { Nuzhdiki } from '@shared/nuzhdiki';
 import { MESSAGE } from '../schemas/message.schema';
+import { Subscription } from 'rxjs';
 import StartOptions from '../pre-start';
 
 enum BotStatus {
@@ -20,6 +21,7 @@ enum BotStatus {
 export class Bot {
   opts: Schedule;
   media: Media = new Media();
+  subscribtions: Subscription = new Subscription();
   client: Client = new Client({
       options: { debug: true, messagesLogLevel: 'info'  },
       connection: { reconnect: true },
@@ -29,7 +31,7 @@ export class Bot {
       },
       channels: [process.env.BOT_CHANNEL!]
     });
-  announcer: Announcer | null;
+  announcer: Announcer;
 
   public status: BotStatus = BotStatus.SLEEPS; // sleeps by default
   private readonly prefix: string = '!';
@@ -78,14 +80,13 @@ export class Bot {
     this.status = BotStatus.SLEEPS;
     // if (!this.announcer) return;
     // this.announcer.start.unsubscribe();
-    // this.announcer = null;
+    this.subscribtions.remove(this.announcer.start);
   }
 
   public wakeup(): void {
     if (this.status === BotStatus.WORKS) return;
     this.status = BotStatus.WORKS;
-    if (this.announcer) return;
-    this.announcer = new Announcer(900000);
+    this.subscribtions.add(this.announcer.start);
   }
 
   public init(): void {
