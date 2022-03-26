@@ -264,26 +264,13 @@ export class ChatComponent extends HTMLElement {
           const img = document.createElement('img');
           img.title = owners[ownersInfo.data[i].id][j].name;
           img.classList.add('emote');
-          // img.setAttribute('data-bs-toggle', 'tooltip');
-          // img.setAttribute('data-bs-placement', 'top');
           img.src = `https://static-cdn.jtvnw.net/emoticons/v2/${owners[ownersInfo.data[i].id][j].id}/default/light/3.0`;
           img.dataset.name = owners[ownersInfo.data[i].id][j].name;
           img.dataset.id = owners[ownersInfo.data[i].id][j].id;
-          // new Tooltip(img, {
-          //   boundary: this.quickpanel
-          // });
           container.append(title, avatar?avatar:'', subcont);
           subcont.append(img);
         }
-        // if (ownersInfo.data[i].display_name.toLowerCase() == this.user.display_name) {
-        //   if (this.quickpanel.children.length < 1) {
-            // setTimeout(() => { // Quickpanel task
-            //   queueMicrotask(this.quickpanel.append(container));
-            // }, 0);
-        //   }
-        // } else {
-          this.quickpanel.append(container, document.createElement('hr'));
-        // }
+        this.quickpanel.append(container, document.createElement('hr'));
       }
     }).catch((err) => console.log(err))
   }
@@ -315,15 +302,19 @@ export class ChatComponent extends HTMLElement {
       } else {
         badge = document.createElement('a');
         badge.classList.add('ml-15', 'pull-right', 'badge', 'rounded-pill', 'bg-light', 'text-dark');
+
         last.append(badge);
+        last.setAttribute('role', 'button')
+
         wrap = document.createElement('div');
         wrap.classList.add('list-group', 'list-group-flush');
-        badge.setAttribute('data-bs-toggle', 'collapse');
-        last.setAttribute('role', 'button')
-        badge.setAttribute('aria-expanded', true)
         wrap.id = String(message + Date.now()).hashCode();
+
+        badge.setAttribute('data-bs-toggle', 'collapse');
+        badge.setAttribute('aria-expanded', true)
         badge.setAttribute('aria-controls', wrap.id);
         badge.setAttribute('data-bs-toggle', '#' + wrap.id);
+
         let collapse = new Collapse(wrap, {
           toggle: true
         });
@@ -394,7 +385,6 @@ export class ChatComponent extends HTMLElement {
 
     this.ws.onmessage = (event) => {
       let depeche = JSON.parse(event.data);
-      console.log(depeche);
       switch (depeche.event) {
         case 'bot-status':
           this.setLive(depeche.msg == 'works');
