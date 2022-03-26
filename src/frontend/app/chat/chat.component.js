@@ -97,12 +97,6 @@ export class ChatComponent extends HTMLElement {
       this.selfEmotes[event.target.dataset.id].push(`${this.text.value.length}-${this.text.value.length + event.target.dataset.name.length}`);
       this.text.value = this.text.value + ' ' + event.target.dataset.name + ' ';
     }));
-    // this.text.addEventListener('focus', () => {
-    //   quickpanel.show();
-    // })
-    // this.quickpanel.addEventListener('mouseleave', () => {
-    //   quickpanel.hide();
-    // })
     this.setWsConnection();
     this.getLurkersFromStorage();
     this.connectTmiClient();
