@@ -94,7 +94,7 @@ export class SoundsController extends Popout {
         this._sounds.splice(i, 1);
         break;
       };
-      this.saveCommands().then(() => {
+      this.saveSounds().then(() => {
         console.log('deleted');
         this.isEmpty();
       });
