@@ -34,5 +34,10 @@ export const USER = model('User', new Schema ({
         response: { type: String }
       }
     ]
-  }
+  },
+  moderationUsersAllows: [{
+    userId: Number,
+    login: String,
+    allowedSections: [String]
+  }]
 }));

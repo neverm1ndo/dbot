@@ -4,11 +4,18 @@ import template from 'pug-loader!./automode.tpl.pug';
 import { AutomodeRuleComponent } from './automode.rule';
 
 export class AutomodeController extends Popout {
-  _rules;
+  _rules = [];
   constructor() {
     super();
     this.getRules();
-    this.innerHTML = template();
+    this.innerHTML = template({
+      title: 'Автомод',
+      icon: 'bi-robot',
+      cardTexts: [
+        'Автоматический бан пользователя, если в его сообщении будут обнаружены добавленные в правило слова или фразы.',
+        'Удалить правило можно нажав на крестик в блоке правила.'
+      ],
+    });
     this.closeBtn  = this.querySelector('.btn-close');
     this.container = this.querySelector('#container');
     this.textarea  = this.querySelector('.textarea');
@@ -70,18 +77,19 @@ export class AutomodeController extends Popout {
       this.removeRule(rule);
     });
   }
-  getRules() {
-    return Http.get('/api/user/automode-rules').then((rules) => {
-      this._rules = rules.map(rule => new AutomodeRuleComponent(rule));
-      this._rules.forEach((rule) => {
-        this.container.append(rule);
-        rule.addEventListener('click', (event) => {
-          this.removeRule(rule);
-        });
+  spawnRules(rules) {
+    this._rules = rules.map(rule => new AutomodeRuleComponent(rule));
+    this._rules.forEach((rule) => {
+      this.container.append(rule);
+      rule.addEventListener('click', (event) => {
+        this.removeRule(rule);
       });
-    }).catch((err) => {
-      console.error(err);
     });
+  }
+  getRules() {
+    return Http.get('/api/user/automode-rules')
+               .then((rules) => this.spawnRules(rules))
+               .catch((err) => console.error);
   }
   saveRules() {
     return Http.post('/api/user/update-automode-rules',

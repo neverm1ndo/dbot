@@ -10,6 +10,7 @@ import { CommandsController } from './commands/commands.ctrl';
 import { CustomCommandComponent } from './commands/custom-command';
 import { AnnounceComponent } from './announcer/announce';
 import { AnnouncerController } from './announcer/announcer.ctrl';
+import { Mods } from './mods/mods.ctrl';
 import { SoundsController } from './sounds/sounds.ctrl';
 import { SoundComponent } from './sounds/sound';
 import { ChatComponent } from '../chat/chat.component';
@@ -26,6 +27,7 @@ customElements.define('custom-announce', AnnounceComponent);
 customElements.define('custom-announcer', AnnouncerController);
 customElements.define('sounds-list', SoundsController);
 customElements.define('sound-item', SoundComponent);
+customElements.define('moderators-rules', Mods);
 customElements.define('omd-chat', ChatComponent);
 
 [
@@ -44,6 +46,10 @@ customElements.define('omd-chat', ChatComponent);
   {
     btn: document.querySelector('#btn-announcer'),
     controller: AnnouncerController
+  },
+  {
+    btn: document.querySelector('#btn-mods'),
+    controller: Mods
   }
 ].forEach((component) => {
   component.btn.addEventListener('click', () => {

@@ -4,12 +4,12 @@ div.container-fluid.popout.automode
       div.card-body
         div.d-flex.flex-row.justify-content-between
           h5.card-title
-            i.bi.bi-robot.mr-3
-            span Автомод
+            i(class="bi " + icon + " mr-3")
+            span=title
           button.btn-close.btn-close-white(type="button" aria-label="close")
         hr
-        p.card-text Автоматический бан пользователя, если в его сообщении будут обнаружены добавленные в правило слова или фразы.
-        p.card-text Удалить правило можно нажав на крестик в блоке правила.
+        each text in cardTexts
+          p.card-text=text
         hr
         div.badges-container#container
         textarea.textarea(placeholder="Добавить текст правила...")
