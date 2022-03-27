@@ -10,8 +10,8 @@ omd-chat {
   font-family: 'Arial', sans;
   font-size: 14px!important;
   img {
-    -webkit-app-region: no-drag;
-    -webkit-user-select: none;
+    -webkit-app-region: no-drag!important;
+    -webkit-user-select: none!important;
     user-select: none;
     cursor: inherit;
   }
