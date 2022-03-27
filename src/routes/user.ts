@@ -33,7 +33,7 @@ router.get('/moderators', (req: any, res: Response) => {
 });
 router.post('/update-moderators', json(), (req: any, res: Response) => {
   if (!req.cookies['nmnd_user_access_token']) return res.sendStatus(UNAUTHORIZED);
-  USER.updateMany({ 'user.login': { $in: req.body.rules }},
+  USER.updateMany({ 'user.settings.moderationUsersAllow.login': req.user.user.login },
   { 'user.settings.moderationUsersAllow': req.body.rules.map((mod: any) => { login: mod })},
   { upsert: true },
   (err: any) => {
