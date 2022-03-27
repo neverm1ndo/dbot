@@ -30,7 +30,7 @@ html body div::-webkit-scrollbar-thumb:active, html body div::-webkit-scrollbar-
   opacity: 0.5;
 }
 aside {
-  width: 60px;
+  max-width: 45px;
 }
 :host(omd-chat) {
   width: 100%;
