@@ -86,13 +86,12 @@ export class SoundsController extends Popout {
       });
     });
     sound.addEventListener('play', (event) => {
-      console.log(event)
       this.player.play(event.target.value);
     });
     sound.addEventListener('delete', (event) => {
-      for (let i = 0; i < this.sounds.length; i++) {
-        if (this.sounds[i].value.command !== event.target.value.command) continue;
-        this.sounds.splice(i, 1);
+      for (let i = 0; i < this._sounds.length; i++) {
+        if (this._sounds[i].value.command !== event.target.value.command) continue;
+        this._sounds.splice(i, 1);
         break;
       };
       this.saveCommands().then(() => {
