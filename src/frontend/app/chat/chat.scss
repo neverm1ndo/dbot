@@ -98,6 +98,11 @@ omd-chat {
     padding: 5px;
     border: none;
     word-wrap: break-word;
+    &-msg {
+      .emoticon {
+        height: 32px;
+      }
+    }
   }
   .card .card-body span {
     display: inline;
@@ -147,8 +152,7 @@ omd-chat {
   }
   .emotes-list .emote, #broadcaster-quickpanel .emote {
     display: inline-block;
-    max-width: 30px;
-    width: 30px;
+    height: 36px;
     margin: 3px;
     cursor: pointer;
     border-radius: 4px;
@@ -180,9 +184,9 @@ omd-chat {
     margin-bottom: 5px;
   }
   .card .card-body img {
-    max-width: 26px;
     display: inline;
   }
+  .card. ca
   @keyframes siren {
     0% { opacity: 0.6;}
     50% { opacity: 1;}
