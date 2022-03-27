@@ -6,7 +6,9 @@ import template from 'pug-loader!../automode/automode.tpl.pug';
 export class Mods extends AutomodeController {
   constructor() {
     super();
-    this.innerHTML = template({
+  }
+  setTemplate() {
+    return template({
       title: 'Доступ к управлению ботом',
       icon: 'bi-people-fill',
       cardTexts: [

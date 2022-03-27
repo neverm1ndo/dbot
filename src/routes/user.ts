@@ -24,6 +24,23 @@ router.get('/automode-rules', (req: any, res: Response) => {
     res.send(user.settings.banwords);
   });
 });
+router.get('/moderators', (req: any, res: Response) => {
+  if (!req.cookies['nmnd_user_access_token']) return res.sendStatus(UNAUTHORIZED);
+  USER.find({ 'settings.moderationUsersAllow.login': req.user.user.login }, (err: any, users: any) => {
+    if (err) return logger.err(err, true);
+    res.send(users.map((user: any) => user.user.login));
+  });
+});
+router.post('/update-moderators', json(), (req: any, res: Response) => {
+  if (!req.cookies['nmnd_user_access_token']) return res.sendStatus(UNAUTHORIZED);
+  USER.updateMany({ 'user.login': { $in: req.body.rules }},
+  { 'user.settings.moderationUsersAllow': req.body.rules.map((mod: any) => { login: mod })},
+  { upsert: true },
+  (err: any) => {
+    if (err) return logger.err(err, true);
+    res.sendStatus(OK);
+  });
+});
 router.get('/sounds', (req: any, res: Response) => {
   if (!req.cookies['nmnd_user_access_token']) return res.sendStatus(UNAUTHORIZED);
   USER.findOne({'user.login': req.user.user.login }, (err: any, user: any) => {

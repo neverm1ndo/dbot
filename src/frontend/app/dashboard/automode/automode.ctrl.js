@@ -8,14 +8,7 @@ export class AutomodeController extends Popout {
   constructor() {
     super();
     this.getRules();
-    this.innerHTML = template({
-      title: 'Автомод',
-      icon: 'bi-robot',
-      cardTexts: [
-        'Автоматический бан пользователя, если в его сообщении будут обнаружены добавленные в правило слова или фразы.',
-        'Удалить правило можно нажав на крестик в блоке правила.'
-      ],
-    });
+    this.innerHTML = this.setTemplate();
     this.closeBtn  = this.querySelector('.btn-close');
     this.container = this.querySelector('#container');
     this.textarea  = this.querySelector('.textarea');
@@ -34,6 +27,17 @@ export class AutomodeController extends Popout {
           .catch((err) => {
             console.error(err);
           });
+    });
+  }
+
+  setTemplate() {
+    return template({
+      title: 'Автомод',
+      icon: 'bi-robot',
+      cardTexts: [
+        'Автоматический бан пользователя, если в его сообщении будут обнаружены добавленные в правило слова или фразы.',
+        'Удалить правило можно нажав на крестик в блоке правила.'
+      ],
     });
   }
 
