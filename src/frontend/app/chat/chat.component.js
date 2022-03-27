@@ -11,7 +11,6 @@ import BTTV from './bttv';
 import { User } from './chat.user';
 import { ChatMessage } from './chat.message';
 import { ChatAlert } from './chat.alert';
-import { Marker } from './marker';
 import { ChattersListController } from './chatter-list.controller';
 import { secondsToTimestamp, timestamp } from './utils';
 
@@ -67,7 +66,7 @@ export class ChatComponent extends HTMLElement {
     this.bttv.getEmotes(this.channel, this.quickpanel);
     this.marker.addEventListener('click', () => {
       if (!this.connected) return;
-      Marker.create(this.user).then((res) => {
+      TwitchApi.createMarker().then((res) => {
         this.alert(`Установлен маркер на позиции ${secondsToTimestamp(res.data[0].position_seconds)} ${res.data[0].description?'с описанием ' + res.data[0].description:''}`, 'twitch', '', ['bi', 'bi-vr']);
       }).catch((err) => {
         this.alert(`Не удалось создать маркер ${err.message}`, 'warning', '', ['bi', 'bi-exclamation-diamond-fill']);

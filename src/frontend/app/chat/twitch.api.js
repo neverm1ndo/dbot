@@ -38,4 +38,14 @@ export default class TwitchApi {
   static getClips(slug) {
     return Http.get(`${TwitchApi._API_URL}/clips?id=${slug}`, TwitchApi._headers);
   }
+
+  static createMarker(description = 'Highlight'+Date.now()) {
+    return Http.post(`${TwitchApi._API_URL}/streams/markers`,
+    {
+      user_id: TwitchApi._user.id,
+      description
+    }, Object.assign(TwitchApi._headers, {
+      'Content-Type': 'application/json',
+    }));
+  }
 }
