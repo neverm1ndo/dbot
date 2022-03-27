@@ -7,6 +7,7 @@ import TTVClip from './ttv.clips.embed';
 import HEX from '@shared/hex';
 import Http from '@shared/http';
 import Cookies from '@shared/cookies';
+import TwitchApi from './twitch.api';
 
 
 export class ChatMessage extends HTMLDivElement {
@@ -77,12 +78,7 @@ export class ChatMessage extends HTMLDivElement {
       }
       const ttvClipSlug = TTVClip.getSlug(links[0]);
       if (!ttvClipSlug) return;
-      Http.get('https://api.twitch.tv/helix/clips?id=' + ttvClipSlug,
-      {
-        'Authorization': 'Bearer ' + chat.user.token,
-        'Client-ID': chat.user.client
-      })
-      .then(data => {
+      TwitchApi.getClips(ttvClipSlug).then(data => {
         const clip = data.data[0];
         [...this.body.getElementsByTagName('a')].map((link) => { link.remove(); });
         if (clip) {

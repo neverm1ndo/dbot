@@ -6,6 +6,7 @@ import TTVClip from './ttv.clips.embed';
 import Collapse from 'bootstrap/js/dist/collapse';
 import Tooltip from 'bootstrap/js/dist/tooltip';
 import PubSub from './pubsub';
+import TwitchApi from './twitch.api';
 import BTTV from './bttv';
 import { User } from './chat.user';
 import { ChatMessage } from './chat.message';
@@ -215,12 +216,9 @@ export class ChatComponent extends HTMLElement {
     return params.has('channel')?params.get('channel'):this.user.username;
   }
   getEmoteSet(id) {
-    Http.get(`https://api.twitch.tv/helix/chat/emotes/set?emote_set_id=${id.join('&emote_set_id=')}`,
-      {
-        'Authorization': 'Bearer ' + this.user.token,
-        'Client-ID': this.user.client
-      }).then(data => { if (data.data.length > 0) this.addEmotes(data.data) })
-        .catch(err => console.error);
+    TwitchApi.getEmoteSets(id)
+             .then(data => { if (data.data.length > 0) this.addEmotes(data.data) })
+             .catch(err => console.error);
   }
   addEmotes(emotes) {
     const owners = {};
@@ -230,14 +228,11 @@ export class ChatComponent extends HTMLElement {
       if (!owners[emotes[i].owner_id]) owners[emotes[i].owner_id] = [];
       owners[emotes[i].owner_id].push(emotes[i]);
     }
-    Http.get(`https://api.twitch.tv/helix/users?id=${[...streamers].join('&id=')}`, {
-      'Authorization': 'Bearer ' + this.user.token,
-      'Client-ID': this.user.client
-    }).then((ownersInfo) => {
+    TwitchApi.getUsers(streamers).then((ownersInfo) => {
       ownersInfo.data.push({
         id: '0',
         display_name: 'Whole World'
-      })
+      });
       for (let i = 0; i < ownersInfo.data.length; i++) {
         const container = document.createElement('div');
         const subcont   = document.createElement('div');
@@ -417,10 +412,7 @@ export class ChatComponent extends HTMLElement {
   handleStreamInfo(id) {
     let interval = setInterval(() => {
       if (this.live) {
-        Http.get(`https://api.twitch.tv/helix/streams?user_id=${id}`, {
-          'Authorization': 'Bearer ' + this.user.token,
-          'Client-ID': this.user.client
-        }).then((data) => {
+        TwitchApi.getStreams(id).then((data) => {
           const streamInfo = data.data[0];
           if (streamInfo) {
             this.stream = streamInfo;
@@ -433,23 +425,14 @@ export class ChatComponent extends HTMLElement {
     }, 120000);
   }
   getChannelProperties (channel) {
-    Http.get(`https://api.twitch.tv/helix/users?login=${channel}`, {
-      'Authorization': 'Bearer ' + this.user.token,
-      'Client-ID': this.user.client
-    }).then((data) => {
+    TwitchApi.getUser(channel).then((data) => {
       this.user.twitch = data[0];
       this.settings.id = data.data[0].id;
       this.pubsub.connect(this.settings.id);
       this.handleStreamInfo(this.settings.id);
       return Promise.all([
-        Http.get(`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${this.settings.id}`, {
-          'Authorization': 'Bearer ' + this.user.token,
-          'Client-ID': this.user.client
-        }),
-        Http.get(`https://api.twitch.tv/helix/chat/badges/global`, {
-          'Authorization': 'Bearer ' + this.user.token,
-          'Client-ID': this.user.client
-        }),
+        TwitchApi.getChannelBadges(this.settings.id),
+        TwitchApi.getGlobalBadges(),
         Http.get(`/controls/chat/last?channel=${channel}`),
       ])
     }).then(([badges, global, lastMessages]) => {
