@@ -2,6 +2,7 @@ import Http from '@shared/http';
 import { Popout } from '../popout';
 import template from 'pug-loader!./announcer.tpl.pug';
 import emptyList from 'pug-loader!../commands/empty-commands-list.tpl.pug';
+import { autoscroll } from '@shared/scroller';
 import { AnnounceComponent } from './announce';
 
 export class AnnouncerController extends Popout {

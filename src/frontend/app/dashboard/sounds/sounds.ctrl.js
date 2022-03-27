@@ -2,6 +2,7 @@ import Http from '@shared/http';
 import { Popout } from '../popout';
 import template from 'pug-loader!./sounds.tpl.pug';
 import emptyList from 'pug-loader!../commands/empty-commands-list.tpl.pug';
+import { autoscroll } fron '@shared/scroller';
 import { SoundComponent } from './sound';
 import { Player } from './player';
 
