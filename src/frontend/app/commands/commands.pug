@@ -4,7 +4,6 @@ html(lang="en")
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
     meta(http-equiv="Content-Security-Policy" content="default-src *; img-src * 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *")
-    title OMD | Команды бота #{user.username}
     link(rel="shortcut icon" href="/assets/tank2.png")
   body
     div.d-flex.flex-column.flex-nowrap.h-100.align-items-start.justify-content-stretch
@@ -64,8 +63,8 @@ html(lang="en")
             b При прослушивании чекайте громкость, она может отличаться от той, что при воспроизведении на стриме! Потенциально это минус уши!
           div.d-flex.flex-column.mt-2
             each command in sounds
-              div.d-flex.flex-row.align-items-center
-                label.mr-2
+              div.d-flex.flex-row.align-items-center.mb-1
+                label.mr-2.w-25
                   b='!' + command.command
                 audio(src=command.path volume=command.gain controls)
               
