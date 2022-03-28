@@ -23,6 +23,11 @@ router.get('/', corsOpt, checkSession, validateAccessToken, (req: IGetUserAuthIn
   res.set("Content-Security-Policy", "default-src *; img-src * data: 'self'; script-src-elem *; connect-src *")
      .render('chat', req.user);
 });
+router.get('/refresh-session', corsOpt, checkSession, validateAccessToken, (req: IGetUserAuthInfoRequest, res: Response,) => {
+  res.send({
+    accessToken: req.user.accessToken,
+  });
+});
 router.get('/lurkers', corsOpt, (req: Request, res: Response,) => {
   res.send(bot.opts.blacklist);
 });

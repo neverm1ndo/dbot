@@ -419,7 +419,12 @@ export class ChatComponent extends HTMLElement {
           } else {
             this.chatterList.dom.counter.innerHTML = 0;
           }
-        })
+        }).catch(() => {
+          Http.get('/controls/chat/refresh-session').then((token) => {
+            this.user.token = token.accessToken;
+            Cookies.set('nmnd_user_access_token', token.accessToken, {});
+          }).catch((err) => console.error);
+        });
       }
     }, 120000);
   }
