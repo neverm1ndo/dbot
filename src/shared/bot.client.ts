@@ -189,8 +189,11 @@ export class Bot {
       //TODO: make this command optional
       case 'd2pt': {
         if (args) {
-            const arg = args.join(' ');
-            D2PT.getHeroWR(arg).then((msg: string) => {
+            let arg = args.join(' ');
+            let pos;
+            if (arg.includes('|')) [arg, pos] = arg.split('|').map((val) => val.trim());
+            console.log(arg, pos);
+            D2PT.getHeroWR(arg, pos).then((msg: string) => {
               this.client.say(channel, msg);
             }).catch((err) => {
               this.client.say(channel, err);

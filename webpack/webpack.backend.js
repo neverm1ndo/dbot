@@ -5,6 +5,7 @@ module.exports = {
   entry: {
     server: './src/index.ts'
   },
+  devtool: 'inline-source-map',
   target: 'node',
   externals: [nodeExternals()],
   externalsPresets: {
