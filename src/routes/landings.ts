@@ -4,14 +4,10 @@ import { USER } from '../schemas/user.schema';
 
 const router = Router();
 
-router.get('/', (req: Request, res: Response) => {
-  USER.findOne({'user.id': 144668618 }, (err: any, user: any) => {
+router.get('/:username', (req: Request, res: Response) => {
+  USER.findOne({'user.login': req.params.username }, (err: any, user: any) => {
     if (err) return logger.err(err, true);
-    let commands = '';
-    user.settings.sounds.forEach((element: {command: string, path: string}) => {
-      commands = commands + '!' + element.command + '\n';
-    });
-    res.render('commands', { commands });
+    res.render('commands', { sounds: user.settings.sounds, custom: user.settings.commands, username: req.params.username });
   })
 });
 

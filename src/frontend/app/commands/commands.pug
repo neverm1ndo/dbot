@@ -4,7 +4,7 @@ html(lang="en")
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
     meta(http-equiv="Content-Security-Policy" content="default-src *; img-src * 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *")
-    title Diktorbot | Команды бота
+    title OMD | Команды бота #{username}
     link(rel="shortcut icon" href="/assets/tank2.png")
   body
     div.d-flex.flex-column.flex-nowrap.h-100.align-items-start.justify-content-stretch
@@ -15,7 +15,54 @@ html(lang="en")
               img.logo(src="/assets/tank2.png")
       main.d-flex.w-100.flex-fill.pb-4
         div.container.h-100
-          h3 Функциональные команды
-          pre !ролл !ранг !анек !нуждики
-          h3 Звуковые команды
-          pre=commands
+          h3 Функциональные встроенные команды
+          p <b>!ролл</b> - выдает рандомное число от 0 до 100
+          p 
+            span <b>!d2pt</b> {имя_персонажа} | {позиция} - выводит винрейт и пикрейт персонажа из доты на 7к+ авг. Если не указывать позицию, то выдаст статистику по всем играм. 
+            div
+              button.btn.btn-dark.btn-sm(type="button" data-bs-toggle="collapse" href="#how-to-d2pt" role="button" aria-expanded="false" aria-controls="how-to-d2pt") Как пользоваться
+            div.collapse.p-3.bg-light.rounded#how-to-d2pt
+              div <kbd>!d2pt invoker</kbd>
+              div <kbd>!d2pt invoker | mid</kbd> - винрейт инвокера, пикнутого в мид
+              div <kbd>!d2pt invoker | 2</kbd> - то же самое, что и команда выше, только вместо названия позиции, его номер 
+              div.mt-2 
+                u Доступные для ввода позиции: 
+              table.table
+                thead
+                  th Номер
+                  th Название
+                tbody
+                  tr
+                    td 1
+                    td carry
+                  tr
+                    td 2
+                    td mid
+                  tr
+                    td 3
+                    td offlane
+                  tr
+                    td 4
+                    td support(4)
+                  tr
+                    td 5
+                    td support(5)
+          p <b>!нуждики</b> - воспроизводит великолепные короткие шутки("нуждики") за авторством Александра Нуждина в его же исполнении, в количестве, как правило, 3-х штук
+          hr
+          h3 Кастомные команды #{username}
+          each command in custom
+            div <b>!#{command.name}</b>
+          hr
+          h3 Звуковые команды в чате #{username}
+          p Если ввести одну из команд, приведенных ниже, прозвучит звуковой эффект. Звуки воспроизводятся не чаще, чем раз в 30 секунд.
+          div.d-flex.flex-row
+            div.mr-2
+              img.rounded(src="https://static-cdn.jtvnw.net/emoticons/v2/58765/default/light/3.0" width="38px" height="38px")
+            b При прослушивании чекайте громкость, она может отличаться от той, что при воспроизведении на стриме! Потенциально это минус уши!
+          div.d-flex.flex-column.mt-2
+            each command in sounds
+              div.d-flex.flex-row.align-items-center
+                label.mr-2
+                  b='!' + command.command
+                audio(src=command.path volume=command.gain controls)
+              
