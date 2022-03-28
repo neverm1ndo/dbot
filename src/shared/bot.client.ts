@@ -149,6 +149,8 @@ export class Bot {
         return;
       }
     });
+
+    const channelName = channel.slice(1);
     // BUILT-IN COMMANDS
     switch (command) {
       //TODO: make this command optional
@@ -173,11 +175,11 @@ export class Bot {
         break;
       }
       case 'хелп': {
-        this.client.say(channel, `OhMyDog Список команд тут: https://apps.nmnd.ru/commands/${channel}`);
+        this.client.say(channel, `OhMyDog Список команд тут: https://apps.nmnd.ru/commands/${channelName}`);
         break;
       }
       case 'help': {
-        this.client.say(channel, `OhMyDog Список команд тут: https://apps.nmnd.ru/commands/${channel}`);
+        this.client.say(channel, `OhMyDog Список команд тут: https://apps.nmnd.ru/commands/${channelName}`);
         break;
       }
       case 'нуждики': {
