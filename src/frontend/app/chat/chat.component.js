@@ -2,6 +2,7 @@ import template from 'pug-loader!./chat.tpl.pug';
 import styles from './chat.scss';
 import tmi from 'tmi.js';
 import Http from '@shared/http';
+import Cookies from '@shared/cookies';
 import TTVClip from './ttv.clips.embed';
 import Collapse from 'bootstrap/js/dist/collapse';
 import Tooltip from 'bootstrap/js/dist/tooltip';
