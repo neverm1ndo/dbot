@@ -173,11 +173,11 @@ export class Bot {
         break;
       }
       case 'хелп': {
-        this.client.say(channel, `OhMyDog Список команд тут: https://apps.nmnd.ru/commands`);
+        this.client.say(channel, `OhMyDog Список команд тут: https://apps.nmnd.ru/commands/${channel}`);
         break;
       }
       case 'help': {
-        this.client.say(channel, `OhMyDog Список команд тут: https://apps.nmnd.ru/commands`);
+        this.client.say(channel, `OhMyDog Список команд тут: https://apps.nmnd.ru/commands/${channel}`);
         break;
       }
       case 'нуждики': {
