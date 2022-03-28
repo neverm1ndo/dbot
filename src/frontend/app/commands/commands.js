@@ -8,3 +8,9 @@ const collapseList = collapseElementList.map(function (collapseEl) {
     toggle: false
   });
 });
+
+const audioList = [].slice.call(document.querySelectorAll('.audio'));
+audioList.forEach(function(audio) {
+  audio.volume = audio.dataset.volume/100;
+  if (audio.volume == 0) audio.volume = 0.25;
+});

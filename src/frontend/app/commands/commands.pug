@@ -67,5 +67,5 @@ html(lang="en")
               div.d-flex.flex-row.align-items-center.mb-1
                 label.mr-2.w-25
                   b='!' + command.command
-                audio(src=command.path volume=command.gain controls)
+                audio.audio(src=command.path data-volume=command.gain controls)
               
