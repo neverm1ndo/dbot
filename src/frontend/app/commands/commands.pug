@@ -4,7 +4,7 @@ html(lang="en")
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
     meta(http-equiv="Content-Security-Policy" content="default-src *; img-src * 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *")
-    title OMD | Команды бота #{username}
+    title OMD | Команды бота #{user.username}
     link(rel="shortcut icon" href="/assets/tank2.png")
   body
     div.d-flex.flex-column.flex-nowrap.h-100.align-items-start.justify-content-stretch
@@ -13,6 +13,9 @@ html(lang="en")
           div.d-flex.flex-row.pt-4.pb-4
             div.d-flex
               img.logo(src="/assets/tank2.png")
+              img.logo.rounded-circle.mr-2(src=user.avatar)
+            div.d-flex
+              h3 Бот #{user.username}
       main.d-flex.w-100.flex-fill.pb-4
         div.container.h-100
           h3 Функциональные встроенные команды
@@ -21,7 +24,7 @@ html(lang="en")
             span <b>!d2pt</b> {имя_персонажа} | {позиция} - выводит винрейт и пикрейт персонажа из доты на 7к+ авг. Если не указывать позицию, то выдаст статистику по всем играм. 
             div
               button.btn.btn-dark.btn-sm(type="button" data-bs-toggle="collapse" href="#how-to-d2pt" role="button" aria-expanded="false" aria-controls="how-to-d2pt") Как пользоваться
-            div.collapse.p-3.bg-light.rounded#how-to-d2pt
+            div.collapse.p-3.bg-light.rounded.mt-2#how-to-d2pt
               div <kbd>!d2pt invoker</kbd>
               div <kbd>!d2pt invoker | mid</kbd> - винрейт инвокера, пикнутого в мид
               div <kbd>!d2pt invoker | 2</kbd> - то же самое, что и команда выше, только вместо названия позиции, его номер 
@@ -49,11 +52,11 @@ html(lang="en")
                     td support(5)
           p <b>!нуждики</b> - воспроизводит великолепные короткие шутки("нуждики") за авторством Александра Нуждина в его же исполнении, в количестве, как правило, 3-х штук
           hr
-          h3 Кастомные команды #{username}
+          h3 Кастомные команды #{user.username}
           each command in custom
             div <b>!#{command.name}</b>
           hr
-          h3 Звуковые команды в чате #{username}
+          h3 Звуковые команды в чате #{user.username}
           p Если ввести одну из команд, приведенных ниже, прозвучит звуковой эффект. Звуки воспроизводятся не чаще, чем раз в 30 секунд.
           div.d-flex.flex-row
             div.mr-2
