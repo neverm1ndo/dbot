@@ -893,6 +893,7 @@ export class D2PT {
           });
       }, {});
       if (!positionInfo) reject();
+      if (!positionInfo[pos as number]) resolve('Нет информации по данному герою на данной позиции.');
       resolve(positionInfo[pos as number]);
     });
   }
