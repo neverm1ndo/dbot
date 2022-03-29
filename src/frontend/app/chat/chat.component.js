@@ -376,7 +376,7 @@ export class ChatComponent extends HTMLElement {
         this.alert(`Стрим запущен. Время запуска ${timestamp(Date.now())}`, 'success', '', ['bi', 'bi-twitch']);
       });
       this.socket.on('channel.follow', (event) => {
-        this.alert(`Новый фолловер <b>${depeche.msg.user_name}</b>`, 'twitch', '', ['bi', 'bi-twitch']);
+        this.alert(`Новый фолловер <b>${event.user_name}</b>`, 'twitch', '', ['bi', 'bi-twitch']);
       });
       this.socket.on('stream.oflline', (event) => {
         this.setLive(false);
