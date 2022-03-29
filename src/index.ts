@@ -2,10 +2,10 @@ import './pre-start'; // Must be the first import
 import app from '@server';
 import logger from '@shared/Logger';
 import https from 'https';
-// import http from 'http';
+import http from 'http';
 import { readFileSync } from 'fs';
-import WebSocket from 'ws';
-import sockets from './routes/sockets';
+import { Server, Socket } from 'socket.io';
+import sockets, { socketAuth, socketCORS } from './routes/sockets';
 
 const port = Number(process.env.PORT);
 
@@ -14,10 +14,14 @@ const server = https.createServer({
   cert: readFileSync(process.env.SSL_CERT!, 'utf8'),
   rejectUnauthorized: false
 }, app);
-// const serverHttp = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-wss.on('connection', (ws: WebSocket, req: any) => {
-  sockets(ws, req);
+
+const serverHttp = http.createServer(app);
+
+export const io = new Server(server, { cors: socketCORS });
+io.use(socketAuth);
+io.on('connection', (socket: Socket) => {
+  sockets(socket);
 });
+
 server.listen(port, () => { logger.info('OMD server started on port: ' + port) });
-// serverHttp.listen(8080, () => { logger.info('OMD server started on port: ' + port) });
+serverHttp.listen(8080, () => { logger.info('OMD server started on port: ' + 8080) });

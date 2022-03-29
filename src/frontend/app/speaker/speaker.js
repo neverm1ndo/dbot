@@ -1,6 +1,7 @@
 import './speaker.css';
+import { io } from 'socket.io-client';
+import Cookies from '@shared/cookies';
 
-let ws;
 class Player {
   constructor() {
     this.ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -119,46 +120,19 @@ accept.addEventListener('click', (event) => {
 
 const indicator = document.querySelector('#indicator');
 
-(function setConnection() {
-  console.log(window.location.host);
-  ws = new WebSocket(`wss://${window.location.host}`);
-  ws.onopen = function() {
-    console.log("Соединение установлено.");
-    ws.send(JSON.stringify({event: 'speaker-connection'}));
-    indicator.classList.remove('bg-red');
-    indicator.classList.add('bg-green');
-  };
-
-  ws.onclose = function(event) {
-    if (event.wasClean) {
-      console.log('Соединение закрыто чисто');
-    } else {
-      console.log('Обрыв соединения');
-      indicator.classList.remove('bg-green');
-      indicator.classList.add('bg-red');
-      setTimeout(()=> {
-        setConnection();
-      }, 5000)
-    }
-    console.log('Code: ' + event.code + '\n Reason: ' + event.reason);
-  };
-
-  ws.onmessage = (event) => {
-    let depeche = JSON.parse(event.data);
-    console.log(depeche);
-    switch (depeche.event) {
-      case 'play-sound':
-        if (!player) break;
-        player.play(depeche.msg);
-      break;
-      case 'connection':
-        console.log(depeche.msg);
-      break;
-      default:
-    }
-  }
-
-  ws.onerror = function(error) {
-    console.log("Ошибка " + error.message);
-  };
-})();
+const socket = io(`wss://${window.location.host}`, {
+  reconnectionDelayMax: 10000,
+  auth: {
+    token: Cookies.get('nmnd_user_access_token'),
+  },
+});
+socket.on("connect", () => {
+  console.log("Соединение установлено.");
+  indicator.classList.add('bg-green');
+  socket.on("play-sound", (sound) => {
+    if (player) player.play(sound);
+  });
+  socket.on('close', () => {
+    indicator.classList.add('bg-red');
+  });
+});

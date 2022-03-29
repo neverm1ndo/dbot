@@ -35,16 +35,15 @@ export class Bot {
 
   public status: BotStatus = BotStatus.SLEEPS; // sleeps by default
   private readonly prefix: string = '!';
+  // schedules: {[channel: string]: Schedule} = {};
 
   constructor() {
     this.opts = new Schedule(process.env.BOT_CHANNEL!);
+    // this.schedules = {};
     this.announcer = new Announcer(900000);
-    if (process.env.NODE_ENV !== 'development') {
-      this.checkEventSubscriptions();
-    }
-    if (StartOptions.works) {
-      this.wakeup();
-    }
+    // this.spawnSchedules();
+    if (process.env.NODE_ENV !== 'development') this.checkEventSubscriptions();
+    if (StartOptions.works) this.wakeup();
   }
 
   private checkEventSubscriptions(): void {
@@ -81,12 +80,14 @@ export class Bot {
     // if (!this.announcer) return;
     // this.announcer.start.unsubscribe();
     this.subscribtions.remove(this.announcer.start);
+    logger.imp(`Bot status -> ${this.status}`);
   }
 
   public wakeup(): void {
     if (this.status === BotStatus.WORKS) return;
     this.status = BotStatus.WORKS;
     this.subscribtions.add(this.announcer.start);
+    logger.imp(`Bot status -> ${this.status}`);
   }
 
   public init(): void {
@@ -134,10 +135,11 @@ export class Bot {
   }
   private readChattersMessage(channel: any, tags: ChatUserstate, command?: string, args?: string[]): void {
     if (!tags.username || !command) return;
+        const channelName = channel.slice(1);
     // SOUNDS
     this.opts.schedules.sounds.forEach((sound: { command: string, path: string, gain?: number }) => {
       if (command === sound.command) {
-        this.media.playSound(tags, sound);
+        this.media.playSound(channelName, tags, sound);
         return;
       }
     });
@@ -150,7 +152,6 @@ export class Bot {
       }
     });
 
-    const channelName = channel.slice(1);
     // BUILT-IN COMMANDS
     switch (command) {
       //TODO: make this command optional
@@ -184,7 +185,7 @@ export class Bot {
       }
       case 'нуждики': {
         Nuzhdiki.getOne().then((path: string) => {
-          this.media.playSound(tags, { path });
+          this.media.playSound(channelName, tags, { path });
         });
         break;
       }

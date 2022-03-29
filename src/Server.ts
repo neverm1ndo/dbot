@@ -5,6 +5,8 @@ import helmet from 'helmet';
 import { join } from 'path';
 import { connect } from 'mongoose';
 
+import { io } from './index';
+
 import express, { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 import passport from 'passport';
@@ -23,7 +25,6 @@ import logger from '@shared/Logger';
 import axios from 'axios';
 
 import { USER } from './schemas/user.schema';
-import { cm } from './routes/sockets';
 
 import { getHmac, getHmacMessage, verifyMessage, validateAccessToken } from '@shared/functions';
 import { HMAC_PREFIX, TWITCH_MESSAGE_SIGNATURE, MESSAGE_TYPE, MESSAGE_TYPE_NOTIFICATION, MESSAGE_TYPE_REVOCATION, MESSAGE_TYPE_VERIFICATION } from '@shared/constants';
@@ -142,15 +143,13 @@ app.post('/webhooks/callback/streams', (req: any, res: Response) => {
     const secret = process.env.TWITCH_EVENTSUB_SECRET!;
     const message = getHmacMessage(req);
     const hmac = HMAC_PREFIX + getHmac(secret, message);
-    console.log(secret, hmac)
-    console.log(req.headers[TWITCH_MESSAGE_SIGNATURE]);
 
     if (true === verifyMessage(hmac, req.headers[TWITCH_MESSAGE_SIGNATURE])) {
         logger.imp("Message signatures match");
         let notification = req.body;
 
         if (MESSAGE_TYPE_NOTIFICATION === req.headers[MESSAGE_TYPE]) {
-            logger.imp(notification.subscription.type);
+            logger.imp(`#${req.body.event.broadcaster_user_login}: ${notification.subscription.type}`);
             switch (notification.subscription.type) {
               case 'stream.online': {
                 bot.wakeup();
@@ -162,7 +161,7 @@ app.post('/webhooks/callback/streams', (req: any, res: Response) => {
               };
               default: break;
             }
-            cm.sendall({ event: notification.subscription.type, msg: req.body.event });
+            io.sockets.in(req.body.event.broadcaster_user_login).emit(notification.subscription.type, req.body.event);
             res.sendStatus(204);
         }
         else if (MESSAGE_TYPE_VERIFICATION === req.headers[MESSAGE_TYPE]) {

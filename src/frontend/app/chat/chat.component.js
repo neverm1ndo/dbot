@@ -9,6 +9,7 @@ import Tooltip from 'bootstrap/js/dist/tooltip';
 import PubSub from './pubsub';
 import TwitchApi from './twitch.api';
 import BTTV from './bttv';
+import { io } from 'socket.io-client';
 import { User } from './chat.user';
 import { ChatMessage } from './chat.message';
 import { ChatAlert } from './chat.alert';
@@ -34,7 +35,13 @@ export class ChatComponent extends HTMLElement {
     }});
     this.pubsub = new PubSub(this);
     this.chatterList = new ChattersListController(this);
-    this.ws = new WebSocket(`wss://${window.location.host}`);
+    this.socket = io(`wss://${window.location.host}`, {
+      reconnectionDelayMax: 10000,
+      auth: {
+        token: this.user.token,
+      }
+    });
+    this.setSocketConnection();
     const tag = document.createElement('script');
           tag.src = 'https://www.youtube.com/player_api';
     document.body.append(tag);
@@ -96,7 +103,6 @@ export class ChatComponent extends HTMLElement {
       this.selfEmotes[event.target.dataset.id].push(`${this.text.value.length}-${this.text.value.length + event.target.dataset.name.length}`);
       this.text.value = this.text.value + ' ' + event.target.dataset.name + ' ';
     }));
-    this.setWsConnection();
     this.getLurkersFromStorage();
     this.connectTmiClient();
     this.setUserBagde();
@@ -359,51 +365,24 @@ export class ChatComponent extends HTMLElement {
     this.live = live;
     this.marker.disabled = !live;
   }
-  setWsConnection() {
-    this.ws.onopen = function() {
-      console.log(`Соединение c ${window.location.host} установлено`);
-      this.send(JSON.stringify({event: 'chat-connection'}));
-    };
-
-    this.ws.onclose = (event) => {
-      if (event.wasClean) {
-        console.log('Соединение закрыто чисто');
-      } else {
-        console.log('Обрыв соединения');
-        setTimeout(()=> {
-          this.setWsConnection();
-        }, 5000);
-      }
-      console.log('Code: ' + event.code + '\n Reason: ' + event.reason);
-    };
-
-    this.ws.onmessage = (event) => {
-      let depeche = JSON.parse(event.data);
-      switch (depeche.event) {
-        case 'bot-status':
-          this.setLive(depeche.msg == 1);
-        break;
-        case 'stream.online': {
-          this.setLive(true);
-          this.alert(`Стрим запущен. Время запуска ${timestamp(Date.now())}`, 'success', '', ['bi', 'bi-twitch']);
-          break;
-        }
-        case 'channel.follow': {
-          this.alert(`Новый фолловер <b>${depeche.msg.user_name}</b>`, 'twitch', '', ['bi', 'bi-twitch']);
-          break;
-        }
-        case 'stream.offline': {
-          this.setLive(false);
-          this.alert(`Стрим окончен. Время трансляции ${secondsToTimestamp(Date.now() - new Date(this.stream.started_at).getTime()/1000)}`, 'success', '', ['bi', 'bi-twitch']);
-          break;
-        }
-        default: break;
-      }
-    }
-
-    this.ws.onerror = function(error) {
-      console.log("Ошибка " + error.message);
-    };
+  setSocketConnection() {
+    this.socket.on('connect', () => {
+      console.log("Соединение установлено.");
+      this.socket.on('bot-status', (status) => {
+        this.setLive(status == 1);
+      });
+      this.socket.on('stream.online', (event) => {
+        this.setLive(true);
+        this.alert(`Стрим запущен. Время запуска ${timestamp(Date.now())}`, 'success', '', ['bi', 'bi-twitch']);
+      });
+      this.socket.on('channel.follow', (event) => {
+        this.alert(`Новый фолловер <b>${depeche.msg.user_name}</b>`, 'twitch', '', ['bi', 'bi-twitch']);
+      });
+      this.socket.on('stream.oflline', (event) => {
+        this.setLive(false);
+        this.alert(`Стрим окончен. Время трансляции ${secondsToTimestamp(Date.now() - new Date(this.stream.started_at).getTime()/1000)}`, 'success', '', ['bi', 'bi-twitch']);
+      });
+    });
   }
   addLurker(username) {
     this.settings.lurkers.push(username);
