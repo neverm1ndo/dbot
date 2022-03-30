@@ -7,8 +7,8 @@ export default class TwitchApiService {
   constructor(user) {
     this._user = user;
     this._headers = {
-      'Authorization': 'Bearer ' + this.user.token,
-      'Client-ID': this.user.client
+      'Authorization': 'Bearer ' + this._user.token,
+      'Client-ID': this._user.client
     };
   }
 

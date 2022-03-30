@@ -23,10 +23,10 @@ export class ChatComponent extends HTMLElement {
   connected = false;
   selfEmotes = {};
 
-  constructor(TwitchApi = new TwitchApiService()) {
+  constructor() {
     super();
     this.user = new User();
-    TwitchApi.user = this.user;
+    this.TwitchApi = new TwitchApiService(this.user);
     this.settings = {
       badges: [],
       lurkers: [],
