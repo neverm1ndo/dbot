@@ -21,7 +21,7 @@ enum BotStatus {
 export class Bot {
   opts: Schedule;
   media: Media = new Media();
-  subscribtions: Subscription = new Subscription();
+  subscribtion: any;
   client: Client = new Client({
       options: { debug: true, messagesLogLevel: 'info'  },
       connection: { reconnect: true },
@@ -79,14 +79,14 @@ export class Bot {
     this.status = BotStatus.SLEEPS;
     // if (!this.announcer) return;
     // this.announcer.start.unsubscribe();
-    this.subscribtions.remove(this.announcer.start);
+    this.subscribtion.unsubscribe();
     logger.imp(`Bot status -> ${this.status}`);
   }
 
   public wakeup(): void {
     if (this.status === BotStatus.WORKS) return;
     this.status = BotStatus.WORKS;
-    this.subscribtions.add(this.announcer.start);
+    this.subscribtion = this.announcer.start;
     logger.imp(`Bot status -> ${this.status}`);
   }
 
