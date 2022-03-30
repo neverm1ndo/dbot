@@ -7,7 +7,6 @@ import TTVClip from './ttv.clips.embed';
 import HEX from '@shared/hex';
 import Http from '@shared/http';
 import Cookies from '@shared/cookies';
-import TwitchApi from './twitch.api';
 
 
 export class ChatMessage extends HTMLDivElement {
@@ -70,25 +69,24 @@ export class ChatMessage extends HTMLDivElement {
       this.body.prepend(controls);
     }
     this.append(this.body);
-    if (haveLinks(message)) {
-      const links = haveLinks(message);
-      if (YTFrame.getVideoID(links[0])) {
-        this.body.appendChild(new YTFrame(links[0]));
-        return;
-      }
-      const ttvClipSlug = TTVClip.getSlug(links[0]);
-      if (!ttvClipSlug) return;
-      TwitchApi.getClips(ttvClipSlug).then(data => {
-        const clip = data.data[0];
-        [...this.body.getElementsByTagName('a')].map((link) => { link.remove(); });
-        if (clip) {
-          this.body.append(new TTVClip(clip, 100, 100).valueOf());
-        } else {
-          this.body.append(TTVClip.notLikeThis('Клипа не существует'))
-        }
-        chat.autoscroll();
-      });
+    if (!haveLinks(message)) return;
+    const links = haveLinks(message);
+    if (YTFrame.getVideoID(links[0])) {
+      this.body.appendChild(new YTFrame(links[0]));
+      return;
     }
+    const ttvClipSlug = TTVClip.getSlug(links[0]);
+    if (!ttvClipSlug) return;
+    this.chat.TwitchApi.getClips(ttvClipSlug).then(data => {
+      const clip = data.data[0];
+      [...this.body.getElementsByTagName('a')].map((link) => { link.remove(); });
+      if (clip) {
+        this.body.append(new TTVClip(clip, 100, 100).valueOf());
+      } else {
+        this.body.append(TTVClip.notLikeThis('Клипа не существует'))
+      }
+      chat.autoscroll();
+    });
   }
 
   /**

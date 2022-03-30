@@ -1,50 +1,55 @@
 import Http from '@shared/http'
-import Cookies from '@shared/cookies';
-import { User } from './chat.user';
 
-export default class TwitchApi {
+export default class TwitchApiService {
 
-  static _API_URL = 'https://api.twitch.tv/helix';
-  static _user = new User();
-  static _headers = {
-    'Authorization': 'Bearer ' + TwitchApi._user.token,
-    'Client-ID': TwitchApi._user.client
-  };
+  _API_URL = 'https://api.twitch.tv/helix';
 
-  static getEmoteSets(id) {
-    return Http.get(`${TwitchApi._API_URL}/chat/emotes/set?emote_set_id=${id.join('&emote_set_id=')}`, TwitchApi._headers);
+  constructor(user) {
+    this._user = user;
+    this._headers = {
+      'Authorization': 'Bearer ' + this.user.token,
+      'Client-ID': this.user.client
+    };
   }
 
-  static getUsers(ids) {
-    return Http.get(`${TwitchApi._API_URL}/users?id=${[...ids].join('&id=')}`, TwitchApi._headers);
+  set user(user) {
+    this._user = user;
   }
 
-  static getUser(login) {
-    return Http.get(`${TwitchApi._API_URL}/users?login=${login}`, TwitchApi._headers);
+  getEmoteSets(id) {
+    return Http.get(`${this._API_URL}/chat/emotes/set?emote_set_id=${id.join('&emote_set_id=')}`, this._headers);
   }
 
-  static getStreams(id) {
-    return Http.get(`${TwitchApi._API_URL}/streams?user_id=${id}`, TwitchApi._headers);
+  getUsers(ids) {
+    return Http.get(`${this._API_URL}/users?id=${[...ids].join('&id=')}`, this._headers);
   }
 
-  static getChannelBadges(id) {
-    return Http.get(`${TwitchApi._API_URL}/chat/badges?broadcaster_id=${id}`, TwitchApi._headers);
+  getUser(login) {
+    return Http.get(`${this._API_URL}/users?login=${login}`, this._headers);
   }
 
-  static getGlobalBadges() {
-    return Http.get(`${TwitchApi._API_URL}/chat/badges/global`, TwitchApi._headers);
+  getStreams(id) {
+    return Http.get(`${this._API_URL}/streams?user_id=${id}`, this._headers);
   }
 
-  static getClips(slug) {
-    return Http.get(`${TwitchApi._API_URL}/clips?id=${slug}`, TwitchApi._headers);
+  getChannelBadges(id) {
+    return Http.get(`${this._API_URL}/chat/badges?broadcaster_id=${id}`, this._headers);
   }
 
-  static createMarker(description = 'Highlight'+Date.now()) {
-    return Http.post(`${TwitchApi._API_URL}/streams/markers`,
+  getGlobalBadges() {
+    return Http.get(`${this._API_URL}/chat/badges/global`, this._headers);
+  }
+
+  getClips(slug) {
+    return Http.get(`${this._API_URL}/clips?id=${slug}`, this._headers);
+  }
+
+  static createMarker(description = `Highlight ${Date.now()}`) {
+    return Http.post(`${this._API_URL}/streams/markers`,
     {
-      user_id: TwitchApi._user.id,
+      user_id: this._user.id,
       description
-    }, Object.assign(TwitchApi._headers, {
+    }, Object.assign(this._headers, {
       'Content-Type': 'application/json',
     }));
   }
