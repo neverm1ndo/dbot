@@ -859,12 +859,11 @@ export class D2PT {
         pos = parseInt(pos as string) - 1;
       } else {
         if (!Object.keys(D2PT.positions).includes(String(pos).toLowerCase())) return Promise.reject('Нет такой позиции. Разрешаются: Carry, Mid, Offlane, Support(4), Support(5).');
-        console.log(String(pos).toLowerCase());
         pos = D2PT.positions[pos];
       }
     }
     return axios.get(this.URL_D2PT + validatedHero).then((body) => {
-      if (pos !== undefined) return D2PT.getHeroStatByPosition(parse(body.data).querySelectorAll('.content-box-lvl-3'), validatedHero as Hero, pos);
+      if (pos !== undefined) return D2PT.getHeroStatByPosition(parse(body.data).querySelector('.roles').querySelectorAll('.content-box-lvl-3'), validatedHero as Hero, pos);
       const data  = parse(body.data).querySelector('.hero-header-stats-detailed').rawText.replace(/ +(?= )/g,'');
       const times = data.match(/\d+(?=\sMatches)/)![0];
       const wr    = data.match(/(?<=\s)\d+\.\d+\%(?=\s)/)![0];
