@@ -13,6 +13,7 @@ export class ChatMessage extends HTMLElement {
     super();
     const color = tags.color?new HEX(tags.color):new HEX('FFFFFF');
     this.tags = tags;
+    this.classList.add('card');
     this.innerHTML = template({
       firstMsg: tags['first-msg'] == true,
       timestamp: timestamp(date),

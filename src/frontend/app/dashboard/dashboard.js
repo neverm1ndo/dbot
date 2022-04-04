@@ -52,8 +52,6 @@ customElements.define('moderators-rules', Mods);
   });
 });
 
-document.body.querySelector('#chat')
-             .append(new ChatComponent());
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/service-worker.js')
   .then(function(registration) {

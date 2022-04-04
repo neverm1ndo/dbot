@@ -9,6 +9,18 @@ omd-chat {
   overflow: hidden;
   font-family: 'Arial', sans;
   font-size: 14px!important;
+  omd {
+    &-message {
+      display: block;
+    }
+    &-alert {
+      display: block;
+    }
+    &-control-button {
+      display: block;
+      cursor: pointer;
+    }
+  }
   img {
     user-drag: none;
     -webkit-user-drag: none;

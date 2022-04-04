@@ -1,4 +1,4 @@
-export class MessageControlButton extends HTMLButtonElement {
+export class MessageControlButton extends HTMLElement {
   constructor(type, cb) {
     super();
     this.type = 'button';
