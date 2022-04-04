@@ -131,7 +131,7 @@ app.get('/auth/twitch', passport.authenticate('twitch', { scope: ['user_read', '
 // Set route for OAuth redirect
 app.get('/auth/twitch/callback', passport.authenticate('twitch',
 {
-  successRedirect: '/',
+  successRedirect: '/controls/chat',
   failureRedirect: '/'
 }));
 
