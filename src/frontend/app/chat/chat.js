@@ -4,6 +4,11 @@ import tmi from 'tmi.js';
 import { ChatComponent } from '@chat/chat.component';
 import { SpeakerComponent } from '@app/speaker/speaker.component';
 import { ChattersListComponent } from '@chat/chatters-list/chatters-list.component';
+import { ChatMessageBadge } from '@chat/chat.badge';
+import { ChatMessage } from '@chat/message/chat.message';
+import { ChatAlert } from '@chat/alert/chat.alert';
+import { YTFrame } from '@chat/chat.ytframe';
+import { MessageControlButton } from '@chat/message/chat.message-control';
 
 import { TwitchApiService } from '@chat/services/twitch.api.service';
 import { PubSubService } from '@chat/services/pubsub.service';
@@ -44,9 +49,14 @@ export const client = new tmi.Client({
 * Application componets
 */
 const components = {
-  'omd-speaker': SpeakerComponent,
-  'omd-chat'   : ChatComponent,
-  'omd-chatters-list': ChattersListComponent,
+  'omd-chat'          : ChatComponent,
+  'omd-alert'         : ChatAlert,
+  'omd-chatters-list' : ChattersListComponent,
+  'omd-chat-badge'    : ChatMessageBadge,
+  'omd-chat-message'  : ChatMessage,
+  'omd-control-button': MessageControlButton,
+  'omd-speaker'       : SpeakerComponent,
+  'yt-player'         : YTFrame,
 };
 /**
 * Define application componets

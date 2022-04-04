@@ -1,7 +1,7 @@
 import template from 'pug-loader!./alert.tpl.pug';
 import { MessageControlButton } from '@chat/message/chat.message-control';
 
-export class ChatAlert extends HTMLDivElement {
+export class ChatAlert extends HTMLElement {
   constructor(message, type = 'default', username = '', icon) {
     super();
     this.username = username;

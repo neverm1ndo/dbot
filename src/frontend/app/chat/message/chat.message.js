@@ -8,7 +8,7 @@ import HEX from '@shared/hex';
 import { twitchApiService, bttv, client } from '@chat/chat';
 
 
-export class ChatMessage extends HTMLDivElement {
+export class ChatMessage extends HTMLElement {
   constructor(channel, displayName, tags, message, self, date, channelBadges) {
     super();
     const color = tags.color?new HEX(tags.color):new HEX('FFFFFF');

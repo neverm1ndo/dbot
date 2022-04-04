@@ -2,7 +2,7 @@ const _defaultBadges = {
   'diktorbot': '/assets/tank2.png',
 };
 
-export class ChatMessageBadge extends HTMLDivElement {
+export class ChatMessageBadge extends HTMLElement {
   constructor(type, badges) {
     super();
     this.classList.add('badge-icon');

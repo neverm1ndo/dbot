@@ -1,4 +1,4 @@
-export class YTFrame extends HTMLDivElement {
+export class YTFrame extends HTMLElement {
   player;
   constructor(url) {
     super();
