@@ -1,25 +1,9 @@
-div.chatters-list.w-100.h-100#chatters-list
-  div.d-flex.flex-column.flex-nowrap.align-items-start.justify-content-stretch.h-100
-    div.d-flex.w-100.head
-      div.container-fluid
-        div.d-flex.flex-row.pt-2.pb-2
-          div.d-flex.justify-self-start
-            button.btn.btn-small.btn-secondary.close#close(type="button")
-              svg(width="100%" height="100%" version="1.1" viewBox="0 0 20 20" x="0px" y="0px")
-                g
-                  path(d="M8.5 10L4 5.5 5.5 4 10 8.5 14.5 4 16 5.5 11.5 10l4.5 4.5-1.5 1.5-4.5-4.5L5.5 16 4 14.5 8.5 10z")
-          div.d-flex.flex-fill.text-center
-            h5.w-100 Пользователи чата
-    div.container-fluid.flex-fill.overflow-auto.pt-3.pb-3
-      div.d-flex-flex-fill.list
-        div#list
+omd-chatters-list
 div.d-flex.flex-column.flex-nowrap.h-100.align-items-start.justify-content-stretch
   div.d-flex.w-100.head
     div.container-fluid
       div.d-flex.flex-row.justify-content-between.align-content-start.pt-2.pb-2
         div.d-flex
-          //- a(href='/controls/dash')
-          //-   img.logo.indicator-live(src="/assets/tank2.png")
           div.chatters-counter.d-flex.flex-row.justify-content-between.align-items-center
             div.d-inline
               svg(type="color-text-accessible-red" width="20px" height="20px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px")
@@ -36,6 +20,8 @@ div.d-flex.flex-column.flex-nowrap.h-100.align-items-start.justify-content-stret
         div.balance.d-flex.flex-row.align-items-end.justify-content-between
           button.btn.btn-small.btn-secondary.marker(type="button")
             i.bi.bi-vr
+          button#speaker-init.btn.btn-small.btn-secondary(type="button")
+            i.bi.bi-megaphone-fill
           button.btn.btn-small.btn-secondary.open-chatters-list#open-chatters-list(type="button")
             svg(width="100%" height="100%" version="1.1" viewBox="0 0 20 20" x="0px" y="0px" class="ScIconSVG-sc-1bgeryd-1 cMQeyU")
               g
@@ -53,9 +39,8 @@ div.d-flex.flex-column.flex-nowrap.h-100.align-items-start.justify-content-stret
                 g
                   path(d="M7 11a1 1 0 100-2 1 1 0 000 2zM14 10a1 1 0 11-2 0 1 1 0 012 0zM10 14a2 2 0 002-2H8a2 2 0 002 2z")
                   path(fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0a6 6 0 11-12 0 6 6 0 0112 0z" clip-rule="evenodd")
-            //- div.dropdown-menu.dropdown-menu-dark.p-2.mb-3
-            //-   div#emotes-list.emotes-list
           label.chatty-label(for="chatty")
           input.form-control#text(type="text" name="chatty" placeholder="Отправить сообщение" autocomplete="off")
           button.btn.btn-dark#send(type="button" disabled) Чат
       div#broadcaster-quickpanel.collapse.col-12
+      omd-speaker

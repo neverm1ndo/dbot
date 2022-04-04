@@ -108,7 +108,7 @@ omd-chat {
     display: inline;
   }
   .card .card-body::before {
-    content: attr(data-date);
+    content: attr(data-timestamp);
     font-size: 10px;
     color: var(--bs-gray);
     position: absolute;

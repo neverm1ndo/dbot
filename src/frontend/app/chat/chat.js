@@ -1,9 +1,56 @@
-import { ChatComponent } from './chat.component';
-import '../polyfills';
+import '@app/polyfills';
+import tmi from 'tmi.js';
+
+import { ChatComponent } from '@chat/chat.component';
+import { SpeakerComponent } from '@app/speaker/speaker.component';
+import { ChattersListComponent } from '@chat/chatters-list/chatters-list.component';
+
+import { TwitchApiService } from '@chat/services/twitch.api.service';
+import { PubSubService } from '@chat/services/pubsub.service';
+import { SocketService } from '@chat/services/socket.service';
+import { OmdApiService } from '@chat/services/omd.api.service';
+import BTTVService from '@chat/services/bttv.service';
+
+
 /**
-* Add YouTube embed player API
+* Application services
 */
-customElements.define('omd-chat', ChatComponent);
+export const twitchApiService = new TwitchApiService();
+export const pubsubService    = new PubSubService();
+export const socketService    = new SocketService();
+export const omdApiService    = new OmdApiService();
+export const bttv             = new BTTVService();
+
 /**
-* Set lurkers IIFE
+* Tmi client
 */
+export const client = new tmi.Client({
+   options: {
+     debug: true,
+     messagesLogLevel: "info",
+     clientId: twitchApiService.user.client,
+     skipUpdatingEmotesets: true
+   },
+   connection: { reconnect: true, secure: true },
+   identity: {
+     username: twitchApiService.user.username,
+     password: 'oauth:' + twitchApiService.user.token
+   },
+   channels: [twitchApiService.getChannelName()]
+});
+
+
+/**
+* Application componets
+*/
+const components = {
+  'omd-speaker': SpeakerComponent,
+  'omd-chat'   : ChatComponent,
+  'omd-chatters-list': ChattersListComponent,
+};
+/**
+* Define application componets
+*/
+Object.entries(components).forEach((entry) => {
+  customElements.define(entry[0], entry[1]);
+});

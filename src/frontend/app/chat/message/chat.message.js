@@ -1,74 +1,49 @@
-import { timestamp, haveLinks, linkify } from './utils';
-import { YTFrame } from './chat.ytframe';
-import { ChatAlert } from './chat.alert';
-import { ChatMessageBadge } from './chat.badge';
-import { MessageControlButton } from './chat.message-control';
-import TTVClip from './ttv.clips.embed';
+import template from 'pug-loader!./message.tpl.pug';
+import { timestamp, haveLinks, linkify } from '@chat/utils';
+import { YTFrame } from '@chat/chat.ytframe';
+import { ChatMessageBadge } from '@chat/chat.badge';
+import { MessageControlButton } from '@chat/message/chat.message-control';
+import TTVClip from '@chat/ttv.clips.embed';
 import HEX from '@shared/hex';
-import Http from '@shared/http';
-import Cookies from '@shared/cookies';
+import { twitchApiService, bttv, client } from '@chat/chat';
 
 
 export class ChatMessage extends HTMLDivElement {
-  constructor(channel, displayName, tags, message, self, date, chat) {
+  constructor(channel, displayName, tags, message, self, date, channelBadges) {
     super();
-    let separator = ': ';
     const color = tags.color?new HEX(tags.color):new HEX('FFFFFF');
-    this.body     = document.createElement('div'); // Запихнуть бы все эти переменные в один обжект
-    this.nickname = document.createElement('span');
-    this.message  = document.createElement('span');
-    this.message.classList.add('card-body-msg');
     this.tags = tags;
-    this.nickname.classList.add('nickname');
-    this.nickname.innerHTML = tags['display-name'];
+    this.innerHTML = template({
+      firstMsg: tags['first-msg'] == true,
+      timestamp: timestamp(date),
+      highlightedMessage: tags['highlighted-message'],
+      botCommand: message.startsWith('!'),
+      nickname: tags['display-name'],
+      separator: tags['message-type'] === "action" ? undefined : ': ',
+      message: this.pretty(channel, twitchApiService.user.display_name, tags, message),
+    });
+    this.body     = this.querySelector('.card-body');
+    this.nickname = this.querySelector('.nickname');
     this.nickname.style.color = color < 0x505050?color.brightness(70).contrast(30).toString():color.toString();
-    if (tags['message-type'] === "action") {
-      this.body.style.color = this.nickname.style.color;
-      separator = ''; // Обязательные манипуляции???
-    };
-    this.classList.add('card');
-    this.body.classList.add('card-body');
-    this.body.dataset.date = timestamp(date);
-    if (separator) this.body.innerHTML = separator;
-    this.message.innerHTML = this.pretty(channel, chat.user.display_name, tags, message, chat.bttv); // innerHTML!
-    this.body.prepend(this.nickname);
     if (tags.badges) {
       const container = document.createElement('span');
       const badges = Object.entries(tags.badges);
       if (tags.username === 'diktorbot') badges.push(['diktorbot', '1']);
       for (let i = 0; i < badges.length; i++) {
-        container.append(new ChatMessageBadge(badges[i], chat.settings));
+        container.append(new ChatMessageBadge(badges[i], channelBadges));
       }
       this.body.prepend(container);
     }
-    if (tags['first-msg'] == true) {
-      const firstMsgBadge = document.createElement('span');
-      firstMsgBadge.classList.add('first-msg');
-      firstMsgBadge.innerText = 'Первое сообщение от';
-      this.body.classList.add('first-msg-card');
-      this.body.prepend(firstMsgBadge, document.createElement('br'));
-    }
-    if (tags['msg-id'] == "highlighted-message") {
-      this.message.classList.add("highlighted-message");
-    }
-    if (message.startsWith('!')) {
-      const botCommand = document.createElement('span');
-            botCommand.innerText = 'Команда бота';
-            botCommand.classList.add('bot-command');
-      this.message.prepend(botCommand);
-    }
-    this.body.append(this.message);
-    if (!self && (tags.username !== chat.user.username)) {
+    if (!self && (tags.username !== twitchApiService.user.username)) {
       const controls = document.createElement('span');
       controls.prepend(new MessageControlButton(['bi', 'bi-slash-circle', 'red'], () => {
-        chat.client.ban(channel, tags.username);
+        client.ban(channel, tags.username);
       }));
       controls.prepend(new MessageControlButton(['bi', 'bi-clock', 'yellow'], () => {
-        chat.client.timeout(channel, tags.username, 600, 'rediska');
+        client.timeout(channel,  tags.username);
       }));
       this.body.prepend(controls);
     }
-    this.append(this.body);
     if (!haveLinks(message)) return;
     const links = haveLinks(message);
     if (YTFrame.getVideoID(links[0])) {
@@ -77,7 +52,7 @@ export class ChatMessage extends HTMLDivElement {
     }
     const ttvClipSlug = TTVClip.getSlug(links[0]);
     if (!ttvClipSlug) return;
-    this.chat.TwitchApi.getClips(ttvClipSlug).then(data => {
+      twitchApiService.getClips(ttvClipSlug).then(data => {
       const clip = data.data[0];
       [...this.body.getElementsByTagName('a')].map((link) => { link.remove(); });
       if (clip) {
@@ -85,14 +60,13 @@ export class ChatMessage extends HTMLDivElement {
       } else {
         this.body.append(TTVClip.notLikeThis('Клипа не существует'))
       }
-      chat.autoscroll();
     });
   }
 
   /**
   * Слишком много циклов
   */
-  pretty(channel, displayName, tags, message, bttv) {
+  pretty(channel, displayName, tags, message) {
     let notice = message.includes('@')?'@' + displayName: displayName;
     let splited = message.split(/\s/);
     let result = [];

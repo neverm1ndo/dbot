@@ -1,19 +1,34 @@
 import Http from '@shared/http'
+import { User } from '@chat/chat.user';
 
-export default class TwitchApiService {
+export class TwitchApiService {
+
+  _user = new User();
 
   _API_URL = 'https://api.twitch.tv/helix';
 
-  constructor(user) {
-    this._user = user;
+  constructor() {
     this._headers = {
       'Authorization': 'Bearer ' + this._user.token,
       'Client-ID': this._user.client
     };
   }
 
+  set accessToken(token) {
+    this._user.token = token;
+  }
+
+  get user() {
+    return this._user;
+  }
+
   set user(user) {
     this._user = user;
+  }
+
+  getChannelName() {
+    const params = new URLSearchParams(window.location.search);
+    return params.has('channel')?params.get('channel'):this._user.username;
   }
 
   getEmoteSets(id) {

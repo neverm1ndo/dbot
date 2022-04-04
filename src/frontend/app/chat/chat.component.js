@@ -1,20 +1,12 @@
 import template from 'pug-loader!./chat.tpl.pug';
 import styles from './chat.scss';
-import tmi from 'tmi.js';
-import Http from '@shared/http';
-import Cookies from '@shared/cookies';
-import TTVClip from './ttv.clips.embed';
 import Collapse from 'bootstrap/js/dist/collapse';
-import Tooltip from 'bootstrap/js/dist/tooltip';
-import PubSub from './pubsub';
-import TwitchApiService from './twitch.api';
-import BTTV from './bttv';
-import { io } from 'socket.io-client';
-import { User } from './chat.user';
-import { ChatMessage } from './chat.message';
-import { ChatAlert } from './chat.alert';
-import { ChattersListController } from './chatter-list.controller';
-import { secondsToTimestamp, timestamp } from './utils';
+import { PubSubService } from '@chat/services/pubsub.service';
+import { TwitchApiService } from '@chat/services/twitch.api.service';
+import { socketService, pubsubService, twitchApiService, omdApiService, bttv, client } from '@chat/chat';
+import { ChatMessage } from '@chat/message/chat.message';
+import { ChatAlert } from '@chat/alert/chat.alert';
+import { secondsToTimestamp, timestamp } from '@chat/utils';
 
 export class ChatComponent extends HTMLElement {
 
@@ -25,25 +17,15 @@ export class ChatComponent extends HTMLElement {
 
   constructor() {
     super();
-    this.user = new User();
-    this.TwitchApi = new TwitchApiService(this.user);
     this.settings = {
       badges: [],
       lurkers: [],
       sets: new Set(),
-      id: this.user.id,
+      id: twitchApiService.user.id,
     };
     this.innerHTML = template({ user: {
-        profile_image_url: this.user.profile_image_url
+        profile_image_url: twitchApiService.user.profile_image_url
     }});
-    this.pubsub = new PubSub(this);
-    this.chatterList = new ChattersListController(this);
-    this.socket = io(`wss://${window.location.host}`, {
-      reconnectionDelayMax: 10000,
-      auth: {
-        token: this.user.token,
-      }
-    });
     this.setSocketConnection();
     const tag = document.createElement('script');
           tag.src = 'https://www.youtube.com/player_api';
@@ -57,27 +39,13 @@ export class ChatComponent extends HTMLElement {
     this.quickpanel    = this.querySelector("#broadcaster-quickpanel")
     this.marker        = this.querySelector(".marker");
     this.marker.disabled = true;
-    this.channel = this.getChannelName();
+    this.channel = twitchApiService.getChannelName();
                    this.getChannelProperties(this.channel);
-    this.client = new tmi.Client({
-       options: {
-         debug: true,
-         messagesLogLevel: "info",
-         clientId: this.user.client,
-         skipUpdatingEmotesets: true
-       },
-       connection: { reconnect: true, secure: true },
-       identity: {
-         username: this.user.username,
-         password: 'oauth:' + this.user.token
-       },
-       channels: [this.channel]
-    });
-    this.bttv = new BTTV();
-    this.bttv.getEmotes(this.channel, this.quickpanel);
+    this.chatterList = this.querySelector('omd-chatters-list');
+    bttv.getEmotes(this.channel, this.quickpanel);
     this.marker.addEventListener('click', () => {
       if (!this.connected) return;
-      TwitchApi.createMarker().then((res) => {
+      twitchApiService.createMarker().then((res) => {
         this.alert(`Установлен маркер на позиции ${secondsToTimestamp(res.data[0].position_seconds)} ${res.data[0].description?'с описанием ' + res.data[0].description:''}`, 'twitch', '', ['bi', 'bi-vr']);
       }).catch((err) => {
         this.alert(`Не удалось создать маркер ${err.message}`, 'warning', '', ['bi', 'bi-exclamation-diamond-fill']);
@@ -110,47 +78,64 @@ export class ChatComponent extends HTMLElement {
     this.connectTmiClient();
     this.setUserBagde();
   }
+
   setUserBagde() {
     const label = this.querySelector('.chatty-label');
     const img = new Image();
     img.src = '/assets/cm.png';
-    if (this.user.username == this.channel) img.src = '/assets/bc.png';
+    if (twitchApiService.user.username == this.channel) img.src = '/assets/bc.png';
     label.append(img);
   }
+
+  setSocketConnection() {
+    socketService.onBotStatus().subscribe((status) => {
+      this.setLive(status == 1);
+    });
+    socketService.onStreamOnline().subscribe((event) => {
+      this.setLive(true);
+      this.alert(`Стрим запущен. Время запуска ${timestamp(Date.now())}`, 'success', '', ['bi', 'bi-twitch']);
+    });
+    socketService.onStreamOffline().subscribe((event) => {
+      this.setLive(false);
+      this.alert(`Стрим окончен. Время трансляции ${secondsToTimestamp(Date.now() - new Date(this.stream.started_at).getTime()/1000)}`, 'success', '', ['bi', 'bi-twitch']);
+    });
+    socketService.onChannelFollow().subscribe((event) => {
+      this.alert(`Новый фолловер <b>${event.user_name}</b>`, 'twitch', '', ['bi', 'bi-twitch']);
+    });
+  }
+
   connectTmiClient() {
     const CDC_VIEWER_LIM = 35;
     let trigger = 0;
-    this.client.connect();
-    this.client.on('connected', (channel, self) => {
+    client.connect();
+    client.on('connected', (channel, self) => {
       this.alert('Добро пожаловать в чат!');
       this.connected = true;
       this.submit.disabled = false;
       this.text.disabled = false;
     });
-    this.client.on('disconnected', (channel, self) => {
+    client.on('disconnected', (channel, self) => {
       this.alert('Вы отсоединенны от чата', 'siren');
       this.connected = false;
       this.submit.disabled = true;
       this.text.disabled = true;
     });
-    this.client.on('join', (channel, username, self) => {
+    client.on('join', (channel, username, self) => {
       if (self || this.chatterList.connected.includes(username) || this.settings.lurkers.includes(username)) return;
       this.chatterList.add(username);
-      if (this.stream) {
-        if (this.stream.viewer_count <= CDC_VIEWER_LIM) {
-          this.alert(`<b>${username}</b> подключился`, 'connect', username);
-        }
+      if (this.chatterList.connected.length <= CDC_VIEWER_LIM) {
+        this.alert(`<b>${username}</b> подключился`, 'connect', username);
       }
     });
-    this.client.on('ban', (channel, username, reason, userstate) => {
+    client.on('ban', (channel, username, reason, userstate) => {
       // Replaced with PubSub event handler
       this.pseudoDelete(username);
     });
-    this.client.on('timeout', (channel, username, reason, duration, userstate) => {
+    client.on('timeout', (channel, username, reason, duration, userstate) => {
       this.alert(`<b>${username}</b> отстранен на ${duration} секунд ${reason?'по причине ' + reason:''}`, 'warning', '', ['bi', 'bi-clock']);
       this.pseudoDelete(username);
     });
-    this.client.on('part', (channel, username, self) => {
+    client.on('part', (channel, username, self) => {
       if (self || this.settings.lurkers.includes(username)) return;
       setTimeout(() => {
         if (this.chatterList.connected.includes(username)) {
@@ -163,7 +148,7 @@ export class ChatComponent extends HTMLElement {
         }
       }, 180000);
     });
-    this.client.on('chat', (channel, tags, message, self) => {
+    client.on('chat', (channel, tags, message, self) => {
       if (self) {
         tags.emotes = this.selfEmotes;
         this.add(tags, message, self);
@@ -171,45 +156,46 @@ export class ChatComponent extends HTMLElement {
       }
       this.add(tags, message, self);
     });
-    this.client.on('subscription', (channel, username, methods, message, userstate) => {
+    client.on('subscription', (channel, username, methods, message, userstate) => {
       this.alert(`<b>${username}</b> оформил подписку<br><small>${message}</small>`, 'twitch', '', ['bi', 'bi-twitch']);
     });
-    this.client.on('notice', (channel, msgid, message) => {
+    client.on('notice', (channel, msgid, message) => {
       this.alert(`<small>${message}</small>`);
     });
-    this.client.on('vips', (channel, vips) => {
+    client.on('vips', (channel, vips) => {
       vips = vips.join('</br>');
       this.alert(`<small>${vips.length > 0?vips:'Список VIP пуст'}</small>`);
     });
-    this.client.on('mods', (channel, mods) => {
+    client.on('mods', (channel, mods) => {
       mods = mods.join('</br>');
       this.alert(`<small>${mods.length > 0?mods:'Список модераторов пуст'}</small>`);
     });
-    this.client.on('resub', (channel, username, methods, message, userstate) => {
+    client.on('resub', (channel, username, methods, message, userstate) => {
       this.alert(`<b>${username}</b> переоформил подписку<br><small>${message}</small>`, 'twitch', '', ['bi', 'bi-twitch']);
     });
-    this.client.on('subgift', (channel, username, streakMonths, recepient, methods, userstate) => {
+    client.on('subgift', (channel, username, streakMonths, recepient, methods, userstate) => {
       this.alert(`<b>${username}</b> подарил подписку <u>${recepient}</u>`, 'twitch', '', ['bi', 'bi-gift-fill']);
     });
-    this.client.on('raided', (channel, username, viewers) => {
+    client.on('raided', (channel, username, viewers) => {
       this.alert(`<b>${username}</b> зарейдил канал на <b>${viewers}</b> зрителей`, 'twitch', '', ['bi', 'bi-twitch']);
     });
-    this.client.on('hosted', (channel, username, viewers, autohost) => {
+    client.on('hosted', (channel, username, viewers, autohost) => {
       this.alert(`<b>${username}</b> захостил канал на <b>${viewers}</b> зрителей`, 'twitch', '', ['bi', 'bi-twitch']);
     });
-    this.client.on('whisper', (channel, tags, message, self) => {
+    client.on('whisper', (channel, tags, message, self) => {
       this.add(tags, message, self);
     });
-    this.client.on('clearchat', (channel) => {
+    client.on('clearchat', (channel) => {
       this.alert('Чат был очищен');
     });
-    this.client.on('cheer', (channel, userstate, message) => {
+    client.on('cheer', (channel, userstate, message) => {
       this.alert(`<b>${username}</b> поддержал канал на <b>${userstate.bits}</b> Cheers`, 'info');
     });
-    this.client.on('emotesets', (sets, obj) => {
+    client.on('emotesets', (sets, obj) => {
       this.getEmoteSet(sets.split(','));
     });
   }
+
   getLurkersFromStorage() {
     const storage = window.localStorage.getItem('lurkers');
     if (!storage) return;
@@ -220,15 +206,13 @@ export class ChatComponent extends HTMLElement {
     });
     window.localStorage.setItem('lurkers', JSON.stringify(this.settings.lurkers));
   }
-  getChannelName() {
-    const params = new URLSearchParams(window.location.search);
-    return params.has('channel')?params.get('channel'):this.user.username;
-  }
+
   getEmoteSet(id) {
-    this.TwitchApi.getEmoteSets(id)
+    twitchApiService.getEmoteSets(id)
                   .then(data => { if (data.data.length > 0) this.addEmotes(data.data) })
                   .catch(err => console.error);
   }
+
   addEmotes(emotes) {
     const owners = {};
     let streamers = new Set();
@@ -237,7 +221,7 @@ export class ChatComponent extends HTMLElement {
       if (!owners[emotes[i].owner_id]) owners[emotes[i].owner_id] = [];
       owners[emotes[i].owner_id].push(emotes[i]);
     }
-    this.TwitchApi.getUsers(streamers).then((ownersInfo) => {
+    twitchApiService.getUsers(streamers).then((ownersInfo) => {
       ownersInfo.data.push({
         id: '0',
         display_name: 'Whole World'
@@ -267,6 +251,7 @@ export class ChatComponent extends HTMLElement {
       }
     }).catch((err) => console.log(err))
   }
+
   /**
   * @param {number} amount - max chat lenght
   * DOM optimization
@@ -275,9 +260,17 @@ export class ChatComponent extends HTMLElement {
   removeOldMessages(amount) {
     if (this.chat.children.length >= amount) this.chat.children[0].remove();
   }
+
+  /**
+  * @param {number} tags - chat tmi message tags
+  * @param {string} message - chat message
+  * @param {boolean} self - self message
+  * @param {number} date - current unix timestamp
+  * Adds new message container into the chat container, then scrolls chat to the bottom
+  */
   add(tags, message, self, date = Date.now()) {
     this.removeOldMessages(800);
-    const messageComponent = new ChatMessage(this.channel, this.user.display_name, tags, message, self, date, this);
+    const messageComponent = new ChatMessage(this.channel, twitchApiService.user.display_name, tags, message, self, date, this.settings.badges);
           messageComponent.nickname.addEventListener('click', () => {
             this.text.value = this.text.value + ' @' + tags.username + ' ';
             this.text.focus();
@@ -285,6 +278,14 @@ export class ChatComponent extends HTMLElement {
     this.chat.append(messageComponent);
     this.autoscroll();
   }
+
+  /**
+  * @param {string} message - chat message
+  * @param {string} type - alert type
+  * @param {string} username - target username
+  * @param {Array<string>} icon - bootstrap icon classes ['bi', 'bi-info']
+  * Adds new alert container, makes a stack
+  */
   alert(message, type, username, icon) {
     this.removeOldMessages(800);
     const prevLast = this.chat.children[this.chat.children.length - 2];
@@ -343,12 +344,14 @@ export class ChatComponent extends HTMLElement {
       this.autoscroll();
     }, 10);
   }
+
   autoscroll () {
     this.chat.parentElement.scrollTo({
       top: this.chat.parentElement.scrollHeight + 300,
       behavior: 'smooth'
     });
   }
+
   pseudoDelete(username) {
     const childs = this.chat.childNodes;
     for (let i = 0; i < childs.length; i += 1) {
@@ -358,43 +361,28 @@ export class ChatComponent extends HTMLElement {
       child.body.classList.add('text-decoration-line-through', 'pseudo-delete');
     }
   }
+
   send(message = '') {
     if (!this.text.value && !message) return;
-    this.client.say(this.channel, message || this.text.value);
+    client.say(this.channel, message || this.text.value);
     this.text.value = '';
     this.selfEmotes = {};
   }
+
   setLive(live) {
     this.live = live;
     this.marker.disabled = !live;
   }
-  setSocketConnection() {
-    this.socket.on('connect', () => {
-      console.log("Соединение установлено.");
-      this.socket.on('bot-status', (status) => {
-        this.setLive(status == 1);
-      });
-      this.socket.on('stream.online', (event) => {
-        this.setLive(true);
-        this.alert(`Стрим запущен. Время запуска ${timestamp(Date.now())}`, 'success', '', ['bi', 'bi-twitch']);
-      });
-      this.socket.on('channel.follow', (event) => {
-        this.alert(`Новый фолловер <b>${event.user_name}</b>`, 'twitch', '', ['bi', 'bi-twitch']);
-      });
-      this.socket.on('stream.oflline', (event) => {
-        this.setLive(false);
-        this.alert(`Стрим окончен. Время трансляции ${secondsToTimestamp(Date.now() - new Date(this.stream.started_at).getTime()/1000)}`, 'success', '', ['bi', 'bi-twitch']);
-      });
-    });
-  }
+
   addLurker(username) {
     this.settings.lurkers.push(username);
     window.localStorage.setItem('lurkers', JSON.stringify([...new Set(this.settings.lurkers)]));
   }
+
   handleStreamInfo(id) {
     let interval = setInterval(() => {
       if (this.live) {
-        this.TwitchApi.getStreams(id).then((data) => {
+        twitchApiService.getStreams(id).then((data) => {
           const streamInfo = data.data[0];
           if (streamInfo) {
             this.stream = streamInfo;
@@ -403,24 +391,25 @@ export class ChatComponent extends HTMLElement {
             this.chatterList.dom.counter.innerHTML = 0;
           }
         }).catch(() => {
-          Http.get('/controls/chat/refresh-session').then((token) => {
-            console.log(`Token refreshed: \n New: ${token} \n Old: ${this.user.token}`);
-            this.user.token = token.accessToken;
+          omdApiService.refreshSession().then((token) => {
+            console.log(`Token refreshed: \n New: ${token} \n Old: ${twitchApiService.user.token}`);
+            twitchApiService.accessToken = token.accessToken;
           }).catch((err) => console.error);
         });
       }
     }, 120000);
   }
+
   getChannelProperties (channel) {
-    this.TwitchApi.getUser(channel).then((data) => {
-      this.user.twitch = data[0];
+    twitchApiService.getUser(channel).then((data) => {
+      twitchApiService.user.twitch = data[0];
       this.settings.id = data.data[0].id;
-      this.pubsub.connect(this.settings.id);
+      pubsubService.connect(this.settings.id);
       this.handleStreamInfo(this.settings.id);
       return Promise.all([
-        this.TwitchApi.getChannelBadges(this.settings.id),
-        this.TwitchApi.getGlobalBadges(),
-        Http.get(`/controls/chat/last?channel=${channel}`),
+        twitchApiService.getChannelBadges(this.settings.id),
+        twitchApiService.getGlobalBadges(),
+        omdApiService.getLastMessages(this.channel),
       ])
     }).then(([badges, global, lastMessages]) => {
       this.settings.badges = [...badges.data, ...global.data];

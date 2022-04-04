@@ -1,5 +1,5 @@
-import Http from '@shared/http';
-import Tooltip from 'bootstrap/js/dist/tooltip';
+
+import { omdApiService } from '@chat/chat';
 import _ from 'underscore';
 
 class BTTV {
@@ -18,7 +18,7 @@ class BTTV {
   constructor() {};
   getEmotes(channel, emotesContainer) {
     console.log('Getting BTTV emotes');
-    Http.get(`/controls/chat/emotes?channel=${channel}`)
+    omdApiService.getBttvEmotes(channel)
     .then((data) => {
       console.log('Got BTTV global emotes');
       this.bttvEmotes = this.bttvEmotes.emotes.concat(data.channel.emotes.map(function(n) {

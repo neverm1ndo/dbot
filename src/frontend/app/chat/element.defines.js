@@ -1,8 +1,8 @@
-import { ChatMessageBadge } from './chat.badge';
-import { ChatMessage } from './chat.message';
-import { ChatAlert } from './chat.alert';
-import { YTFrame } from './chat.ytframe';
-import { MessageControlButton } from './chat.message-control';
+import { ChatMessageBadge } from '@chat/chat.badge';
+import { ChatMessage } from '@chat/message/chat.message';
+import { ChatAlert } from '@chat/alert/chat.alert';
+import { YTFrame } from '@chat/chat.ytframe';
+import { MessageControlButton } from '@chat/message/chat.message-control';
 
 //** Define custom HTML elements **//
 

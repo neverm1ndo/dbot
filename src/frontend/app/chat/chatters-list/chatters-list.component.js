@@ -1,17 +1,21 @@
-import { ChatAlert } from './chat.alert';
-import { MessageControlButton } from './chat.message-control';
+import template from 'pug-loader!./chatters-list.tpl.pug';
 
-export class ChattersListController {
+import { ChatAlert } from '@chat/alert/chat.alert';
+import { MessageControlButton } from '@chat/message/chat.message-control';
+
+export class ChattersListComponent extends HTMLElement {
   connected = [];
-  constructor(target) {
+  constructor() {
+    super();
+    this.innerHTML = template();
     this.dom = {
-      box: target.querySelector('#chatters-list'),
-      list: target.querySelector('#list'),
-      counter: target.querySelector('#chatters-counter'),
-      altCounter: target.querySelector('#chatters-counter-alt'),
+      box: this.querySelector('#chatters-list'),
+      list: this.querySelector('#list'),
+      counter: document.querySelector('#chatters-counter'),
+      altCounter: document.querySelector('#chatters-counter-alt'),
       buttons: {
-        open: target.querySelector('#open-chatters-list'),
-        close: target.querySelector('#close')
+        open: document.querySelector('#open-chatters-list'),
+        close: this.querySelector('#close')
       }
     };
     this.dom.buttons.close.addEventListener('click', () => {

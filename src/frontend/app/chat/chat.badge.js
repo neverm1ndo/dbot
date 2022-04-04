@@ -1,15 +1,15 @@
-const defaultBadges = {
+const _defaultBadges = {
   'diktorbot': '/assets/tank2.png',
 };
 
 export class ChatMessageBadge extends HTMLDivElement {
-  constructor(type, settings) {
+  constructor(type, badges) {
     super();
     this.classList.add('badge-icon');
     this.icon = new Image(20, 20);
     this.icon.classList.add('badge-icon-img');
-    for (let i = 0; i < settings.badges.length; i++) {
-      const badge = settings.badges[i];
+    for (let i = 0; i < badges.length; i++) {
+      const badge = badges[i];
       if (type[0] !== badge.set_id) continue;
       for (let j = 0; j < badge.versions.length; j++) {
         const version = badge.versions[j];
@@ -19,10 +19,10 @@ export class ChatMessageBadge extends HTMLDivElement {
       }
     }
     if (!this.icon.src) {
-      const defaultBadgesKeys = Object.keys(defaultBadges);
+      const defaultBadgesKeys = Object.keys(_defaultBadges);
       for (let i = 0; i < defaultBadgesKeys.length; i++ ) {
         if (type[0] !== defaultBadgesKeys[i]) continue;
-        this.icon.src = defaultBadges[defaultBadgesKeys[i]];
+        this.icon.src = _defaultBadges[defaultBadgesKeys[i]];
         break;
       }
     }

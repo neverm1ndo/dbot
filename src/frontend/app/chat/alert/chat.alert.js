@@ -1,16 +1,16 @@
-import { MessageControlButton } from './chat.message-control';
+import template from 'pug-loader!./alert.tpl.pug';
+import { MessageControlButton } from '@chat/message/chat.message-control';
 
 export class ChatAlert extends HTMLDivElement {
   constructor(message, type = 'default', username = '', icon) {
     super();
     this.username = username;
     this.type = type;
-    this.msg = document.createElement('span');
-    if (icon) {
-      this.icon = document.createElement('i');
-      this.icon.classList.add(...icon);
-    }
     this.classList.add('alert', 'mb-1');
+    this.innerHTML = template({
+      icon: icon ? icon.join(' '): undefined,
+      message
+    });
     switch (type) {
       case 'success':
       this.classList.add('bg-success', 'text-light');
@@ -45,25 +45,23 @@ export class ChatAlert extends HTMLDivElement {
       default:
         this.classList.add('text-muted');
     }
-    this.msg.innerHTML = message;
-    if (icon) this.msg.prepend(this.icon);
-    this.append(this.msg);
-    if (username) {
-      let btn = new MessageControlButton(['bi', 'bi-robot', 'white'], (event) => {
-        const msg = document.createElement('span');
-        // ChatAlert.addLurker(username);
-        // chatterList.remove(username);
-        btn.remove();
-        this.msg.remove();
-        msg.innerHTML = '<em>(<b>' + username + '</b> добавлен в черный список)</em>';
-        this.prepend(msg);
-        setTimeout(() => {
-          this.remove()
-        }, 2000);
-        event.preventDefault();
-        event.stopPropagation();
-      })
-      this.prepend(btn);
-    }
+    this.msg = this.querySelector('.message');
+
+    if (!username) return;
+    let btn = new MessageControlButton(['bi', 'bi-robot', 'white'], (event) => {
+      const msg = document.createElement('span');
+      // ChatAlert.addLurker(username);
+      // chatterList.remove(username);
+      btn.remove();
+      this.msg.remove();
+      msg.innerHTML = '<em>(<b>' + username + '</b> добавлен в черный список)</em>';
+      this.prepend(msg);
+      setTimeout(() => {
+        this.remove()
+      }, 2000);
+      event.preventDefault();
+      event.stopPropagation();
+    });
+    this.prepend(btn);
   }
 }

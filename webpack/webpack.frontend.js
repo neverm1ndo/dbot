@@ -22,6 +22,7 @@ module.exports = {
       '@app': path.resolve(__dirname, '../src/frontend/app'),
       '@shared': path.resolve(__dirname, '../src/frontend/app/shared'),
       '@assets': path.resolve(__dirname, '../src/frontend/assets'),
+      '@chat': path.resolve(__dirname, '../src/frontend/app/chat'),
     },
   },
   output: {
