@@ -1,4 +1,5 @@
 export class Player {
+  muted = false;
   constructor() {
     this.ctx = new (window.AudioContext || window.webkitAudioContext)();
     this.source = this.ctx.createBufferSource();
@@ -24,7 +25,14 @@ export class Player {
     });
   }
 
-  play (sound) {
+  toggleMute() {
+    if (this.muted) this.gainNode.gain.value = window.localStorage.getItem('gain');
+    else this.gainNode.gain.value = 0;
+    this.muted = !this.muted;
+    this.playerRanger.disabled = this.muted;
+  }
+
+  play(sound) {
     this.source = null;
     this.source = this.ctx.createBufferSource();
     sound.gain = sound.gain ?? this.gainNode.gain.value*100;

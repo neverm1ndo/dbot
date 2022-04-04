@@ -13,8 +13,23 @@ export class SpeakerComponent extends HTMLElement {
     let collapse = new Collapse(this.gainContainer, {
       toggle: false
     });
+    const toggleButton = this.querySelector('#toggle-speaker');
+    const muteButton = this.querySelector('#mute');
     const initButton = document.querySelector('#speaker-init');
     initButton.classList.add('bg-danger');
+    toggleButton.addEventListener('click', () => {
+      collapse.toggle();
+    });
+    muteButton.addEventListener('click', () => {
+      if (!this.player.muted) {
+        muteButton.classList.add('btn-danger');
+        muteButton.classList.remove('btn-dark');
+      } else {
+        muteButton.classList.remove('btn-danger')
+        muteButton.classList.add('btn-dark');
+      }
+      this.player.toggleMute();
+    });
     initButton.addEventListener('click', () => {
       collapse.toggle();
       if (!this.player) {

@@ -1,23 +1,21 @@
 omd-speaker {
-  margin: 0;
   background: var(--bs-gray-dark);
   color: #dfdfdf;
   text-align: center;
-  top: 0px;
-  left: 0px;
   font-family: 'Arial', sans-serif;
   text-align: center;
   z-index: 20;
-
-  #mute {
-    top: 70%;
-  }
-
   .imps {
     display: flex;
     /* align-self: flex-end; */
     flex-direction: column;
     flex-grow: 12;
+  }
+  .ml-3 {
+    margin-left: 1rem;
+  }
+  .mr-3 {
+    margin-right: 1rem;
   }
   .imps div {
     display: flex;
@@ -54,7 +52,7 @@ omd-speaker {
   /* The slider itself */
 .ranger {
     /* margin-left: 60px; */
-    margin: 10px 0px 0px 0px;
+    margin: 18px 10px 0px 0px;
     -webkit-appearance: none;  /* Override default CSS styles */
     appearance: none;
     width: 100%; /* Full-width */

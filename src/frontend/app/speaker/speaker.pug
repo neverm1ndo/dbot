@@ -1,8 +1,13 @@
-div.container-fluid.h-100.mb-2
-  div.compressor.gain.collapse
+div.container-fluid.h-100.p-0
+  div.compressor.gain.collapse.bg-dark.rounded-3.mb-2
     div.d-flex.flex-row.justify-content-center.align-items.center.w-100
-      span
+      div.d-flex.align-items-center
+        i.bi.bi-megaphone-fill.mr-3.ml-3
         small(style={float: 'left', 'margin-right': '15px'}) Gain 
-        small.m-3#gain_value(style={float: 'right', 'margin-right': '15px'}) 100
+        small.ml-3.mr-3#gain_value(style={float: 'right', 'margin-right': '15px'}) 100
       div.d-flex.flex-fill.ml-2
         input.ranger.w-100(type="range" min="0" max="100" name="volume2" value="35" id="gain")
+      button.btn.btn-dark.mr-2#mute
+        i.bi.bi-volume-mute-fill
+      button.btn.btn-dark.mr-2#toggle-speaker
+        i.bi.bi-chevron-down
