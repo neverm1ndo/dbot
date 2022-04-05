@@ -33,6 +33,9 @@ omd-speaker {
     flex-basis: auto;
     width: 100%;
   }
+  #gain_value {
+    width: 3em;
+  }
   #vol_label {
     position: absolute;
         /* top: 12%; */
