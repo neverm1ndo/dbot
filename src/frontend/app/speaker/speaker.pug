@@ -1,10 +1,9 @@
 div.container-fluid.h-100.p-0
   div.compressor.gain.collapse.bg-dark.rounded-3.mb-2.pt-1.pb-1
     div.d-flex.flex-row.justify-content-center.align-items.center.w-100
-      div.d-flex.align-items-center
-        i.bi.bi-megaphone-fill.mr-3.ml-3
-        small(style={float: 'left', 'margin-right': '15px'}) Gain 
-        small.ml-3.mr-3#gain_value(style={float: 'right', 'margin-right': '15px'}) 100
+      div.d-flex.align-items-center.gain-meter
+        i.bi.bi-megaphone-fill.mr-2.ml-2
+        small.mr-2#gain_value(style={float: 'right', 'margin-right': '15px'}) 100
       div.d-flex.flex-fill.ml-2
         input.ranger.w-100(type="range" min="0" max="100" name="volume2" value="35" id="gain")
       button.btn.btn-dark.mr-2#mute

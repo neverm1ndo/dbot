@@ -5,6 +5,11 @@ omd-speaker {
   font-family: 'Arial', sans-serif;
   text-align: center;
   z-index: 20;
+  .gain {
+    &-meter {
+      width: 60px;
+    }
+  }
   .imps {
     display: flex;
     /* align-self: flex-end; */
@@ -58,7 +63,7 @@ omd-speaker {
   /* The slider itself */
 .ranger {
     /* margin-left: 60px; */
-    margin: 18px 10px 0px 0px;
+    margin: 17px 10px 0px 0px;
     -webkit-appearance: none;  /* Override default CSS styles */
     appearance: none;
     width: 100%; /* Full-width */
