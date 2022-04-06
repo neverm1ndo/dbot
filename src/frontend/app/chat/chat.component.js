@@ -384,7 +384,7 @@ export class ChatComponent extends HTMLElement {
 
   handleStreamInfo(id) {
     timer(0, 120000)
-    .pipe(takeWhile(() => this.live == true));
+    .pipe(takeWhile(() => this.live == true))
     .pipe(switchMap(() => from(twitchApiService.getStreams(id))))
     .pipe(catchError((err) =>  {
       return throwError(err);
