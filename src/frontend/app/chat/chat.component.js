@@ -7,6 +7,8 @@ import { socketService, pubsubService, twitchApiService, omdApiService, bttv, cl
 import { ChatMessage } from '@chat/message/chat.message';
 import { ChatAlert } from '@chat/alert/chat.alert';
 import { secondsToTimestamp, timestamp } from '@chat/utils';
+import { timer, throwError } from 'rxjs';
+import { map, takeWhile, switchMap, from, catchError } from 'rxjs/operators';
 
 export class ChatComponent extends HTMLElement {
 
@@ -93,6 +95,7 @@ export class ChatComponent extends HTMLElement {
     });
     socketService.onStreamOnline().subscribe((event) => {
       this.setLive(true);
+      this.handleStreamInfo(this.settings.id);
       this.alert(`Стрим запущен. Время запуска ${timestamp(Date.now())}`, 'success', '', ['bi', 'bi-twitch']);
     });
     socketService.onStreamOffline().subscribe((event) => {
@@ -380,32 +383,31 @@ export class ChatComponent extends HTMLElement {
   }
 
   handleStreamInfo(id) {
-    let interval = setInterval(() => {
-      if (this.live) {
-        twitchApiService.getStreams(id).then((data) => {
-          const streamInfo = data.data[0];
-          if (streamInfo) {
-            this.stream = streamInfo;
-            this.chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
-          } else {
-            this.chatterList.dom.counter.innerHTML = 0;
-          }
-        }).catch(() => {
-          omdApiService.refreshSession().then((token) => {
-            console.log(`Token refreshed: \n New: ${token} \n Old: ${twitchApiService.user.token}`);
-            twitchApiService.accessToken = token.accessToken;
-          }).catch((err) => console.error);
-        });
-      }
-    }, 120000);
-  }
+    timer(0, 120000)
+    .pipe(takeWhile(() => this.live == true));
+    .pipe(switchMap(() => from(twitchApiService.getStreams(id))))
+    .pipe(catchError((err) =>  {
+      return throwError(err);
+    }))
+    .subscribe((data) => {
+      const streamInfo = data.data[0];
+      if (streamInfo) {
+        this.stream = streamInfo;
+        this.chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
+      } else {
+        this.chatterList.dom.counter.innerHTML = 0;
+      };
+    }, (err) => {
+      console.error(err);
+    });
+  };
 
   getChannelProperties (channel) {
     twitchApiService.getUser(channel).then((data) => {
       twitchApiService.user.twitch = data[0];
       this.settings.id = data.data[0].id;
       pubsubService.connect(this.settings.id);
-      this.handleStreamInfo(this.settings.id);
+      // this.handleStreamInfo(this.settings.id);
       return Promise.all([
         twitchApiService.getChannelBadges(this.settings.id),
         twitchApiService.getGlobalBadges(),
