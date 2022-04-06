@@ -7,8 +7,8 @@ import { socketService, pubsubService, twitchApiService, omdApiService, bttv, cl
 import { ChatMessage } from '@chat/message/chat.message';
 import { ChatAlert } from '@chat/alert/chat.alert';
 import { secondsToTimestamp, timestamp } from '@chat/utils';
-import { timer, throwError } from 'rxjs';
-import { map, takeWhile, switchMap, from, catchError } from 'rxjs/operators';
+import { timer, throwError, from } from 'rxjs';
+import { map, takeWhile, switchMap, catchError } from 'rxjs/operators';
 
 export class ChatComponent extends HTMLElement {
 
