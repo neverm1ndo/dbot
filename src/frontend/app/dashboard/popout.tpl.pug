@@ -1,0 +1,16 @@
+div.container-fluid.popout.automode
+  div.d-flex.flex-column.justify-content-center.align-items-center.h-100
+    div.card.gray.text-light.col-12.col-md-9.col-lg-6.shadow.h-95
+      div.card-body.d-flex.flex-column.h-100
+        div.d-flex.flex-row.justify-content-between
+          h5.card-title
+            i.mr-3.bi(class=icon)
+            span=title
+          button.btn-close.btn-close-white(type="button" aria-label="close")
+        if subtitles
+          hr
+          div.card-text
+            each subtitle in subtitles
+              p=subtitle
+          hr
+        div.col-12.main

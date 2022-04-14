@@ -1,109 +1,87 @@
 import Http from '@shared/http';
 import { Popout } from '../popout';
+import { AnnounceListItemEditComponent } from './announce-list.component';
 import template from 'pug-loader!./announcer.tpl.pug';
-import emptyList from 'pug-loader!../commands/empty-commands-list.tpl.pug';
+import itemTemplate from 'pug-loader!./announce.tpl.pug';
 import { autoscroll } from '@shared/scroller';
-import { AnnounceComponent } from './announce';
 
 export class AnnouncerController extends Popout {
-  _messages = [];
-  constructor() {
-    super();
-    this.getAllMessages();
-    this.innerHTML = template();
-    this.closeBtn  = this.querySelector('.btn-close');
-    this.container = this.querySelector('#container');
-    this.textarea  = this.querySelector('.textarea');
-    this.submit    = this.querySelector('#submit');
-    this.closeBtn.addEventListener('click', () => {
-      this.close();
-    })
-    this.submit.addEventListener('click', () => {
-      if (!this.textarea.value) return;
-      this.addMessage(this.textarea.value)
-      .then(() => {
-        console.log('saved');
-        this.textarea.value = '';
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  constructor(icon) {
+    super({
+      title: 'Автоматические сообщения',
+      subtitles: [
+        'Добавляйте сообщения, которые будут отправлены ботом в чат с интервалом в 15 минут',
+        'Бот не воспроизводит сообщения, пока ваш стрим оффлайн',
+      ],
+      icon
     });
+    this.body.innerHTML = template();
+    this._announceList = this.querySelector('custom-list');
+    this._announceList.addEventListener('remove-item', (event) => {
+      this._deleteMessage(Object.assign(event.detail.itemValue, { _id: event.detail.target._id }))
+          .then(() => {
+            this._announceList.remove(event.detail.target);
+            console.log('Announce deleted', event.detail.itemValue);
+          })
+          .catch((err) => console.error);
+    });
+    this._announceList.addEventListener('patch-list-item', (event) => {
+      this._patchMessage(event.detail)
+          .then(() => {
+            console.log('Announce patched successfuly');
+          }).catch((err) => console.error);
+    });
+    this._form = {
+      message: this.querySelector('.textarea'),
+      submit: this.querySelector('#submit'),
+    };
+    this._form.submit.addEventListener('click', () => {
+      if (!this._form.message.value) return;
+      this._addMessage(this.formValue)
+          .then(() => {
+            this._announceList.add({ message: this.formValue.message, timing: (this._announceList.children.length+1)*15 }, itemTemplate, AnnounceListItemEditComponent);
+            this._clearForm();
+            autoscroll(this.body);
+          })
+          .catch((err) => console.error);
+    });
+    this._getAllMessages();
   }
 
-  isEmpty() {
-    if (this._messages.length > 0) {
-      const empty = this.container.querySelector('#empty');
-      if (empty) empty.remove();
-      return;
-    }
-    this.container.innerHTML = emptyList({ message: 'Список кастомных команд пуст' });
+  get formValue() {
+    return {
+      message: this._form.message.value
+    };
   }
 
-  getAllMessages() {
+  _clearForm() {
+    this._form.message.value = '';
+  }
+
+  _getAllMessages() {
     return Http.get('/api/user/automessages').then((messages) => {
-      /*
-        Add rules to stack
-      */
-      messages.forEach((message) => {
-        this.addMessageToListView(message);
+      messages.forEach((message, index) => {
+        this._announceList.add({ message: message.message, _id: message._id, timing: (index+1)*15 }, itemTemplate, AnnounceListItemEditComponent);
       });
-      this.isEmpty();
-    }).catch((err) => {
-      /*
-      Show error alert
-      */
-      console.error(err);
-    });
+    }).catch((err) => console.error);
   }
-  //
-  addMessage(messageRaw) {
-    return Http.post('/api/user/update-automessages',
-      {
-        messages: [...this.getMessagesRaw(), messageRaw]
-      }, {
-        'Content-Type': 'application/json'
-      })
-      .then(() => {
-        this.addMessageToListView(messageRaw);
-        autoscroll(this.container.parentElement);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+
+  _patchMessage(messageValue) {
+    return Http.patch('/api/user/patch-custom-announce',
+      messageValue,
+      { 'Content-Type': 'application/json' });
   }
-  //
-  addMessageToListView(messageRaw) {
-    const message = new AnnounceComponent(this.container.children.length + 1, messageRaw);
-    this._messages.push(message);
-    this.container.append(message);
-    message.addEventListener('save', (event) => {
-      this.saveMessages().then(() => {
-        console.log('saved');
-      });
-    });
-    message.addEventListener('delete', (event) => {
-      this._messages.splice(this._messages.indexOf(event.target.value), 1);
-      this.saveMessages().then(() => {
-        console.log('deleted');
-        this.isEmpty();
-      });
-    });
+
+  _addMessage(messageValue) {
+    console.log(messageValue)
+    return Http.post('/api/user/add-custom-announce',
+      messageValue,
+      { 'Content-Type': 'application/json' });
   }
-  //
-  saveMessages() {
-    return Http.post('/api/user/update-automessages',
-      {
-        messages: this.getMessagesRaw()
-      }, {
-        'Content-Type': 'application/json'
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
-  //
-  getMessagesRaw() {
-    return this._messages.map(message => message.value);
+
+  _deleteMessage(messageValue) {
+    return Http.delete('/api/user/delete-custom-announce',
+    messageValue,
+    { 'Content-Type': 'application/json' });
   }
 }

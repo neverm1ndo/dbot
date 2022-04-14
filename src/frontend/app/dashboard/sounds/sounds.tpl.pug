@@ -1,24 +1,12 @@
-div.container-fluid.popout.automode
-  div.d-flex.flex-column.justify-content-center.align-items-center.h-100
-    div.card.gray.text-light.col-12.col-md-9.col-lg-6.shadow.h-95
-      div.card-body.d-flex.flex-column.h-100
-        div.d-flex.flex-row.justify-content-between
-          h5.card-title
-            i.bi.bi-music-note.mr-3
-            span Звуковые команды
-          button.btn-close.btn-close-white(type="button" aria-label="close")
-        hr
-        span.card-text Добавляйте звуки, для воспроизведения их в спикере бота с помощью команды в чате
-        hr
-        div.col-12.overflow-auto.d-flex.flex-fill
-          div.d-flex.flex-column.flex-fill.p-2#container
-        hr
-        div.col-12
-          h6
-            i.bi.bi-clipboard-plus.mr-2 
-            span Добавить новый звук
-          input.form-control.input-dark.mb-2.mt-3#command-name(type="text" placeholder="Команда для бота")
-          input.form-control.input-dark.mb-2#new-sound-path(type="text" placeholder="URL звука")
-          button#submit.btn.btn-dark
-            i.bi.bi-plus.mr-2
-            small Добавить
+div.col-12.overflow-auto.d-flex.flex-fill
+  sounds-list
+hr
+div.col-12
+  h6
+    i.bi.bi-clipboard-plus.mr-2 
+    span Добавить новый звук
+  input.form-control.input-dark.mb-2.mt-3#command-name(type="text" placeholder="Команда для бота")
+  input.form-control.input-dark.mb-2#new-sound-path(type="text" placeholder="URL звука")
+  button#submit.btn.btn-dark
+    i.bi.bi-plus.mr-2
+    small Добавить

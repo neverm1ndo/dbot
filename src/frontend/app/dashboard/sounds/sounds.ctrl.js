@@ -1,119 +1,85 @@
+import template from 'pug-loader!./sounds.tpl.pug';
 import Http from '@shared/http';
 import { Popout } from '../popout';
-import template from 'pug-loader!./sounds.tpl.pug';
-import emptyList from 'pug-loader!../commands/empty-commands-list.tpl.pug';
-import { autoscroll } from '@shared/scroller';
-import { SoundComponent } from './sound';
 import { Player } from './player';
+import { autoscroll } from '@shared/scroller';
+
+const HEADERS = { 'Content-Type': 'application/json' };
 
 export class SoundsController extends Popout {
-  _sounds = [];
-  constructor() {
-    super();
-    this.getAllSounds();
-    this.innerHTML = template();
-    this.closeBtn  = this.querySelector('.btn-close');
-    this.container = this.querySelector('#container');
-    this.name      = this.querySelector('#command-name');
-    this.path      = this.querySelector('#new-sound-path');
-    this.submit    = this.querySelector('#submit');
-    this.player = new Player();
-    this.closeBtn.addEventListener('click', () => {
-      this.close();
+  constructor(icon) {
+    super({
+      title: 'Звуковые команды',
+      subtitles: [
+        'Добавляйте звуки, для воспроизведения их в спикере бота с помощью команды в чате'
+      ],
+      icon: icon
     });
-    this.submit.addEventListener('click', () => {
-      if (!this.path.value && !this.name.value) return;
-      this.addSound({
-        command: this.name.value.toLowerCase(),
-        path: this.path.value,
-        gain: 50,
-      })
-      .then(() => {
-        console.log('saved');
-        this.name.value = '';
-        this.path.value = '';
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    this.body.innerHTML = template();
+    this._soundsList = this.querySelector('sounds-list');
+    this._soundsList.addEventListener('play-item-sound', (event) => {
+      this._player.play(event.detail);
     });
+    this._soundsList.addEventListener('patch-item', (event) => {
+      this._patchSound(event.detail)
+          .then(() => {
+            console.log('Sound patched successfuly');
+          }).catch((err) => console.error);
+    });
+    this._soundsList.addEventListener('remove-item', (event) => {
+      this._deleteSound(event.detail)
+          .then(() => {
+            console.log('Sound deleted successfuly');
+          }).catch((err) => console.error);
+    });
+    this._form = {
+      name: this.querySelector('#command-name'),
+      response: this.querySelector('#new-sound-path'),
+      submit: this.querySelector('#submit'),
+    };
+    this._form.submit.addEventListener('click', () => {
+      if (!this._form.response.value && !this._form.name.value) return;
+      this._addSound(this.formValue)
+          .then(() => {
+            this._soundsList.add(this.formValue);
+            this._clearForm();
+            autoscroll(this.body);
+          })
+          .catch((err) => console.error);
+    });
+    this._player = new Player();
+    this._getSounds();
   }
 
-  isEmpty() {
-    if (this._sounds.length > 0) {
-      const empty = this.container.querySelector('#empty');
-      if (empty) empty.remove();
-      return;
-    }
-    this.container.innerHTML = emptyList({ message: 'Список звуков пуст' });
+  get formValue() {
+    return {
+      command: this._form.name.value.toLowerCase(),
+      path: this._form.response.value
+    };
   }
 
-  getAllSounds() {
+  _clearForm() {
+    this._form.textarea.value = '';
+    this._form.name.value = '';
+  }
+
+  _getSounds() {
     return Http.get('/api/user/sounds').then((sounds) => {
       sounds.forEach((sound) => {
-        this.addSoundToListView(sound);
+        this._soundsList.add(sound);
       });
-      this.isEmpty();
-    }).catch((err) => {
-      console.error(err);
-    });
+    }).catch((err) => console.error);
   }
 
-  addSound(soundRaw) {
-    return Http.post('/api/user/update-sounds',
-      {
-        sounds: [...this.getSoundsRaw(), soundRaw]
-      }, {
-        'Content-Type': 'application/json'
-      })
-      .then(() => {
-        this.addSoundToListView(soundRaw);
-        autoscroll(this.container.parentElement);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  _addSound(soundValue) {
+    return Http.post('/api/user/add-sound', soundValue, HEADERS);
   }
 
-  addSoundToListView(soundRaw) {
-    const sound = new SoundComponent(soundRaw);
-    this._sounds.push(sound);
-    this.container.append(sound);
-    this.isEmpty();
-    sound.addEventListener('save', (event) => {
-      this.saveSounds().then(() => {
-        console.log('saved');
-      });
-    });
-    sound.addEventListener('play', (event) => {
-      this.player.play(event.target.value);
-    });
-    sound.addEventListener('delete', (event) => {
-      for (let i = 0; i < this._sounds.length; i++) {
-        if (this._sounds[i].value.command !== event.target.value.command) continue;
-        this._sounds.splice(i, 1);
-        break;
-      };
-      this.saveSounds().then(() => {
-        console.log('deleted');
-        this.isEmpty();
-      });
-    });
+  _patchSound(soundValue) {
+    return Http.patch('/api/user/patch-sound', soundValue, HEADERS);
   }
 
-  saveSounds() {
-    return Http.post('/api/user/update-sounds',
-      {
-        sounds: this.getSoundsRaw()
-      }, {
-        'Content-Type': 'application/json'
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
-
-  getSoundsRaw() {
-    return this._sounds.map(sound => sound.value);
+  _deleteSound(soundValue) {
+    return Http.patch('/api/user/delete-sound', soundValue, HEADERS);
   }
 }

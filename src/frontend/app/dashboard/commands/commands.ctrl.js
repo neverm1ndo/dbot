@@ -1,116 +1,90 @@
 import Http from '@shared/http';
 import { Popout } from '../popout';
 import template from 'pug-loader!./commands.tpl.pug';
-import emptyList from 'pug-loader!./empty-commands-list.tpl.pug';
-import { CustomCommandComponent } from './custom-command';
+import itemTemplate from 'pug-loader!./custom-command.tpl.pug';
 import { autoscroll } from '@shared/scroller';
+import { CommandListItemEditComponent } from './commands-list.component';
 
 export class CommandsController extends Popout {
-  _commands = [];
-  constructor() {
-    super();
-    this.getAllCommands();
-    this.innerHTML = template();
-    this.closeBtn  = this.querySelector('.btn-close');
-    this.container = this.querySelector('#container');
-    this.name      = this.querySelector('#command-name');
-    this.textarea  = this.querySelector('.textarea');
-    this.submit    = this.querySelector('#submit');
-    this.closeBtn.addEventListener('click', () => {
-      this.close();
-    })
-    this.submit.addEventListener('click', () => {
-      if (!this.textarea.value && !this.name.value) return;
-      console.log(this.textarea.value, this.name.value);
-      this.addCommand({
-        name: this.name.value.toLowerCase(),
-        response: this.textarea.value
-      })
-      .then(() => {
-        console.log('saved');
-        this.textarea.value = '';
-        this.name.value = '';
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  constructor(icon) {
+    super({
+      title: 'Кастомные команды',
+      subtitles: [
+        'Добавляйте свои команды и указывайте тип ответа на команду'
+      ],
+      icon
     });
+    this.body.innerHTML = template();
+    this._commandsList = this.querySelector('custom-list');
+    this._commandsList.addEventListener('remove-item', (event) => {
+      this._deleteCommand(Object.assign(event.detail.itemValue, { _id: event.detail.target._id }))
+          .then(() => {
+            this._commandsList.remove(event.detail.target);
+            console.log('Command deleted', event.detail.itemValue);
+          })
+          .catch((err) => console.error);
+    });
+    this._commandsList.addEventListener('patch-list-item', (event) => {
+      this._patchCommand(event.detail)
+          .then(() => {
+            console.log('Command patched successfuly');
+          }).catch((err) => console.error);
+    });
+    this._form = {
+      command: this.querySelector('#command-name'),
+      response: this.querySelector('.textarea'),
+      submit: this.querySelector('#submit'),
+    };
+    this._form.submit.addEventListener('click', () => {
+      if (!this._form.response.value && !this._form.command.value) return;
+      this._addCommand(this.formValue)
+          .then(() => {
+            this._commandsList.add(this.formValue, itemTemplate, CommandListItemEditComponent);
+            this._clearForm();
+            autoscroll(this.body);
+          })
+          .catch((err) => console.error);
+    });
+    this._getCommands();
   }
 
-  isEmpty() {
-    if (this._commands.length > 0) {
-      const empty = this.container.querySelector('#empty');
-      if (empty) empty.remove();
-      return;
-    }
-    this.container.innerHTML = emptyList({ message: 'Список кастомных команд пуст' });
+  get formValue() {
+    return {
+      command: this._form.command.value.toLowerCase(),
+      response: this._form.response.value
+    };
   }
 
-  getAllCommands() {
+  _clearForm() {
+    this._form.textarea.value = '';
+    this._form.command.value = '';
+  }
+
+  _getCommands() {
     return Http.get('/api/user/commands').then((commands) => {
       commands.forEach((command) => {
-        this.addCommandToListView(command);
+        this._commandsList.add(command, itemTemplate, CommandListItemEditComponent);
       });
-      this.isEmpty();
     }).catch((err) => {
       console.error(err);
     });
   }
 
-  addCommand(commandRaw) {
-    console.log(this.getCommandsRaw(), commandRaw)
-    return Http.post('/api/user/update-commands',
-      {
-        commands: [...this.getCommandsRaw(), commandRaw]
-      }, {
-        'Content-Type': 'application/json'
-      })
-      .then(() => {
-        this.addCommandToListView(commandRaw);
-        autoscroll(this.container.parentElement);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  _patchCommand(commandValue) {
+    return Http.patch('/api/user/patch-custom-command',
+      commandValue,
+      { 'Content-Type': 'application/json' });
   }
 
-  addCommandToListView(commandRaw) {
-    const command = new CustomCommandComponent(commandRaw.name, commandRaw.response, commandRaw._id);
-    this._commands.push(command);
-    this.container.append(command);
-    this.isEmpty();
-    command.addEventListener('save', (event) => {
-      console.log(event);
-      this.saveCommands().then(() => {
-        console.log('saved');
-      });
-    });
-    command.addEventListener('delete', (event) => {
-      for (let i = 0; i < this._commands.length; i++) {
-        if (this._commands[i]._id !== event.target._id) continue;
-        this._commands.splice(i, 1);
-        break;
-      }
-      this.saveCommands().then(() => {
-        console.log('deleted');
-        this.isEmpty();
-      });
-    });
+  _addCommand(commandValue) {
+    return Http.post('/api/user/add-custom-command',
+      commandValue,
+      { 'Content-Type': 'application/json' });
   }
 
-  saveCommands() {
-    return Http.post('/api/user/update-commands',
-      {
-        commands: this.getCommandsRaw()
-      }, {
-        'Content-Type': 'application/json'
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
-
-  getCommandsRaw() {
-    return this._commands.map(command => command.value);
+  _deleteCommand(commandValue) {
+    return Http.delete('/api/user/delete-custom-command',
+    commandValue,
+    { 'Content-Type': 'application/json' });
   }
 }

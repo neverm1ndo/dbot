@@ -17,12 +17,15 @@ export const USER = model('User', new Schema ({
   accessToken: String,
   refreshToken: String,
   settings: {
-    automessages: [String],
+    automessages: [
+      {
+        message: { type: String },
+      }
+    ],
     banwords: [String],
     announcer_delay: Number,
     sounds: [
       {
-        _id : false,
         command: { type: String },
         path: { type: String },
         gain: { type: Number }
@@ -30,7 +33,7 @@ export const USER = model('User', new Schema ({
     ],
     commands: [
       {
-        name: { type: String },
+        command: { type: String },
         response: { type: String }
       }
     ]

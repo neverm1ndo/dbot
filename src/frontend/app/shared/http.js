@@ -19,5 +19,29 @@ class Http {
       console.error(`Ошибка HTTP: ${this.res.status}`);
     }
   }
+  static async delete(url, data, headers) {
+    const res = await fetch(url, {
+      method: 'DELETE',
+      headers,
+      body: JSON.stringify(data)
+    });
+    if (res.ok) {
+      return await res;
+    } else {
+      console.error(`Ошибка HTTP: ${this.res.status}`);
+    }
+  }
+  static async patch(url, data, headers) {
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify(data)
+    });
+    if (res.ok) {
+      return await res;
+    } else {
+      console.error(`Ошибка HTTP: ${this.res.status}`);
+    }
+  }
 }
 export default Http;

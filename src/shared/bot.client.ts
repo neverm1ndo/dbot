@@ -29,19 +29,19 @@ export class Bot {
       },
       channels: [process.env.BOT_CHANNEL!]
     });
-  announcer: Announcer;
+  announcers: { [channel: string]: Announcer } = {};
 
-  public status: BotStatus = BotStatus.SLEEPS; // sleeps by default
+  // public status: BotStatus = BotStatus.SLEEPS; // sleeps by default
   private readonly prefix: string = '!';
   // schedules: {[channel: string]: Schedule} = {};
 
   constructor() {
-    this.opts = new Schedule(process.env.BOT_CHANNEL!);
+    this.opts = new Schedule();
     // this.schedules = {};
-    this.announcer = new Announcer(900000);
+    // this.announcer = new Announcer(900000);
     // this.spawnSchedules();
     if (process.env.NODE_ENV !== 'development') this.checkEventSubscriptions();
-    if (StartOptions.works) this.wakeup();
+    if (StartOptions.works) this.wakeup(process.env.BOT_CHANNEL!);
   }
 
   private checkEventSubscriptions(): void {
@@ -72,26 +72,24 @@ export class Bot {
   }
 
   // TODO: make users own statuses, now its global
-  public shutdown(): void {
-    if (this.status === BotStatus.SLEEPS) return;
-    this.status = BotStatus.SLEEPS;
-    if (!this.announcer) return;
-    // this.announcer.start.unsubscribe();
-    logger.imp(`Bot status -> ${this.status}`);
+  public shutdown(channel: string): void {
+    // if (this.status === BotStatus.SLEEPS) return;
+    if (!this.announcers[channel]) return;
+    delete this.announcers[channel];
+    logger.imp(`Shuttdown in ${channel} channel`);
   }
 
-  public wakeup(): void {
-    if (this.status === BotStatus.WORKS) return;
-    this.status = BotStatus.WORKS;
-    this.announcer = new Announcer(900000);
-    this.announcer.start.subscribe((announce: string) => {
-      this.client.say(process.env.BOT_CHANNEL!, announce);
-    });;
-    logger.imp(`Bot status -> ${this.status}`);
+  public wakeup(channel: string): void {
+    // if (this.status === BotStatus.WORKS) return;
+    if (this.announcers[channel]) return;
+    this.announcers[channel] = new Announcer(900000, channel);
+    this.announcers[channel].start.subscribe((announce: string) => {
+      this.client.say(channel, announce);
+    });
+    logger.imp(`Woke up in ${channel} channel`);
   }
 
   public init(): void {
-    logger.info('Bot status: ' + this.status);
     this.client.connect();
     // TODO: join for every connected user
     this.client.on('message', (channel: string, tags: ChatUserstate, message: string, self: boolean) => {
@@ -122,35 +120,43 @@ export class Bot {
   private banSpam(channel: string, tags: ChatUserstate, message: string, self: boolean) {
     if (self) return;
     if (!this.isPrevileged(tags) || !this.isSubscriber(tags)) {
+      const channelName = channel.slice(1);
       message = message.replace(/ /g, '').toLowerCase();
-      for (let i = 0; i < this.opts.dictionary.length; i+=1) {
-        let form = this.opts.dictionary[i].replace(/ /g, '').toLowerCase();
-        if (message.includes(form)) {
-          this.client.ban(channel, tags.username!, 'Banned phrase: ' + this.opts.dictionary[i]);
-          logger.warn(tags.username + ' banned for reason: ' + this.opts.dictionary[i]);
-          return;
-        }
-      };
+      this.opts.getChannelDictionary(channelName).then((dictionary: string[]) => {
+        for (let i = 0; i < dictionary.length; i+=1) {
+          const current = dictionary[i];
+          const form = current.replace(/ /g, '').toLowerCase();
+          if (message.includes(form)) {
+            this.client.ban(channel, tags.username!, 'Banned phrase: ' + current);
+            logger.warn(channelName + ': ' + tags.username + ' banned for reason: ' + current);
+            return;
+          }
+        };
+      }).catch((err) => logger.err(err))
     }
   }
   private readChattersMessage(channel: any, tags: ChatUserstate, command?: string, args?: string[]): void {
     if (!tags.username || !command) return;
         const channelName = channel.slice(1);
     // SOUNDS
-    this.opts.schedules.sounds.forEach((sound: { command: string, path: string, gain?: number }) => {
-      if (command === sound.command) {
-        this.media.playSound(channelName, tags, sound);
-        return;
-      }
-    });
+    this.opts.getChannelSounds(channelName).then((sounds: any[]) => {
+      sounds.forEach((sound: { command: string, path: string, gain?: number }) => {
+        if (command === sound.command) {
+          this.media.playSound(channelName, tags, sound);
+          return;
+        }
+      });
+    }).catch((err) => logger.err(err));
     // CUSTOM COMMANDS
-    this.opts.customCommands.forEach((customCommand) => {
-      if (command === customCommand.name) {
-        console.log(customCommand);
-        this.client.say(channel, customCommand.response);
-        return;
-      }
-    });
+    this.opts.getChannelCustomCommands(channelName).then((commands: any[]) => {
+      commands.forEach((customCommand) => {
+        if (command === customCommand.name) {
+          console.log(customCommand);
+          this.client.say(channel, customCommand.response);
+          return;
+        }
+      });
+    }).catch((err) => logger.err(err));
 
     // BUILT-IN COMMANDS
     switch (command) {

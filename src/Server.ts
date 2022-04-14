@@ -152,11 +152,11 @@ app.post('/webhooks/callback/streams', (req: any, res: Response) => {
             logger.imp(`#${req.body.event.broadcaster_user_login}: ${notification.subscription.type}`);
             switch (notification.subscription.type) {
               case 'stream.online': {
-                bot.wakeup();
+                bot.wakeup(req.body.event.broadcaster_user_login);
                 break;
               };
               case 'stream.offline': {
-                bot.shutdown();
+                bot.shutdown(req.body.event.broadcaster_user_login);
                 break;
               };
               default: break;

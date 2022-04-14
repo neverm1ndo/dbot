@@ -1,40 +1,47 @@
 import Http from '@shared/http';
-import { AutomodeController } from '../automode/automode.ctrl';
-import { AutomodeRuleComponent } from '../automode/automode.rule';
-import template from 'pug-loader!../automode/automode.tpl.pug';
+import { Popout } from '@app/dashboard/popout';
+import template from 'pug-loader!./mods.tpl.pug';
 
-export class Mods extends AutomodeController {
-  constructor() {
-    super();
-  }
-  setTemplate() {
-    return template({
+export class Mods extends Popout {
+  constructor(icon) {
+    super({
       title: 'Доступ к управлению ботом',
-      icon: 'bi-people-fill',
-      cardTexts: [
+      icon,
+      subtitles: [
         'Добавьте никнеймы пользователей, которым вы доверяете настройку бота',
         'Удалить модератора можно нажав на крестик в блоке правила.'
       ],
     });
+    this.body.innerHTML = template();
+    this.body.innerHTML = template();
+    this.getMods();
+    this.textarea  = this.querySelector('.textarea');
+    this.submit    = this.querySelector('#submit');
+    this._moderators = this.querySelector('badge-list');
+    // this._moderators.addEventListener('remove-item', (event) => {
+    //   this.removeRule(event.detail);
+    // });
+    // this.submit.addEventListener('click', () => {
+    //   if (!this.textarea.value) return;
+    //   this.addRule(this.textarea.value);
+    // });
   }
-  addRule(ruleRaw) {
+  addBadge(rule) {
+    this._moderators.add(rule);
+  }
+  addMod(ruleRaw) {
     return Http.post('/api/user/update-moderators',
       { rules: this.getRulesRaw().push(ruleRaw) },
       {'Content-Type': 'application/json'})
       .then(() => { this.addBadge(ruleRaw); })
       .catch((err) => console.error );
   }
-  getRules() {
+  getMods() {
     return Http.get('/api/user/moderators')
-               .then((rules) => this.spawnRules(rules))
+               .then((rules) => { rules.forEach((rule) => this.addBadge(rule)); })
                .catch((err) => console.error);
   }
-  saveRules() {
-    return Http.post('/api/user/update-moderators',
-      { rules: this.getRulesRaw() },
-      { 'Content-Type': 'application/json' });
-  }
-  removeRule(rule) {
+  removeMod(rule) {
     return Http.post('/api/user/update-moderators',
       { rules: this.getRulesRaw().filter((r) => r != rule.value )},
       { 'Content-Type': 'application/json'})

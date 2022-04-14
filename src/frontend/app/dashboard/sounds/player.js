@@ -26,18 +26,17 @@ export class Player {
       request.open('GET', sound.path, true);
       request.responseType = 'arraybuffer';
       request.onload = () => {
-        console.log(request.response)
         this.ctx.decodeAudioData(request.response,
-          (buffer) => {
-            this.source.buffer = buffer;
-            this.source.loop = false;
-            resolve();
-          },
-          (e) => {
-            reject(e);
-          });
-        }
-        request.send();
+        (buffer) => {
+          this.source.buffer = buffer;
+          this.source.loop = false;
+          resolve();
+        },
+        (e) => {
+          reject(e);
+        });
+      };
+      request.send();
     }).then(() => {
       this.source.connect(this.gainNode);
       this.source.start(0);

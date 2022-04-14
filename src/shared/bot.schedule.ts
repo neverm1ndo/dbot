@@ -16,16 +16,6 @@ interface Chatters {
 }
 
 export class Schedule {
-  schedules: UserSettings = {
-    automessages: [],
-    banwords: [],
-    sounds: [],
-    commands: []
-  };
-  chatters: Chatters = {
-    regulars: [],
-    lurkers: []
-  };
   blacklist: string[] = [  // FIXME: hardcoded
     "diktorbot",
     "9kmmrbot",
@@ -45,31 +35,40 @@ export class Schedule {
     "feet",
     "communityshowcase"
   ];
-  constructor(username: string) {
-    USER.findOne({'user.login': username}, (err: any, user: any) => {
-      console.log('user');
-      if (err || !user) return;
-      this.schedules = user.settings;
+
+  getChannelSounds(channel: string): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      USER.findOne({'user.login': channel}, (err: any, user: any) => {
+        if (err || !user) return reject(err || 'User not found');
+        resolve(user.settings.sounds);
+      });
     });
   }
 
-  get sounds(): string[] {
-    return this.schedules.sounds;
+  getChannelDictionary(channel: string): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      USER.findOne({'user.login': channel}, (err: any, user: any) => {
+        if (err || !user) return reject(err || 'User not found');
+        resolve(user.settings.banwords);
+      });
+    });
   }
 
-  get dictionary(): string[] {
-    return this.schedules.banwords;
+  getChannelCustomCommands(channel: string): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      USER.findOne({'user.login': channel}, (err: any, user: any) => {
+        if (err || !user) return reject(err || 'User not found');
+        resolve(user.settings.commands);
+      });
+    });
   }
 
-  get customCommands(): any[] {
-    return this.schedules.commands;
-  }
-
-  set dictionary(newdict) {
-    this.schedules.banwords = newdict;
-  }
-
-  get automessages(): string[] {
-    return this.schedules.automessages;
+  getChannelAutomessages(channel: string): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      USER.findOne({'user.login': channel}, (err: any, user: any) => {
+        if (err || !user) return reject(err || 'User not found');
+        resolve(user.settings.automessages);
+      });
+    });
   }
 };
