@@ -150,7 +150,7 @@ export class Bot {
     // CUSTOM COMMANDS
     this.opts.getChannelCustomCommands(channelName).then((commands: any[]) => {
       commands.forEach((customCommand) => {
-        if (command === customCommand.name) {
+        if (command === customCommand.command) {
           console.log(customCommand);
           this.client.say(channel, customCommand.response);
           return;

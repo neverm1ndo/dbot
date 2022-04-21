@@ -16,7 +16,7 @@ router.get('/:username', (req: Request, res: Response) => {
         avatar: user.user.profile_image_url
       }
     });
-  })
+  });
 });
 
 export default router;
