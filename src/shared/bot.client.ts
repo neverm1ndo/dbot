@@ -18,7 +18,7 @@ enum BotStatus {
 }
 
 export class Bot {
-  opts: Schedule;
+  opts: Schedule = new Schedule();
   media: Media = new Media();
   client: Client = new Client({
       options: { debug: true, messagesLogLevel: 'info'  },
@@ -36,7 +36,6 @@ export class Bot {
   // schedules: {[channel: string]: Schedule} = {};
 
   constructor() {
-    this.opts = new Schedule();
     // this.schedules = {};
     // this.announcer = new Announcer(900000);
     // this.spawnSchedules();
@@ -82,7 +81,7 @@ export class Bot {
   public wakeup(channel: string): void {
     // if (this.status === BotStatus.WORKS) return;
     if (this.announcers[channel]) return;
-    this.announcers[channel] = new Announcer(900000, channel);
+    this.announcers[channel] = new Announcer(this, 900000, channel);
     this.announcers[channel].start.subscribe((announce: string) => {
       this.client.say(channel, announce);
     });
