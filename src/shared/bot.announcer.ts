@@ -10,6 +10,6 @@ export class Announcer {
     this.start = from(bot.opts.getChannelAutomessages(channel))
     .pipe(mergeMap((automessages) =>
       timer(delay, delay)
-      .pipe(map(e => automessages[e % automessages.length]))));
+      .pipe(map(e => automessages[e % automessages.length].message))));
   }
 };

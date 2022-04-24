@@ -81,7 +81,7 @@ export class Bot {
   public wakeup(channel: string): void {
     // if (this.status === BotStatus.WORKS) return;
     if (this.announcers[channel]) return;
-    this.announcers[channel] = new Announcer(this, 900000, channel);
+    this.announcers[channel] = new Announcer(this, 9000000, channel);
     this.announcers[channel].start.subscribe((announce: string) => {
       this.client.say(channel, announce);
     });
