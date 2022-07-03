@@ -29,7 +29,6 @@ export class PubSubService {
     this._ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
       console.log('[PUBSUB] RECV: ' + JSON.stringify(message) + '\n');
-      console.log()
       switch (message.type) {
         case 'MESSAGE' : {
           const msg = JSON.parse(message.data.message).data;
