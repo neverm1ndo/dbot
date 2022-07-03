@@ -2,7 +2,7 @@ div.d-flex.reward.card
     div.d-flex.flew-row.card-body
         div.d-flex.reward-color
         div.d-flex.align-items-center.justify-content-center
-            if redemption.reward.image 
+            if redemption.reward.image !== null
                 img.reward-image(src=redemption.reward.image.url_1x)
             else 
                 img.reward-image(src=redemption.reward["default-image"].url_1x)
