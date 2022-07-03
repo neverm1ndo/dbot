@@ -37,7 +37,7 @@ export class PubSubService {
           break;
         }
         case 'reward-redeemed' : {
-          chat.reward(message.data);
+          chat.reward(message.data.message.data);
           break;
         }
         case 'RECONNECT' : {
