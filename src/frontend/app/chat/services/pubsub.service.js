@@ -30,6 +30,7 @@ export class PubSubService {
       const message = JSON.parse(event.data);
       console.log('[PUBSUB] RECV: ' + JSON.stringify(message) + '\n');
       const msg = JSON.parse(message.data.message).data;
+      console.log(message, msg);
       switch (message.type) {
         case 'MESSAGE' : {
           if (!this._moderation_actions[msg.moderation_action]) return;
