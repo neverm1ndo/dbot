@@ -15,7 +15,9 @@ import { PubSubService } from '@chat/services/pubsub.service';
 import { SocketService } from '@chat/services/socket.service';
 import { OmdApiService } from '@chat/services/omd.api.service';
 import BTTVService from '@chat/services/bttv.service';
+import { ChatReward } from './reward/reward.component';
 
+export const chat = document.querySelector('omd-chat');
 
 /**
 * Application services
@@ -49,6 +51,7 @@ export const client = new tmi.Client({
 * Application componets
 */
 const components = {
+  'omd-chat-reward'   : ChatReward,
   'omd-chat'          : ChatComponent,
   'omd-alert'         : ChatAlert,
   'omd-chatters-list' : ChattersListComponent,
@@ -61,6 +64,8 @@ const components = {
 /**
 * Define application componets
 */
+
 Object.entries(components).forEach((entry) => {
   customElements.define(entry[0], entry[1]);
 });
+

@@ -9,6 +9,7 @@ import { io } from './index';
 
 import express, { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
+import MongoStore from 'connect-mongo';
 import passport from 'passport';
 import refresh from 'passport-oauth2-refresh';
 import OAuth2Strategy from 'passport-oauth2';
@@ -42,12 +43,18 @@ export const bot = new Bot();
  *                              Set basic express settings
  ***********************************************************************************/
 
+// MongoDB connection
+const clientP = connect(process.env.MONGO!, { useNewUrlParser: true, useUnifiedTopology: true }).then(m => m.connection.getClient());
 app.use(session({
   secret: process.env.SESSION_SECRET!,
   resave: true,
   saveUninitialized: true,
-  cookie: { maxAge: 525600*60000 }
+  cookie: { maxAge: 525600*60000 },
+  store: MongoStore.create({ 
+    clientPromise: clientP
+  })
 }));
+
 app.set('view engine', 'pug');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -110,9 +117,6 @@ const strategy = new OAuth2Strategy({
 passport.use('twitch',  strategy);
 refresh.use('twitch', strategy);
 
-// MongoDB connection
-connect(process.env.MONGO!, { useNewUrlParser: true, useUnifiedTopology: true });
-
 // Show routes called in console during development
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
@@ -126,7 +130,7 @@ app.use('/commands', CommandsRouter);
 app.use('/api', express.json(), APIRouter);
 
 // Set route to start OAuth link, this is where you define scopes to request
-app.get('/auth/twitch', passport.authenticate('twitch', { scope: ['user_read', 'user_subscriptions', 'channel_editor','chat:read', 'chat:edit', 'channel:moderate'] }));
+app.get('/auth/twitch', passport.authenticate('twitch', { scope: ['user_read', 'user_subscriptions', 'channel_editor','chat:read', 'chat:edit', 'channel:moderate', 'channel:read:redemptions'] }));
 
 // Set route for OAuth redirect
 app.get('/auth/twitch/callback', passport.authenticate('twitch',

@@ -1,14 +1,15 @@
 import template from 'pug-loader!./chat.tpl.pug';
 import styles from './chat.scss';
+
 import Collapse from 'bootstrap/js/dist/collapse';
-import { PubSubService } from '@chat/services/pubsub.service';
-import { TwitchApiService } from '@chat/services/twitch.api.service';
 import { socketService, pubsubService, twitchApiService, omdApiService, bttv, client } from '@chat/chat';
 import { ChatMessage } from '@chat/message/chat.message';
 import { ChatAlert } from '@chat/alert/chat.alert';
+import { ChatReward } from '@chat/reward/reward.component';
 import { secondsToTimestamp, timestamp } from '@chat/utils';
-import { timer, throwError, from } from 'rxjs';
-import { map, takeWhile, switchMap, catchError } from 'rxjs/operators';
+
+import { interval, throwError, from, fromEvent } from 'rxjs';
+import { takeWhile, switchMap, catchError, filter } from 'rxjs/operators';
 
 export class ChatComponent extends HTMLElement {
 
@@ -28,10 +29,12 @@ export class ChatComponent extends HTMLElement {
     this.innerHTML = template({ user: {
         profile_image_url: twitchApiService.user.profile_image_url
     }});
-    this.setSocketConnection();
+    this.#setSocketConnection();
+    
     const tag = document.createElement('script');
           tag.src = 'https://www.youtube.com/player_api';
     document.body.append(tag);
+    
     this.chat          = this.querySelector('#chat-box');
     this.text          = this.querySelector('#text');
     this.text.disabled = true;
@@ -42,26 +45,37 @@ export class ChatComponent extends HTMLElement {
     this.marker        = this.querySelector(".marker");
     this.marker.disabled = true;
     this.channel = twitchApiService.getChannelName();
-                   this.getChannelProperties(this.channel);
+    this.#getChannelProperties(this.channel);
+    
     this.chatterList = this.querySelector('omd-chatters-list');
     bttv.getEmotes(this.channel, this.quickpanel);
-    this.marker.addEventListener('click', () => {
-      if (!this.connected) return;
-      twitchApiService.createMarker().then((res) => {
-        this.alert(`Установлен маркер на позиции ${secondsToTimestamp(res.data[0].position_seconds)} ${res.data[0].description?'с описанием ' + res.data[0].description:''}`, 'twitch', '', ['bi', 'bi-vr']);
-      }).catch((err) => {
-        this.alert(`Не удалось создать маркер ${err.message}`, 'warning', '', ['bi', 'bi-exclamation-diamond-fill']);
-      });
+    
+    this.#subToChatEvents();
+    this.#quickpanelSetup();
+    this.#getLurkersFromStorage();
+    this.#connectTmiClient();
+    this.#setUserBagde();
+
+    // this.#handleStreamInfo(this.settings.id);
+  }
+
+  #subToChatEvents() {
+    fromEvent(this.marker, 'click').subscribe(() => this.#markerEventHandler());
+    fromEvent(this.submit, 'click').pipe(filter(() => this.connected)).subscribe(() => this.send());
+    fromEvent(this.text, 'keydown').pipe(filter((event) => event.code == 'Enter')).subscribe(() => this.send());
+    fromEvent(this.text, 'input').pipe(filter(() => this.text.value == '')).subscribe(() => { this.selfEmotes = {}; });
+  }
+
+  #markerEventHandler() {
+    if (!this.connected) return;
+    twitchApiService.createMarker().then((res) => {
+      this.alert(`Установлен маркер на позиции ${secondsToTimestamp(res.data[0].position_seconds)} ${res.data[0].description?'с описанием ' + res.data[0].description:''}`, 'twitch', '', ['bi', 'bi-vr']);
+    }).catch((err) => {
+      this.alert(`Не удалось создать маркер ${err.message}`, 'warning', '', ['bi', 'bi-exclamation-diamond-fill']);
     });
-    this.submit.addEventListener('click', () => {
-      if (this.connected) this.send();
-    });
-    this.text.addEventListener('keydown', (event) => {
-      if (event.code === 'Enter') this.send();
-    });
-    this.text.addEventListener('input', (event) => {
-      if (this.text.value === '') this.selfEmotes = {};
-    });
+  }
+
+  #quickpanelSetup() {
     const quickpanel = new Collapse(this.quickpanel, {
       toggle: false
     });
@@ -74,14 +88,11 @@ export class ChatComponent extends HTMLElement {
         this.selfEmotes[event.target.dataset.id] = [];
       }
       this.selfEmotes[event.target.dataset.id].push(`${this.text.value.length}-${this.text.value.length + event.target.dataset.name.length}`);
-      this.text.value = this.text.value + ' ' + event.target.dataset.name + ' ';
+      this.text.value = `${this.text.value} ${event.target.dataset.name}`;
     }));
-    this.getLurkersFromStorage();
-    this.connectTmiClient();
-    this.setUserBagde();
   }
 
-  setUserBagde() {
+  #setUserBagde() {
     const label = this.querySelector('.chatty-label');
     const img = new Image();
     img.src = '/assets/cm.png';
@@ -89,13 +100,12 @@ export class ChatComponent extends HTMLElement {
     label.append(img);
   }
 
-  setSocketConnection() {
+  #setSocketConnection() {
     socketService.onBotStatus().subscribe((status) => {
       this.setLive(status == 1);
     });
     socketService.onStreamOnline().subscribe((event) => {
       this.setLive(true);
-      this.handleStreamInfo(this.settings.id);
       this.alert(`Стрим запущен. Время запуска ${timestamp(Date.now())}`, 'success', '', ['bi', 'bi-twitch']);
     });
     socketService.onStreamOffline().subscribe((event) => {
@@ -107,34 +117,34 @@ export class ChatComponent extends HTMLElement {
     });
   }
 
-  connectTmiClient() {
+  #connectTmiClient() {
     const CDC_VIEWER_LIM = 35;
-    let trigger = 0;
+    // let trigger = 0;
     client.connect();
-    client.on('connected', (channel, self) => {
+    client.on('connected', (_channel, _self) => {
       this.alert('Добро пожаловать в чат!');
       this.connected = true;
       this.submit.disabled = false;
       this.text.disabled = false;
     });
-    client.on('disconnected', (channel, self) => {
+    client.on('disconnected', (_channel, _self) => {
       this.alert('Вы отсоединенны от чата', 'siren');
       this.connected = false;
       this.submit.disabled = true;
       this.text.disabled = true;
     });
-    client.on('join', (channel, username, self) => {
+    client.on('join', (_channel, username, self) => {
       if (self || this.chatterList.connected.includes(username) || this.settings.lurkers.includes(username)) return;
       this.chatterList.add(username);
       if (this.chatterList.connected.length <= CDC_VIEWER_LIM) {
         this.alert(`<b>${username}</b> подключился`, 'connect', username);
       }
     });
-    client.on('ban', (channel, username, reason, userstate) => {
+    client.on('ban', (_channel, username, _reason, _userstate) => {
       // Replaced with PubSub event handler
       this.pseudoDelete(username);
     });
-    client.on('timeout', (channel, username, reason, duration, userstate) => {
+    client.on('timeout', (_channel, username, reason, duration, userstate) => {
       this.alert(`<b>${username}</b> отстранен на ${duration} секунд ${reason?'по причине ' + reason:''}`, 'warning', '', ['bi', 'bi-clock']);
       this.pseudoDelete(username);
     });
@@ -151,7 +161,7 @@ export class ChatComponent extends HTMLElement {
         }
       }, 180000);
     });
-    client.on('chat', (channel, tags, message, self) => {
+    client.on('chat', (_channel, tags, message, self) => {
       if (self) {
         tags.emotes = this.selfEmotes;
         this.add(tags, message, self);
@@ -159,47 +169,47 @@ export class ChatComponent extends HTMLElement {
       }
       this.add(tags, message, self);
     });
-    client.on('subscription', (channel, username, methods, message, userstate) => {
+    client.on('subscription', (_channel, username, _methods, message, userstate) => {
       this.alert(`<b>${username}</b> оформил подписку<br><small>${message}</small>`, 'twitch', '', ['bi', 'bi-twitch']);
     });
-    client.on('notice', (channel, msgid, message) => {
+    client.on('notice', (_channel, _msgid, message) => {
       this.alert(`<small>${message}</small>`);
     });
-    client.on('vips', (channel, vips) => {
+    client.on('vips', (_channel, vips) => {
       vips = vips.join('</br>');
       this.alert(`<small>${vips.length > 0?vips:'Список VIP пуст'}</small>`);
     });
-    client.on('mods', (channel, mods) => {
+    client.on('mods', (_channel, mods) => {
       mods = mods.join('</br>');
       this.alert(`<small>${mods.length > 0?mods:'Список модераторов пуст'}</small>`);
     });
-    client.on('resub', (channel, username, methods, message, userstate) => {
+    client.on('resub', (_channel, username, _methods, message, _userstate) => {
       this.alert(`<b>${username}</b> переоформил подписку<br><small>${message}</small>`, 'twitch', '', ['bi', 'bi-twitch']);
     });
-    client.on('subgift', (channel, username, streakMonths, recepient, methods, userstate) => {
+    client.on('subgift', (_channel, username, _streakMonths, recepient, _methods, _userstate) => {
       this.alert(`<b>${username}</b> подарил подписку <u>${recepient}</u>`, 'twitch', '', ['bi', 'bi-gift-fill']);
     });
-    client.on('raided', (channel, username, viewers) => {
+    client.on('raided', (_channel, username, viewers) => {
       this.alert(`<b>${username}</b> зарейдил канал на <b>${viewers}</b> зрителей`, 'twitch', '', ['bi', 'bi-twitch']);
     });
-    client.on('hosted', (channel, username, viewers, autohost) => {
+    client.on('hosted', (_channel, username, viewers, autohost) => {
       this.alert(`<b>${username}</b> захостил канал на <b>${viewers}</b> зрителей`, 'twitch', '', ['bi', 'bi-twitch']);
     });
-    client.on('whisper', (channel, tags, message, self) => {
+    client.on('whisper', (_channel, tags, message, self) => {
       this.add(tags, message, self);
     });
-    client.on('clearchat', (channel) => {
+    client.on('clearchat', (_channel) => {
       this.alert('Чат был очищен');
     });
-    client.on('cheer', (channel, userstate, message) => {
+    client.on('cheer', (_channel, userstate, message) => {
       this.alert(`<b>${username}</b> поддержал канал на <b>${userstate.bits}</b> Cheers`, 'info');
     });
-    client.on('emotesets', (sets, obj) => {
-      this.getEmoteSet(sets.split(','));
+    client.on('emotesets', (sets, _obj) => {
+      this.#getEmoteSet(sets.split(','));
     });
   }
 
-  getLurkersFromStorage() {
+  #getLurkersFromStorage() {
     const storage = window.localStorage.getItem('lurkers');
     if (!storage) return;
     const lurkers = JSON.parse(storage);
@@ -210,13 +220,13 @@ export class ChatComponent extends HTMLElement {
     window.localStorage.setItem('lurkers', JSON.stringify(this.settings.lurkers));
   }
 
-  getEmoteSet(id) {
+  #getEmoteSet(id) {
     twitchApiService.getEmoteSets(id)
-                  .then(data => { if (data.data.length > 0) this.addEmotes(data.data) })
-                  .catch(err => console.error);
+                    .then(data => { if (data.data.length > 0) this.addEmotes(data.data) })
+                    .catch(_err => console.error);
   }
 
-  addEmotes(emotes) {
+  #addEmotes(emotes) {
     const owners = {};
     let streamers = new Set();
     for (let i = 0; i < emotes.length; i++) {
@@ -252,7 +262,7 @@ export class ChatComponent extends HTMLElement {
         }
         this.quickpanel.append(container, document.createElement('hr'));
       }
-    }).catch((err) => console.log(err))
+    }).catch(_err => console.log);
   }
 
   /**
@@ -279,6 +289,14 @@ export class ChatComponent extends HTMLElement {
             this.text.focus();
           });
     this.chat.append(messageComponent);
+    this.autoscroll();
+  }
+
+  /**
+  * Adds new message container with reward used
+  */
+  reward(rewardData) {
+    this.chat.append(new ChatReward(rewardData));
     this.autoscroll();
   }
 
@@ -372,7 +390,7 @@ export class ChatComponent extends HTMLElement {
     this.selfEmotes = {};
   }
 
-  setLive(live) {
+  #setLive(live) {
     this.live = live;
     this.marker.disabled = !live;
   }
@@ -382,8 +400,8 @@ export class ChatComponent extends HTMLElement {
     window.localStorage.setItem('lurkers', JSON.stringify([...new Set(this.settings.lurkers)]));
   }
 
-  handleStreamInfo(id) {
-    timer(0, 120000)
+  #handleStreamInfo(id) {
+     interval(0, 120000)
     .pipe(takeWhile(() => this.live == true))
     .pipe(switchMap(() => from(twitchApiService.getStreams(id))))
     .pipe(catchError((err) =>  {
@@ -402,7 +420,7 @@ export class ChatComponent extends HTMLElement {
     });
   };
 
-  getChannelProperties (channel) {
+  #getChannelProperties (channel) {
     twitchApiService.getUser(channel).then((data) => {
       twitchApiService.user.twitch = data[0];
       this.settings.id = data.data[0].id;

@@ -20,6 +20,7 @@ export interface IGetUserAuthInfoRequest extends Request {
 const router = Router();
 
 router.get('/', corsOpt, checkSession, validateAccessToken, (req: IGetUserAuthInfoRequest, res: Response,) => {
+  console.log(req.user);
   res.set("Content-Security-Policy", "default-src *; img-src * data: 'self'; script-src-elem *; connect-src *")
      .render('chat', req.user);
 });

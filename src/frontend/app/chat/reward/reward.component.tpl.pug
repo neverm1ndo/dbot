@@ -1,0 +1,18 @@
+div.d-flex.reward.card
+    div.d-flex.flew-row.card-body
+        div.d-flex.reward-color
+        div.d-flex.align-items-center.justify-content-center
+            if redemption.reward.image 
+                img.reward-image(src=redemption.reward.image.url_1x)
+            else 
+                img.reward-image(src=redemption.reward["default-image"].url_1x)
+        div.d-flex.flex-column.flex-fill.align-items-start.justify-content-center
+            div.d-flex.reward-user
+                b=redemption.user.display_name 
+            div.d-flex.reward-content
+                span получил награду
+                b #{ redemption.reward.title }
+                span за
+                    span.reward-content-cost #{ redemption.reward.cost }
+        if user_input
+            div.d-flex.reward-user-input #{ user_input }

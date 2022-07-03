@@ -38,12 +38,6 @@ custom-list-item, sounds-list-item {
   display: flex;
   width: 100%;
 }
-announce, list {
-  &-item-edit-form {
-    flex: 0 0 auto;
-    width: 100%;
-  }
-}
 aside {
   max-width: 45px;
 }

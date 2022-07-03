@@ -1,10 +1,10 @@
 import { User } from '@chat/chat.user';
+import { chat } from '@chat/chat';
 import { nonce } from '@chat/utils';
 
 export class PubSubService {
 
-  _user = new User();
-  _SCOPE = 'user_read+chat_login';
+  #user = new User();
   _ws = new WebSocket('wss://pubsub-edge.twitch.tv');
   _moderation_actions = {
     'unban': 'разбанил',
@@ -29,16 +29,25 @@ export class PubSubService {
     this._ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
       console.log('[PUBSUB] RECV: ' + JSON.stringify(message) + '\n');
-      if (message.type == 'MESSAGE') {
-        const msg = JSON.parse(message.data.message).data;
-        if (!this._moderation_actions[msg.moderation_action]) return;
-        // this.chat.alert(`<b>${msg.created_by}</b> ${this.moderation_actions[msg.moderation_action]} <b>${msg.args[0]}</b> ${msg.args[1]?'по причине: ' + msg.args[1]:''}`, 'warning', '');
-      }
-      if (message.type == 'RECONNECT') {
-        console.log('[PUBSUB] INFO: Reconnecting...\n');
-        setTimeout(() => {
-          this.connect()
-        }, reconnectInterval);
+      switch (message.type) {
+        case 'MESSAGE' : {
+          const msg = JSON.parse(message.data.message).data;
+          if (!this._moderation_actions[msg.moderation_action]) return;
+          chat.alert(`<b>${msg.created_by}</b> ${this.moderation_actions[msg.moderation_action]} <b>${msg.args[0]}</b> ${msg.args[1]?'по причине: ' + msg.args[1]:''}`, 'warning', '');
+          break;
+        }
+        case 'reward-redeemed' : {
+          chat.reward(message.data);
+          break;
+        }
+        case 'RECONNECT' : {
+          console.log('[PUBSUB] INFO: Reconnecting...\n');
+          setTimeout(() => {
+            this.connect()
+          }, reconnectInterval);
+          break;
+        }
+        default: break;
       }
     };
     this._ws.onclose = () => {
@@ -61,8 +70,8 @@ export class PubSubService {
       type: 'LISTEN',
       nonce: nonce(15),
       data: {
-          topics: [`chat_moderator_actions.${this._user.id}.${id}`],
-          auth_token: this._user.token
+          topics: [`chat_moderator_actions.${this.#user.id}.${id}`, `channel-points-channel-v1.${id}`],
+          auth_token: this.#user.token
       }
     };
     console.log('[PUBSUB] SENT: ' + JSON.stringify(message) + '\n');

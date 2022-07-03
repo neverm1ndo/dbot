@@ -72,6 +72,7 @@ export class Bot {
 
   // TODO: make users own statuses, now its global
   public shutdown(channel: string): void {
+    logger.info(`CHANNEL ${channel} shutdown ${this.announcers[channel]}`);
     // if (this.status === BotStatus.SLEEPS) return;
     if (!this.announcers[channel]) return;
     delete this.announcers[channel];
@@ -80,6 +81,7 @@ export class Bot {
 
   public wakeup(channel: string): void {
     // if (this.status === BotStatus.WORKS) return;
+    logger.info(`CHANNEL ${channel} wakeup ${this.announcers[channel]}`);
     if (this.announcers[channel]) return;
     this.announcers[channel] = new Announcer(this, 9000000, channel);
     this.announcers[channel].start.subscribe((announce: string) => {
