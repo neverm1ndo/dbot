@@ -3,7 +3,7 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 
 import { join } from 'path';
-import { connect } from 'mongoose';
+import { connect, ConnectOptions } from 'mongoose';
 
 import { io } from './index';
 
@@ -44,7 +44,7 @@ export const bot = new Bot();
  ***********************************************************************************/
 
 // MongoDB connection
-const clientP = connect(process.env.MONGO!, { useNewUrlParser: true, useUnifiedTopology: true }).then(m => m.connection.getClient());
+const clientP = connect(process.env.MONGO!, { useNewUrlParser: true, useUnifiedTopology: true } as ConnectOptions).then(m => m.connection.getClient());
 app.use(session({
   secret: process.env.SESSION_SECRET!,
   resave: true,
