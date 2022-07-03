@@ -33,7 +33,7 @@ export class PubSubService {
       switch (message.type) {
         case 'MESSAGE' : {
           const msg = JSON.parse(message.data.message).data;
-          if (msg?.reward) return chat.reward(JSON.parse(message.data.message).data);
+          if (msg?.redemption) return chat.reward(JSON.parse(message.data.message).data);
           if (!this._moderation_actions[msg.moderation_action]) return;
           chat.alert(`<b>${msg.created_by}</b> ${this._moderation_actions[msg.moderation_action]} <b>${msg.args[0]}</b> ${msg.args[1]?'по причине: ' + msg.args[1]:''}`, 'warning', '');
           break;
