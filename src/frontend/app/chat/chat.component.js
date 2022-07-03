@@ -55,6 +55,7 @@ export class ChatComponent extends HTMLElement {
     this.#getLurkersFromStorage();
     this.#connectTmiClient();
     this.#setUserBagde();
+    this.reward(null);
 
     // this.#handleStreamInfo(this.settings.id);
   }
