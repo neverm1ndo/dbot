@@ -14,5 +14,5 @@ div.d-flex.reward.card
                 b #{ redemption.reward.title }
                 span за
                     span.reward-content-cost #{ redemption.reward.cost }
-        if user_input
-            div.d-flex.reward-user-input #{ user_input }
+            if redemption.user_input
+                div.d-flex.reward-user-input #{ redemption.user_input }

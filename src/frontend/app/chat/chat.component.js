@@ -8,8 +8,8 @@ import { ChatAlert } from '@chat/alert/chat.alert';
 import { ChatReward } from '@chat/reward/reward.component';
 import { secondsToTimestamp, timestamp } from '@chat/utils';
 
-import { interval, throwError, from, fromEvent } from 'rxjs';
-import { takeWhile, switchMap, catchError, filter } from 'rxjs/operators';
+import { interval, throwError, from, fromEvent, combineLatest } from 'rxjs';
+import { take, tap, switchMap, catchError, filter } from 'rxjs/operators';
 
 export class ChatComponent extends HTMLElement {
 
@@ -55,8 +55,6 @@ export class ChatComponent extends HTMLElement {
     this.#getLurkersFromStorage();
     this.#connectTmiClient();
     this.#setUserBagde();
-
-    // this.#handleStreamInfo(this.settings.id);
   }
 
   #subToChatEvents() {
@@ -401,41 +399,41 @@ export class ChatComponent extends HTMLElement {
   }
 
   #handleStreamInfo(id) {
-     interval(0, 120000)
-    .pipe(takeWhile(() => this.live == true))
+    return interval(0, 120000)
+    .pipe(filter(() => this.live == true))
     .pipe(switchMap(() => from(twitchApiService.getStreams(id))))
     .pipe(catchError((err) =>  {
       return throwError(err);
     }))
+  };
+
+  #getChannelProperties(channel) {
+    from(twitchApiService.getUser(channel))
+    .pipe(take(1))
+    .pipe(tap((userData) => {
+      twitchApiService.user.twitch = userData[0];
+      this.settings.id = userData.data[0].id;
+      pubsubService.connect(this.settings.id);
+    }))
+    .pipe(switchMap(() => combineLatest([
+      from(twitchApiService.getChannelBadges(this.settings.id)),
+      from(twitchApiService.getGlobalBadges()),
+      from(omdApiService.getLastMessages(this.channel)),
+    ])))
+    .pipe(tap(([badges, global, lastMessages]) => {
+      this.settings.badges = [...badges.data, ...global.data];
+      for (let message in lastMessages) {
+        this.add(message.tags, message.message, message.self, message.date);
+      }
+    }))
+    .pipe(switchMap(() => this.#handleStreamInfo()))
     .subscribe((data) => {
       const streamInfo = data.data[0];
-      if (streamInfo) {
-        this.stream = streamInfo;
-        this.chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
-      } else {
-        this.chatterList.dom.counter.innerHTML = 0;
-      };
+      if (!streamInfo) return this.chatterList.dom.counter.innerHTML = 0;
+      this.stream = streamInfo;
+      this.chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
     }, (err) => {
       console.error(err);
     });
-  };
-
-  #getChannelProperties (channel) {
-    twitchApiService.getUser(channel).then((data) => {
-      twitchApiService.user.twitch = data[0];
-      this.settings.id = data.data[0].id;
-      pubsubService.connect(this.settings.id);
-      // this.handleStreamInfo(this.settings.id);
-      return Promise.all([
-        twitchApiService.getChannelBadges(this.settings.id),
-        twitchApiService.getGlobalBadges(),
-        omdApiService.getLastMessages(this.channel),
-      ])
-    }).then(([badges, global, lastMessages]) => {
-      this.settings.badges = [...badges.data, ...global.data];
-      lastMessages.forEach((message) => {
-        this.add(message.tags, message.message, message.self, message.date);
-      });
-    }).catch((err) => console.error(err));
   }
 }
