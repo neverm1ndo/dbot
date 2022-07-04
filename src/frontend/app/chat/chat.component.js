@@ -422,7 +422,7 @@ export class ChatComponent extends HTMLElement {
     ])))
     .pipe(tap(([badges, global, lastMessages]) => {
       this.settings.badges = [...badges.data, ...global.data];
-      for (let message in lastMessages) {
+      for (let message of lastMessages) {
         this.add(message.tags, message.message, message.self, message.date);
       }
     }))
