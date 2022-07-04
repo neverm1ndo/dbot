@@ -197,7 +197,7 @@ export class Bot {
         break;
       }
       //TODO: make this command optional
-      case 'd2pt': {
+      case 'wr': {
         if (args) {
             let arg = args.join(' ');
             let pos;

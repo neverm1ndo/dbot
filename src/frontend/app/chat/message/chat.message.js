@@ -9,7 +9,7 @@ import { twitchApiService, bttv, client } from '@chat/chat';
 
 
 export class ChatMessage extends HTMLElement {
-  constructor(channel, displayName, tags, message, self, date, channelBadges) {
+  constructor(channel, tags, message, self, date, channelBadges) {
     super();
     const color = tags.color?new HEX(tags.color):new HEX('FFFFFF');
     this.tags = tags;
@@ -21,7 +21,7 @@ export class ChatMessage extends HTMLElement {
       botCommand: message.startsWith('!'),
       nickname: tags['display-name'],
       separator: tags['message-type'] === "action" ? undefined : ': ',
-      message: this.pretty(channel, twitchApiService.user.display_name, tags, message),
+      message: this.pretty(twitchApiService.user.display_name, tags, message),
     });
     this.body     = this.querySelector('.card-body');
     this.nickname = this.querySelector('.nickname');
@@ -67,13 +67,12 @@ export class ChatMessage extends HTMLElement {
   /**
   * Слишком много циклов
   */
-  pretty(channel, displayName, tags, message) {
+  pretty(displayName, tags, message) {
     let notice = message.includes('@')?'@' + displayName: displayName;
     let splited = message.split(/\s/);
     let result = [];
     let position = 0;
     let emotes = [];
-    let emoted = false;
     for (let emote in tags.emotes) {
       for (let i = 0; i < tags.emotes[emote].length; i++) {
         let points = tags.emotes[emote][i].split('-');

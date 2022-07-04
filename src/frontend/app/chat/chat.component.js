@@ -58,19 +58,15 @@ export class ChatComponent extends HTMLElement {
   }
 
   #subToChatEvents() {
-    fromEvent(this.marker, 'click').subscribe(() => this.#markerEventHandler());
+    fromEvent(this.marker, 'click')
+      .pipe(switchMap(() => from(twitchApiService.createMarker())))
+      .pipe(filter(() => !this.connected))
+      .subscribe((res) => {
+        this.alert(`Установлен маркер на позиции ${secondsToTimestamp(res.data[0].position_seconds)} ${res.data[0].description?'с описанием ' + res.data[0].description:''}`, 'twitch', '', ['bi', 'bi-vr']);
+      }, (err) => { this.alert(`Не удалось создать маркер ${err.message}`, 'warning', '', ['bi', 'bi-exclamation-diamond-fill']); });
     fromEvent(this.submit, 'click').pipe(filter(() => this.connected)).subscribe(() => this.send());
     fromEvent(this.text, 'keydown').pipe(filter((event) => event.code == 'Enter')).subscribe(() => this.send());
     fromEvent(this.text, 'input').pipe(filter(() => this.text.value == '')).subscribe(() => { this.selfEmotes = {}; });
-  }
-
-  #markerEventHandler() {
-    if (!this.connected) return;
-    twitchApiService.createMarker().then((res) => {
-      this.alert(`Установлен маркер на позиции ${secondsToTimestamp(res.data[0].position_seconds)} ${res.data[0].description?'с описанием ' + res.data[0].description:''}`, 'twitch', '', ['bi', 'bi-vr']);
-    }).catch((err) => {
-      this.alert(`Не удалось создать маркер ${err.message}`, 'warning', '', ['bi', 'bi-exclamation-diamond-fill']);
-    });
   }
 
   #quickpanelSetup() {
@@ -102,11 +98,11 @@ export class ChatComponent extends HTMLElement {
     socketService.onBotStatus().subscribe((status) => {
       this.setLive(status == 1);
     });
-    socketService.onStreamOnline().subscribe((event) => {
+    socketService.onStreamOnline().subscribe((_event) => {
       this.setLive(true);
       this.alert(`Стрим запущен. Время запуска ${timestamp(Date.now())}`, 'success', '', ['bi', 'bi-twitch']);
     });
-    socketService.onStreamOffline().subscribe((event) => {
+    socketService.onStreamOffline().subscribe((_event) => {
       this.setLive(false);
       this.alert(`Стрим окончен. Время трансляции ${secondsToTimestamp(Date.now() - new Date(this.stream.started_at).getTime()/1000)}`, 'success', '', ['bi', 'bi-twitch']);
     });
@@ -142,11 +138,11 @@ export class ChatComponent extends HTMLElement {
       // Replaced with PubSub event handler
       this.pseudoDelete(username);
     });
-    client.on('timeout', (_channel, username, reason, duration, userstate) => {
+    client.on('timeout', (_channel, username, reason, duration, _userstate) => {
       this.alert(`<b>${username}</b> отстранен на ${duration} секунд ${reason?'по причине ' + reason:''}`, 'warning', '', ['bi', 'bi-clock']);
       this.pseudoDelete(username);
     });
-    client.on('part', (channel, username, self) => {
+    client.on('part', (_channel, username, self) => {
       if (self || this.settings.lurkers.includes(username)) return;
       setTimeout(() => {
         if (this.chatterList.connected.includes(username)) {
@@ -167,7 +163,7 @@ export class ChatComponent extends HTMLElement {
       }
       this.add(tags, message, self);
     });
-    client.on('subscription', (_channel, username, _methods, message, userstate) => {
+    client.on('subscription', (_channel, username, _methods, message, _userstate) => {
       this.alert(`<b>${username}</b> оформил подписку<br><small>${message}</small>`, 'twitch', '', ['bi', 'bi-twitch']);
     });
     client.on('notice', (_channel, _msgid, message) => {
@@ -190,7 +186,7 @@ export class ChatComponent extends HTMLElement {
     client.on('raided', (_channel, username, viewers) => {
       this.alert(`<b>${username}</b> зарейдил канал на <b>${viewers}</b> зрителей`, 'twitch', '', ['bi', 'bi-twitch']);
     });
-    client.on('hosted', (_channel, username, viewers, autohost) => {
+    client.on('hosted', (_channel, username, viewers, _autohost) => {
       this.alert(`<b>${username}</b> захостил канал на <b>${viewers}</b> зрителей`, 'twitch', '', ['bi', 'bi-twitch']);
     });
     client.on('whisper', (_channel, tags, message, self) => {
@@ -199,7 +195,7 @@ export class ChatComponent extends HTMLElement {
     client.on('clearchat', (_channel) => {
       this.alert('Чат был очищен');
     });
-    client.on('cheer', (_channel, userstate, message) => {
+    client.on('cheer', (_channel, userstate, _message) => {
       this.alert(`<b>${username}</b> поддержал канал на <b>${userstate.bits}</b> Cheers`, 'info');
     });
     client.on('emotesets', (sets, _obj) => {
@@ -212,7 +208,7 @@ export class ChatComponent extends HTMLElement {
     if (!storage) return;
     const lurkers = JSON.parse(storage);
     this.settings.lurkers = [...new Set(...[lurkers, this.settings.lurkers])];
-    lurkers.forEach((lurker, index, arr) => {
+    lurkers.forEach((lurker, index) => {
       if (Array.isArray(lurker)) this.settings.lurkers.splice(index, 1);
     });
     window.localStorage.setItem('lurkers', JSON.stringify(this.settings.lurkers));
@@ -281,7 +277,7 @@ export class ChatComponent extends HTMLElement {
   */
   add(tags, message, self, date = Date.now()) {
     this.removeOldMessages(800);
-    const messageComponent = new ChatMessage(this.channel, twitchApiService.user.display_name, tags, message, self, date, this.settings.badges);
+    const messageComponent = new ChatMessage(twitchApiService.user.display_name, tags, message, self, date, this.settings.badges);
           messageComponent.nickname.addEventListener('click', () => {
             this.text.value = this.text.value + ' @' + tags.username + ' ';
             this.text.focus();
