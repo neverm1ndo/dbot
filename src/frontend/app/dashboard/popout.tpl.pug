@@ -2,7 +2,7 @@ div.container-fluid.popout.automode
   div.d-flex.flex-column.justify-content-center.align-items-center.h-100
     div.card.gray.text-light.col-12.col-md-9.col-lg-6.shadow.h-95
       div.card-body.d-flex.flex-column.h-100
-        div.d-flex.flex-column.flex-fill
+        div.d-flex.flex-column
           div.d-flex.flex-row.justify-content-between
             h5.card-title
               i.mr-3.bi(class=icon)
@@ -14,4 +14,4 @@ div.container-fluid.popout.automode
               each subtitle in subtitles
                 p=subtitle
             hr
-        div.d-flex.flex-column.main
+        div.d-flex.flex-column.main.flex-fill.overflow-auto
