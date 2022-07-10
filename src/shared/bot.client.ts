@@ -11,6 +11,7 @@ import { Twitch } from '@shared/twitch';
 import { Nuzhdiki } from '@shared/nuzhdiki';
 import { MESSAGE } from '../schemas/message.schema';
 import StartOptions from '../pre-start';
+import { Subscription } from 'rxjs';
 
 enum BotStatus {
   SLEEPS,
@@ -29,7 +30,7 @@ export class Bot {
       },
       channels: [process.env.BOT_CHANNEL!]
     });
-  announcers: { [channel: string]: Announcer } = {};
+  announcers: { [channel: string]: { announcer: Announcer, subscription?: Subscription }} = {};
 
   // public status: BotStatus = BotStatus.SLEEPS; // sleeps by default
   private readonly prefix: string = '!';
@@ -74,7 +75,9 @@ export class Bot {
   public shutdown(channel: string): void {
     logger.info(`CHANNEL ${channel} shutdown ${this.announcers[channel]}`);
     // if (this.status === BotStatus.SLEEPS) return;
+    this.announcers[channel].subscription?.unsubscribe();
     if (!this.announcers[channel]) return;
+    this.announcers[channel].subscription?.unsubscribe();
     delete this.announcers[channel];
     logger.imp(`Shuttdown in ${channel} channel`);
   }
@@ -83,8 +86,10 @@ export class Bot {
     // if (this.status === BotStatus.WORKS) return;
     logger.info(`CHANNEL ${channel} wakeup ${this.announcers[channel]}`);
     if (this.announcers[channel]) return;
-    this.announcers[channel] = new Announcer(this, 9000000, channel);
-    this.announcers[channel].start.subscribe((announce: string) => {
+    this.announcers[channel] = {
+      announcer: new Announcer(this, 9000000, channel),
+    }
+    this.announcers[channel].subscription = this.announcers[channel].announcer.start.subscribe((announce: string) => {
       this.client.say(channel, announce);
     });
     logger.imp(`Woke up in ${channel} channel`);
