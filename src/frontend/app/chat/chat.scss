@@ -235,6 +235,11 @@ omd-chat {
     border: none;
     background: none;
     /* line-height: 26px; */
+    &-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 100%;
+    }
   }
   .card:last-child {
     margin-bottom: 5px;

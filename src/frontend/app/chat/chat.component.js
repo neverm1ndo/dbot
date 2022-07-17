@@ -1,4 +1,5 @@
 import template from 'pug-loader!./chat.tpl.pug';
+import techAlert from 'pug-loader!./alert/tech.alert.tpl.pug';
 import styles from './chat.scss';
 
 import Collapse from 'bootstrap/js/dist/collapse';
@@ -46,7 +47,7 @@ export class ChatComponent extends HTMLElement {
     this.marker.disabled = true;
     this.channel = twitchApiService.getChannelName();
     this.#getChannelProperties(this.channel);
-    
+    socketService.joinRoom(this.channel);
     this.chatterList = this.querySelector('omd-chatters-list');
     bttv.getEmotes(this.channel, this.quickpanel);
     
@@ -55,13 +56,6 @@ export class ChatComponent extends HTMLElement {
     this.#getLurkersFromStorage();
     this.#connectTmiClient();
     this.#setUserBagde();
-    this.#handleStreamInfo()
-        .subscribe((data) => {
-          const streamInfo = data.data[0];
-          if (!streamInfo) return this.chatterList.dom.counter.innerHTML = 0;
-          this.stream = streamInfo;
-          this.chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
-        }, (err) => console.error(err));
   }
 
   #subToChatEvents() {
@@ -106,7 +100,7 @@ export class ChatComponent extends HTMLElement {
       this.setLive(status == 1);
     });
     socketService.onStreamOnline().subscribe((_event) => {
-      this.setLive(true);
+      this.#setLive(true);
       this.alert(`Стрим запущен. Время запуска ${timestamp(Date.now())}`, 'success', '', ['bi', 'bi-twitch']);
     });
     socketService.onStreamOffline().subscribe((_event) => {
@@ -117,13 +111,17 @@ export class ChatComponent extends HTMLElement {
       this.alert(`Новый фолловер <b>${event.user_name}</b>`, 'twitch', '', ['bi', 'bi-twitch']);
     });
     socketService.onTechMessage().subscribe((message) => {
-      this.alert(`<kbd>Техническое сообщение</kbd></br>${message}`, 'technical', '', ['bi', 'bi-wrench-adjustable-circle-fill', 'mr-2']);
+      message.message = message.message.replace('$reb$', '');
+      console.log(message);
+      this.alert(techAlert({ message }), 'technical', '');
+    });
+    socketService.onRoomJoin().subscribe((room) => {
+      console.log('room', room);
     });
   }
 
   #connectTmiClient() {
     const CDC_VIEWER_LIM = 35;
-    // let trigger = 0;
     client.connect();
     client.on('connected', (_channel, _self) => {
       this.alert('Добро пожаловать в чат!');
@@ -323,7 +321,6 @@ export class ChatComponent extends HTMLElement {
     if (this.chat.lastChild instanceof ChatAlert && this.chat.lastChild.type === type) {
       const last = this.chat.lastChild;
       let wrap;
-      let btn;
       let badge;
       if (last.children.length > 2) {
         wrap = last.lastChild;
@@ -332,7 +329,7 @@ export class ChatComponent extends HTMLElement {
         badge = document.createElement('a');
         badge.classList.add('ml-15', 'pull-right', 'badge', 'rounded-pill', 'bg-light', 'text-dark');
 
-        last.append(badge);
+        if (this.chat.lastChild.type !== 'technical') last.append(badge);
         last.setAttribute('role', 'button')
 
         wrap = document.createElement('div');
@@ -352,7 +349,7 @@ export class ChatComponent extends HTMLElement {
           collapse.toggle();
         })
       }
-      if (wrap.children.length + 1 >= 1) {
+      if (wrap.children.length + 1 >= 1 && this.chat.lastChild.type !== 'technical') {
         setTimeout(() => {
           Collapse.getInstance(wrap).hide();
         }, 10);
@@ -389,11 +386,16 @@ export class ChatComponent extends HTMLElement {
 
   send(message = '') {
     if (!this.text.value && !message) return;
-    if (this.text.value.startsWith('!tech')) {
-      socketService.sendTechnical(this.text.value);
+    if (this.text.value.startsWith('!t')) {
+      socketService.sendTechnical(this.text.value.substring(2, this.text.value.length));
+      this.clearTextField();
       return;
     }
     client.say(this.channel, message || this.text.value);
+    this.clearTextField();
+  }
+
+  clearTextField() {
     this.text.value = '';
     this.selfEmotes = {};
   }
@@ -430,11 +432,19 @@ export class ChatComponent extends HTMLElement {
       from(twitchApiService.getGlobalBadges()),
       from(omdApiService.getLastMessages(this.channel)),
     ])))
-    .subscribe(([badges, global, lastMessages]) => {
+    .pipe(tap(([badges, global, lastMessages]) => {
       this.settings.badges = [...badges.data, ...global.data];
       for (let message of lastMessages) {
         this.add(message.tags, message.message, message.self, message.date);
       }
-    })
+    }))
+    .pipe(switchMap(() => this.#handleStreamInfo(this.settings.id)))
+    .subscribe((data) => {
+      const streamInfo = data.data[0];
+      console.log(streamInfo);
+      if (!streamInfo) return this.chatterList.dom.counter.innerHTML = 0;
+      this.stream = streamInfo;
+      this.chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
+    }, (err) => console.error(err));
   }
 }

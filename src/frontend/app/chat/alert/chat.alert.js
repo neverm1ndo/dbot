@@ -44,6 +44,8 @@ export class ChatAlert extends HTMLElement {
         break;
       case 'technical':
         this.classList.add('technical', 'text-light');
+        const reload = this.querySelector('button[role="reload"]')
+        if (reload) reload.addEventListener('click', () => { document.location.reload() });
         break;
       default:
         this.classList.add('text-muted');

@@ -1,6 +1,7 @@
 import { fromEventPattern } from 'rxjs';
 import { io } from 'socket.io-client';
 import { User } from '@chat/chat.user';
+import { chat } from '@chat/chat';
 
 export class SocketService {
   _user = new User();
@@ -17,8 +18,19 @@ export class SocketService {
     });
   }
 
+  joinRoom(roomName) {
+    console.log('Joining room', roomName)
+    this._socket.emit('join-room', roomName);
+  }
+
   sendTechnical(message) {
     this._socket.emit('technical:message', message);
+  }
+
+  onRoomJoin() {
+    return fromEventPattern((cb) => {
+      this._socket.on('room-join', cb);
+    });
   }
 
   onTechMessage() {

@@ -1,0 +1,15 @@
+div.d-flex.flex-row.w-100
+    div.d-flex.flex-fill
+        div.d-flex.p-1
+            i.bi.bi-wrench-adjustable-circle-fill
+        div.d-flex.flex-column
+            div.d-flex.align-items-center
+                img.m-1.card-avatar(src=message.author.avatar)
+                kbd #{message.author.login}
+            div.d-flex.flex-row.align-items-center.flex-fill
+                div.d-flex.flex-fill #{message.message}
+    if message.reboot
+        div.d-flex.align-self-end
+            button.btn.btn-sm.btn-dark(role="reload")
+                i.bi.bi-arrow-clockwise.mr-2
+                small Reload
