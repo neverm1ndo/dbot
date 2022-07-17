@@ -23,6 +23,12 @@ const sockets = (socket: Socket) => {
 
   socket.join(socket.data.channel || socket.data.username);
 
+  socket.on('technical:message', (message) => {
+    logger.imp(message);
+    socket.broadcast.emit('technical:message', message.replace('!tech', ''));
+    socket.emit('technical:message', message.replace('!tech', ''));
+  });
+
   socket.on('disconnect', (reason) => {
     logger.info(`${socket.data.username}  disconnected from ${socket.rooms}:  ${reason}`);
   });

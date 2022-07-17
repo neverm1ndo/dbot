@@ -219,17 +219,17 @@ omd-chat {
         padding-bottom: 5px;
       }
     }
-    &-list .emote, #broadcaster-quickpanel .emote {
-      display: inline-block;
-      height: 36px;
-      margin: 3px;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: .1s ease-out;
-    }
-    &-list .emote:hover, #broadcaster-quickpanel .emote:hover {
-      transform: scale(1.3);
-    }
+  }
+  #broadcaster-quickpanel .emote {
+    display: inline-block;
+    height: 36px;
+    margin: 3px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: .1s ease-out;
+  }
+  #broadcaster-quickpanel .emote:hover {
+    transform: scale(1.3);
   }
   .card {
     border: none;
@@ -254,6 +254,9 @@ omd-chat {
     animation-direction: normal;
     animation-play-state: running;
     animation-timing-function: ease-in;
+  }
+  .technical {
+    background: #36383a;
   }
   .btn-small {
     width: 30px;

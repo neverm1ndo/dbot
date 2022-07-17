@@ -42,6 +42,9 @@ export class ChatAlert extends HTMLElement {
       case 'disconnect':
         this.classList.add('disconnect', 'text-light');
         break;
+      case 'technical':
+        this.classList.add('technical', 'text-light');
+        break;
       default:
         this.classList.add('text-muted');
     }

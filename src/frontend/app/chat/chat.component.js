@@ -55,6 +55,13 @@ export class ChatComponent extends HTMLElement {
     this.#getLurkersFromStorage();
     this.#connectTmiClient();
     this.#setUserBagde();
+    this.#handleStreamInfo()
+        .subscribe((data) => {
+          const streamInfo = data.data[0];
+          if (!streamInfo) return this.chatterList.dom.counter.innerHTML = 0;
+          this.stream = streamInfo;
+          this.chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
+        }, (err) => console.error(err));
   }
 
   #subToChatEvents() {
@@ -108,6 +115,9 @@ export class ChatComponent extends HTMLElement {
     });
     socketService.onChannelFollow().subscribe((event) => {
       this.alert(`Новый фолловер <b>${event.user_name}</b>`, 'twitch', '', ['bi', 'bi-twitch']);
+    });
+    socketService.onTechMessage().subscribe((message) => {
+      this.alert(`<kbd>Техническое сообщение</kbd></br>${message}`, 'technical', '', ['bi', 'bi-wrench-adjustable-circle-fill', 'mr-2']);
     });
   }
 
@@ -216,7 +226,7 @@ export class ChatComponent extends HTMLElement {
 
   #getEmoteSet(id) {
     twitchApiService.getEmoteSets(id)
-                    .then(data => { if (data.data.length > 0) this.addEmotes(data.data) })
+                    .then(data => { if (data.data.length > 0) this.#addEmotes(data.data) })
                     .catch(_err => console.error);
   }
 
@@ -379,6 +389,10 @@ export class ChatComponent extends HTMLElement {
 
   send(message = '') {
     if (!this.text.value && !message) return;
+    if (this.text.value.startsWith('!tech')) {
+      socketService.sendTechnical(this.text.value);
+      return;
+    }
     client.say(this.channel, message || this.text.value);
     this.text.value = '';
     this.selfEmotes = {};
@@ -416,20 +430,11 @@ export class ChatComponent extends HTMLElement {
       from(twitchApiService.getGlobalBadges()),
       from(omdApiService.getLastMessages(this.channel)),
     ])))
-    .pipe(tap(([badges, global, lastMessages]) => {
+    .subscribe(([badges, global, lastMessages]) => {
       this.settings.badges = [...badges.data, ...global.data];
       for (let message of lastMessages) {
         this.add(message.tags, message.message, message.self, message.date);
       }
-    }))
-    .pipe(switchMap(() => this.#handleStreamInfo()))
-    .subscribe((data) => {
-      const streamInfo = data.data[0];
-      if (!streamInfo) return this.chatterList.dom.counter.innerHTML = 0;
-      this.stream = streamInfo;
-      this.chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
-    }, (err) => {
-      console.error(err);
-    });
+    })
   }
 }

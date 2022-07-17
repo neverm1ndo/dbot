@@ -17,6 +17,16 @@ export class SocketService {
     });
   }
 
+  sendTechnical(message) {
+    this._socket.emit('technical:message', message);
+  }
+
+  onTechMessage() {
+    return fromEventPattern((cb) => {
+      this._socket.on('technical:message', cb);
+    });
+  }
+
   onConnect() {
     return fromEventPattern((cb) => {
       this._socket.on('connect', cb);
