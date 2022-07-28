@@ -165,7 +165,7 @@ app.post('/webhooks/callback/streams', (req: any, res: Response) => {
               };
               default: break;
             }
-            io.sockets.in(req.body.event.broadcaster_user_login).emit(notification.subscription.type, req.body.event);
+            io.to(req.body.event.broadcaster_user_login).emit(notification.subscription.type, req.body.event);
             res.sendStatus(204);
         }
         else if (MESSAGE_TYPE_VERIFICATION === req.headers[MESSAGE_TYPE]) {

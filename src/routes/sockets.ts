@@ -29,7 +29,7 @@ const sockets = (socket: Socket) => {
   });
 
   socket.on('technical:message', (message) => {
-    logger.imp(message); 
+    logger.imp(message, socket.data.channel); 
     socket.broadcast.to(socket.data.channel).emit('technical:message', { message, author: { login: socket.data.username, avatar: socket.data.avatar }, reboot: message.includes('$reb$')});
     socket.emit('technical:message', { message, author: { login: socket.data.username, avatar: socket.data.avatar}, reboot: message.includes('$reb$')});
   });

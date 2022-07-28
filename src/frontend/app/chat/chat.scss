@@ -382,10 +382,10 @@ omd-chat {
   }
   
   .alert {
+    span i {
+      margin-right: 10px;
+    }
     .btn-control {
-      span i {
-        margin-right: 10px;
-      }
       i {
         transition: none;
       }
