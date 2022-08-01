@@ -382,8 +382,8 @@ omd-chat {
   }
   
   .alert {
-    span i {
-      margin-right: 10px;
+    .message {
+      margin-left: 15px;
     }
     .btn-control {
       i {
@@ -394,6 +394,7 @@ omd-chat {
       left: -5px;
       width: 22px;
       top: 0px;
+      text-align: center;
       &:hover {
         color: var(--bs-dark);
         background: var(--bs-light);
