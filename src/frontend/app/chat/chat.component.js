@@ -412,7 +412,7 @@ export class ChatComponent extends HTMLElement {
 
   #handleStreamInfo(id) {
     return interval(0, 120000)
-    .pipe(filter(() => this.live == true))
+    // .pipe(filter(() => this.live == true))
     .pipe(switchMap(() => from(twitchApiService.getStreams(id))))
     .pipe(catchError((err) =>  {
       return throwError(err);
