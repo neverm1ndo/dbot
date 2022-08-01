@@ -411,12 +411,12 @@ export class ChatComponent extends HTMLElement {
   }
 
   #handleStreamInfo(id) {
-    return interval(0, 120000)
-    // .pipe(filter(() => this.live == true))
-    .pipe(switchMap(() => from(twitchApiService.getStreams(id))))
-    .pipe(catchError((err) =>  {
-      return throwError(err);
-    }))
+    // return interval(0, 120000)
+    // // .pipe(filter(() => this.live == true))
+    // .pipe(switchMap(() => from(twitchApiService.getStreams(id))))
+    // .pipe(catchError((err) =>  {
+    //   return throwError(err);
+    // }))
   };
 
   #getChannelProperties(channel) {
@@ -438,13 +438,13 @@ export class ChatComponent extends HTMLElement {
         this.add(message.tags, message.message, message.self, message.date);
       }
     }))
-    .pipe(switchMap(() => this.#handleStreamInfo(this.settings.id)))
+    // .pipe(switchMap(() => this.#handleStreamInfo(this.settings.id)))
     .subscribe((data) => {
-      const streamInfo = data.data[0];
-      console.log(streamInfo);
-      if (!streamInfo) return this.chatterList.dom.counter.innerHTML = 0;
-      this.stream = streamInfo;
-      this.chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
+      // const streamInfo = data.data[0];
+      // console.log(streamInfo);
+      // if (!streamInfo) return this.chatterList.dom.counter.innerHTML = 0;
+      // this.stream = streamInfo;
+      // this.chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
     }, (err) => console.error(err));
   }
 }
