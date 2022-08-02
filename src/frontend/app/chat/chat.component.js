@@ -9,7 +9,7 @@ import { ChatAlert } from '@chat/alert/chat.alert';
 import { ChatReward } from '@chat/reward/reward.component';
 import { secondsToTimestamp, timestamp } from '@chat/utils';
 
-import { interval, throwError, from, fromEvent, combineLatest } from 'rxjs';
+import { timer, throwError, from, fromEvent, combineLatest } from 'rxjs';
 import { take, tap, switchMap, catchError, filter } from 'rxjs/operators';
 
 export class ChatComponent extends HTMLElement {
@@ -56,6 +56,12 @@ export class ChatComponent extends HTMLElement {
     this.#getLurkersFromStorage();
     this.#connectTmiClient();
     this.#setUserBagde();
+    this.#handleStreamInfo(this.settings.id).subscribe((data) => {
+      const streamInfo = data.data[0];
+      if (!streamInfo) return this.chatterList.dom.counter.innerHTML = 0;
+      this.stream = streamInfo;
+      this.chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
+    });
   }
 
   #subToChatEvents() {
@@ -411,12 +417,12 @@ export class ChatComponent extends HTMLElement {
   }
 
   #handleStreamInfo(id) {
-    // return interval(0, 120000)
-    // // .pipe(filter(() => this.live == true))
-    // .pipe(switchMap(() => from(twitchApiService.getStreams(id))))
-    // .pipe(catchError((err) =>  {
-    //   return throwError(err);
-    // }))
+    return timer(0, 120000)
+    .pipe(filter(() => this.settings?.id))
+    .pipe(switchMap(() => from(twitchApiService.getStreams(id))))
+    .pipe(catchError((err) =>  {
+      return throwError(err);
+    }));
   };
 
   #getChannelProperties(channel) {
@@ -432,19 +438,12 @@ export class ChatComponent extends HTMLElement {
       from(twitchApiService.getGlobalBadges()),
       from(omdApiService.getLastMessages(this.channel)),
     ])))
-    .pipe(tap(([badges, global, lastMessages]) => {
+    // .pipe(switchMap(() => this.#handleStreamInfo(this.settings.id)))
+    .subscribe(([badges, global, lastMessages]) => {
       this.settings.badges = [...badges.data, ...global.data];
       for (let message of lastMessages) {
         this.add(message.tags, message.message, message.self, message.date);
       }
-    }))
-    // .pipe(switchMap(() => this.#handleStreamInfo(this.settings.id)))
-    .subscribe((data) => {
-      // const streamInfo = data.data[0];
-      // console.log(streamInfo);
-      // if (!streamInfo) return this.chatterList.dom.counter.innerHTML = 0;
-      // this.stream = streamInfo;
-      // this.chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
     }, (err) => console.error(err));
   }
 }
