@@ -448,16 +448,21 @@ export class ChatComponent extends HTMLElement {
   }
 
   changeViewersCounterLinear(count) {
-    const viewers = +this.chatterList.dom.counter.textContent;
-    const step = viewers - count <= 0? 1: -1;
-    const timer = setInterval(() => {
-      const current = viewers + step; 
-      if (current == count) {
+    const initial = +this.chatterList.dom.counter.textContent;
+    const start = Date.now();
+    
+    const distance = initial - count;
+    
+    let timer = setInterval(function() {
+      let timePassed = Date.now() - start;
+  
+      if (timePassed > 2000) {
         clearInterval(timer);
-        this.chatterList.dom.counter.textContent = current;
+        this.chatterList.dom.counter.textContent = count;
         return;
       }
-      this.chatterList.dom.counter.textContent = current;
+      
+      this.chatterList.dom.counter.textContent = Math.floor(initial + timePassed/2000*(-distance));
     }, 20);
   }
 }
