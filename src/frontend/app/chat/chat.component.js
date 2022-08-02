@@ -9,7 +9,7 @@ import { ChatAlert } from '@chat/alert/chat.alert';
 import { ChatReward } from '@chat/reward/reward.component';
 import { secondsToTimestamp, timestamp } from '@chat/utils';
 
-import { interval, throwError, from, fromEvent, combineLatest } from 'rxjs';
+import { timer, throwError, from, fromEvent, combineLatest } from 'rxjs';
 import { take, tap, switchMap, catchError, filter } from 'rxjs/operators';
 
 export class ChatComponent extends HTMLElement {
@@ -56,8 +56,9 @@ export class ChatComponent extends HTMLElement {
     this.#getLurkersFromStorage();
     this.#connectTmiClient();
     this.#setUserBagde();
-    this.#handleStreamInfo(this.settings.id).subscribe((data) => {
+    this.#handleStreamInfo().subscribe((data) => {
       const streamInfo = data.data[0];
+      console.log(streamInfo)
       if (!streamInfo) return this.chatterList.dom.counter.innerHTML = 0;
       this.stream = streamInfo;
       this.chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
@@ -416,10 +417,10 @@ export class ChatComponent extends HTMLElement {
     window.localStorage.setItem('lurkers', JSON.stringify([...new Set(this.settings.lurkers)]));
   }
 
-  #handleStreamInfo(id) {
-    return interval(0, 120000)
+  #handleStreamInfo() {
+    return timer(0, 120000)
     .pipe(filter(() => this.settings?.id))
-    .pipe(switchMap(() => from(twitchApiService.getStreams(id))))
+    .pipe(switchMap(() => from(twitchApiService.getStreams(this.settings?.id))))
     .pipe(catchError((err) =>  {
       return throwError(err);
     }));
