@@ -453,7 +453,7 @@ export class ChatComponent extends HTMLElement {
     
     const distance = initial - count;
     
-    let timer = setInterval(function() {
+    let timer = setInterval(() => {
       let timePassed = Date.now() - start;
   
       if (timePassed > 2000) {
