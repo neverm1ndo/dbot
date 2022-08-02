@@ -58,10 +58,9 @@ export class ChatComponent extends HTMLElement {
     this.#setUserBagde();
     this.#handleStreamInfo().subscribe((data) => {
       const streamInfo = data.data[0];
-      console.log(streamInfo)
-      if (!streamInfo) return this.chatterList.dom.counter.innerHTML = 0;
+      if (!streamInfo) return this.changeViewersCounterLinear(0);
       this.stream = streamInfo;
-      this.chatterList.dom.counter.innerHTML = streamInfo.viewer_count;
+      this.changeViewersCounterLinear(streamInfo.viewer_count);
     });
   }
 
@@ -446,5 +445,19 @@ export class ChatComponent extends HTMLElement {
         this.add(message.tags, message.message, message.self, message.date);
       }
     }, (err) => console.error(err));
+  }
+
+  changeViewersCounterLinear(count) {
+    const viewers = +this.chatterList.dom.counter.textContent;
+    const step = viewers - count <= 0? 1: -1;
+    const timer = setInterval(() => {
+      const current = viewers + step; 
+      if (current == count) {
+        clearInterval(timer);
+        this.chatterList.dom.counter.textContent = current;
+        return;
+      }
+      this.chatterList.dom.counter.textContent = current;
+    }, 20);
   }
 }
