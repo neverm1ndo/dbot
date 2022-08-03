@@ -243,9 +243,9 @@ export class ChatComponent extends HTMLElement {
       owners[emotes[i].owner_id].push(emotes[i]);
     }
     twitchApiService.getUsers(streamers).then((ownersInfo) => {
-      for (let i = 3; i < this.quickpanel.children.length; i++) {
-        this.quickpanel.children[i].remove();
-      };
+      // for (let i = 3; i < this.quickpanel.children.length; i++) {
+      //   this.quickpanel.children[i].remove();
+      // };
       ownersInfo.data.push({
         id: '0',
         display_name: 'Whole World'
