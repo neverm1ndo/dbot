@@ -87,7 +87,7 @@ export class Bot {
     logger.info(`CHANNEL ${channel} wakeup ${this.announcers[channel]}`);
     if (this.announcers[channel]) return;
     this.announcers[channel] = {
-      announcer: new Announcer(this, 9000000, channel),
+      announcer: new Announcer(this, 6000000, channel),
     }
     this.announcers[channel].subscription = this.announcers[channel].announcer.start.subscribe((announce: string) => {
       this.client.say(channel, announce);
