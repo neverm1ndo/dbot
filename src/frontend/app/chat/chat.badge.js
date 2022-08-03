@@ -5,30 +5,31 @@ const _defaultBadges = {
 export class ChatMessageBadge extends HTMLElement {
   constructor(type, badges) {
     super();
+    
     this.classList.add('badge-icon');
     this.icon = new Image(20, 20);
     this.icon.classList.add('badge-icon-img');
-    for (let i = 0; i < badges.length; i++) {
-      const badge = badges[i];
+    
+    for (const badge of badges) {
       if (type[0] !== badge.set_id) continue;
-      for (let j = 0; j < badge.versions.length; j++) {
-        const version = badge.versions[j];
+      
+      for (const version of badge.versions) {
         if (type[1] !== version.id) continue;
         this.icon.src = version.image_url_2x;
+        this.icon.title = version.id;
         break;
       }
     }
+    
     if (!this.icon.src) {
-      const defaultBadgesKeys = Object.keys(_defaultBadges);
-      for (let i = 0; i < defaultBadgesKeys.length; i++ ) {
-        if (type[0] !== defaultBadgesKeys[i]) continue;
-        this.icon.src = _defaultBadges[defaultBadgesKeys[i]];
+      for (const badgeKey in _defaultBadges) {
+        if (type[0] !== _defaultBadges[badgeKey]) continue;
+        this.icon.src = _defaultBadges[badgeKey];
+        this.icon.title = badgeKey;
         break;
       }
     }
     if (!this.icon.src) delete this.icon;
-    if (this.icon) {
-      this.append(this.icon);
-    }
+    if (this.icon) this.append(this.icon);
   }
 }
