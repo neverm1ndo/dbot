@@ -8,17 +8,17 @@ import { autoscroll } from '@shared/scroller';
 export class AnnouncerController extends Popout {
 
   editing = false;
-  delay = 10;
 
   constructor(icon) {
     super({
       title: 'Автоматические сообщения',
       subtitles: [
-        `Добавляйте сообщения, которые будут отправлены ботом в чат с интервалом в ${this.delay} минут`,
+        `Добавляйте сообщения, которые будут отправлены ботом в чат с интервалом в 10 минут`,
         'Бот не воспроизводит сообщения, пока ваш стрим оффлайн',
       ],
       icon
     });
+    this.delay = 10;
     this.body.innerHTML = template();
     this._announceList = this.querySelector('custom-list');
     this._announceList.addEventListener('remove-item', (event) => {
