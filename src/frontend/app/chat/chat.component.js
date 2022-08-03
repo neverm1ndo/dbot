@@ -243,7 +243,7 @@ export class ChatComponent extends HTMLElement {
       owners[emotes[i].owner_id].push(emotes[i]);
     }
     twitchApiService.getUsers(streamers).then((ownersInfo) => {
-      for (let i = 4; i < this.quickpanel.children.length; i++) {
+      for (let i = 2; i < this.quickpanel.children.length; i++) {
         this.quickpanel.children[i].remove();
       };
       ownersInfo.data.push({
@@ -271,7 +271,8 @@ export class ChatComponent extends HTMLElement {
           container.append(title, avatar?avatar:'', subcont);
           subcont.append(img);
         }
-        this.quickpanel.append(container, document.createElement('hr'));
+        container.prepend(document.createElement('hr'));
+        this.quickpanel.append(container);
       }
     }).catch(_err => console.log);
   }
