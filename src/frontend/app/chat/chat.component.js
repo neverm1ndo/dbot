@@ -437,8 +437,7 @@ export class ChatComponent extends HTMLElement {
       from(twitchApiService.getChannelBadges(this.settings.id)),
       from(twitchApiService.getGlobalBadges()),
       from(omdApiService.getLastMessages(this.channel)),
-    ])))
-    // .pipe(switchMap(() => this.#handleStreamInfo(this.settings.id)))
+    ]))) 
     .subscribe(([badges, global, lastMessages]) => {
       this.settings.badges = [...badges.data, ...global.data];
       for (let message of lastMessages) {

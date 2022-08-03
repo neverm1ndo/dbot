@@ -30,6 +30,7 @@ export class ChatMessage extends HTMLElement {
       const container = document.createElement('span');
       const badges = Object.entries(tags.badges);
       if (tags.username === 'diktorbot') badges.push(['diktorbot', '1']);
+      console.log(badges);
       for (let i = 0; i < badges.length; i++) {
         container.append(new ChatMessageBadge(badges[i], channelBadges));
       }
