@@ -382,8 +382,9 @@ omd-chat {
   }
   
   .alert {
-    .message {
-      margin-left: 15px;
+
+    & > i {
+      margin-right: 15px;
     }
     .btn-control {
       i {
