@@ -26,7 +26,7 @@ export class ListComponent extends HTMLElement {
   }
 }
 
-export class CustomListComponent extends ListComponent {
+export class CustomListComponent extends ListComponent {  
   add(itemValue, itemTemplate, editFormTemplate) {
     const item = new CustomListItemComponent(itemValue, itemTemplate, editFormTemplate);
     item.addEventListener('patch-item', (event) => {
@@ -37,10 +37,17 @@ export class CustomListComponent extends ListComponent {
     });
     this.append(item);
     this.isEmpty();
+    this.parentElement.scrollTo({
+      top: this.parentNode.scrollHeight + 300,
+      behavior: 'smooth'
+    });
   }
 }
 
 export class CustomListItemComponent extends HTMLElement {
+  
+  editing = false;
+
   constructor(itemValue, itemTemplate, editFormComponent) {
     super();
     this._id = itemValue._id;
@@ -58,9 +65,13 @@ export class CustomListItemComponent extends HTMLElement {
           });
     const edit = this.querySelector('#edit');
           edit.addEventListener('click', () => {
+            this.editing = true;
+            edit.disabled = this.editing;
             const editForm = new this._editFormComponent(this._value, this._id);
                   editForm.addEventListener('save-edited-item', (event) => {
                     this.value = event.detail.value;
+                    this.editing = false;
+                    edit.disabled = this.editing;
                     this.dispatchEvent(new CustomEvent('patch-item', { detail: event.detail }));
                   });
             this.firstChild.append(editForm);

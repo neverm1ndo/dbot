@@ -6,6 +6,9 @@ import itemTemplate from 'pug-loader!./announce.tpl.pug';
 import { autoscroll } from '@shared/scroller';
 
 export class AnnouncerController extends Popout {
+
+  editing = false;
+
   constructor(icon) {
     super({
       title: 'Автоматические сообщения',
@@ -23,13 +26,13 @@ export class AnnouncerController extends Popout {
             this._announceList.remove(event.detail.target);
             console.log('Announce deleted', event.detail.itemValue);
           })
-          .catch((err) => console.error);
+          .catch(console.error);
     });
     this._announceList.addEventListener('patch-list-item', (event) => {
       this._patchMessage(event.detail)
           .then(() => {
             console.log('Announce patched successfuly');
-          }).catch((err) => console.error);
+          }).catch(console.error);
     });
     this._form = {
       message: this.querySelector('.textarea'),
@@ -43,7 +46,7 @@ export class AnnouncerController extends Popout {
             this._clearForm();
             autoscroll(this.body);
           })
-          .catch((err) => console.error);
+          .catch(console.error);
     });
     this._getAllMessages();
   }
@@ -63,7 +66,7 @@ export class AnnouncerController extends Popout {
       messages.forEach((message, index) => {
         this._announceList.add({ message: message.message, _id: message._id, timing: (index+1)*15 }, itemTemplate, AnnounceListItemEditComponent);
       });
-    }).catch((err) => console.error);
+    }).catch(console.error);
   }
 
   _patchMessage(messageValue) {
