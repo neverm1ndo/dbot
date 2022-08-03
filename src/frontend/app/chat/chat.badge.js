@@ -23,7 +23,7 @@ export class ChatMessageBadge extends HTMLElement {
     
     if (!this.icon.src) {
       for (const badgeKey in _defaultBadges) {
-        if (type[0] !== _defaultBadges[badgeKey]) continue;
+        if (type[0] !== badgeKey) continue;
         this.icon.src = _defaultBadges[badgeKey];
         this.icon.title = badgeKey;
         break;
