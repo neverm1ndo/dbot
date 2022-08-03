@@ -8,12 +8,13 @@ import { autoscroll } from '@shared/scroller';
 export class AnnouncerController extends Popout {
 
   editing = false;
+  delay = 10;
 
   constructor(icon) {
     super({
       title: 'Автоматические сообщения',
       subtitles: [
-        'Добавляйте сообщения, которые будут отправлены ботом в чат с интервалом в 15 минут',
+        `Добавляйте сообщения, которые будут отправлены ботом в чат с интервалом в ${this.delay} минут`,
         'Бот не воспроизводит сообщения, пока ваш стрим оффлайн',
       ],
       icon
@@ -42,7 +43,7 @@ export class AnnouncerController extends Popout {
       if (!this._form.message.value) return;
       this._addMessage(this.formValue)
           .then(() => {
-            this._announceList.add({ message: this.formValue.message, timing: (this._announceList.children.length+1)*15 }, itemTemplate, AnnounceListItemEditComponent);
+            this._announceList.add({ message: this.formValue.message, timing: (this._announceList.children.length+1)*this.delay }, itemTemplate, AnnounceListItemEditComponent);
             this._clearForm();
             autoscroll(this.body);
           })
