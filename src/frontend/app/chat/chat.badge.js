@@ -16,7 +16,7 @@ export class ChatMessageBadge extends HTMLElement {
       for (const version of badge.versions) {
         if (type[1] !== version.id) continue;
         this.icon.src = version.image_url_2x;
-        this.icon.title = version.id;
+        this.icon.title = badge.set_id + version.id;
         break;
       }
     }

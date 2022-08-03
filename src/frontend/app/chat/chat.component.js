@@ -439,7 +439,7 @@ export class ChatComponent extends HTMLElement {
       from(omdApiService.getLastMessages(this.channel)),
     ]))) 
     .subscribe(([badges, global, lastMessages]) => {
-      this.settings.badges = [...badges.data, ...global.data];
+      this.settings.badges = [...global.data, ...badges.data];
       for (let message of lastMessages) {
         this.add(message.tags, message.message, message.self, message.date);
       }
