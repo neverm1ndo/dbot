@@ -243,6 +243,7 @@ export class ChatComponent extends HTMLElement {
       owners[emotes[i].owner_id].push(emotes[i]);
     }
     twitchApiService.getUsers(streamers).then((ownersInfo) => {
+      this.quickpanel.innerHTML = '';
       ownersInfo.data.push({
         id: '0',
         display_name: 'Whole World'
@@ -393,7 +394,7 @@ export class ChatComponent extends HTMLElement {
   send(message = '') {
     if (!this.text.value && !message) return;
     if (this.text.value.startsWith('!t')) {
-      socketService.sendTechnical(this.text.value.substring(2, this.text.value.length));
+      socketService.sendTechnical(this.text.value.substring(2, this.text.value.length).trim());
       this.clearTextField();
       return;
     }
