@@ -71,8 +71,8 @@ class BTTV {
       img.dataset.id = emotes[i].id;
       subcont.append(img);
     }
-    container.append(title, subcont);
-    emotesContainer.append(container, document.createElement('hr'));
+    container.append(document.createElement('hr'), title, subcont);
+    emotesContainer.append(container);
   }
 }
 
