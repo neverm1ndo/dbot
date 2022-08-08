@@ -1,5 +1,6 @@
 :root {
   --twitch-main: #9146FF;
+  --twitch-pink: #ff38db;
 }
 omd-chat {
   width: 100%;
@@ -533,11 +534,10 @@ omd-chat {
   .first-msg {
     color: #fdfdfd;
     font-size: 10px;
-    background: var(--twitch-main);
+    border: 1px solid var(--twitch-pink);
     border-radius: 1rem;
     padding: 2px 5px 2px 5px;
     &-card {
-      background: #9146FF20;
       border-radius: 0.3rem;
       padding: 15px 10px 5px 10px!important;
       margin-bottom: 5px!important;
@@ -550,7 +550,7 @@ omd-chat {
         overflow: hidden;
         width: 5px;
         height: 100%;
-        background: var(--twitch-main);
+        // background: var(--twitch-main);
         content: ' ';
         left: 0px;
         top: 0px;
