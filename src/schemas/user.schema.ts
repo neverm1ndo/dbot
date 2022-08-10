@@ -19,6 +19,7 @@ export const USER = model('User', new Schema ({
   settings: {
     automessages: [
       {
+        interval: { type: Number },
         message: { type: String },
       }
     ],

@@ -5,6 +5,8 @@ import template from 'pug-loader!./announcer.tpl.pug';
 import itemTemplate from 'pug-loader!./announce.tpl.pug';
 import { autoscroll } from '@shared/scroller';
 
+const HttpHeaders = { 'Content-Type': 'application/json' };
+
 export class AnnouncerController extends Popout {
 
   editing = false;
@@ -13,19 +15,18 @@ export class AnnouncerController extends Popout {
     super({
       title: 'Автоматические сообщения',
       subtitles: [
-        `Добавляйте сообщения, которые будут отправлены ботом в чат с интервалом в 10 минут`,
+        `Добавляйте сообщения, которые будут отправлены ботом в чат с определенным интервалом`,
         'Бот не воспроизводит сообщения, пока ваш стрим оффлайн',
       ],
       icon
     });
-    this.delay = 10;
     this.body.innerHTML = template();
     this._announceList = this.querySelector('custom-list');
     this._announceList.addEventListener('remove-item', (event) => {
       this._deleteMessage(Object.assign(event.detail.itemValue, { _id: event.detail.target._id }))
           .then(() => {
             this._announceList.remove(event.detail.target);
-            console.log('Announce deleted', event.detail.itemValue);
+            console.log('Announce deleted', event.detail.value);
           })
           .catch(console.error);
     });
@@ -36,14 +37,15 @@ export class AnnouncerController extends Popout {
           }).catch(console.error);
     });
     this._form = {
+      interval: this.querySelector('.interval'),
       message: this.querySelector('.textarea'),
       submit: this.querySelector('#submit'),
     };
     this._form.submit.addEventListener('click', () => {
-      if (!this._form.message.value) return;
+      if (!this._form.message.value || !this._form.interval.value) return;
       this._addMessage(this.formValue)
           .then(() => {
-            this._announceList.add({ message: this.formValue.message, timing: (this._announceList.children.length+1)*this.delay }, itemTemplate, AnnounceListItemEditComponent);
+            this._announceList.add(this.formValue, itemTemplate, AnnounceListItemEditComponent);
             this._clearForm();
             autoscroll(this.body);
           })
@@ -54,38 +56,38 @@ export class AnnouncerController extends Popout {
 
   get formValue() {
     return {
+      interval: +this._form.interval.value,
       message: this._form.message.value
     };
   }
 
   _clearForm() {
-    this._form.message.value = '';
+    this._form.message.value = this._form.interval.value = '';
   }
 
   _getAllMessages() {
     return Http.get('/api/user/automessages').then((messages) => {
-      messages.forEach((message, index) => {
-        this._announceList.add({ message: message.message, _id: message._id, timing: (index+1)*15 }, itemTemplate, AnnounceListItemEditComponent);
+      messages.forEach((value) => {
+        this._announceList.add(value, itemTemplate, AnnounceListItemEditComponent);
       });
     }).catch(console.error);
   }
 
-  _patchMessage(messageValue) {
+  _patchMessage(message) {
     return Http.patch('/api/user/patch-custom-announce',
-      messageValue,
-      { 'Content-Type': 'application/json' });
+      message,
+      HttpHeaders);
   }
 
-  _addMessage(messageValue) {
-    console.log(messageValue)
+  _addMessage(message) {
     return Http.post('/api/user/add-custom-announce',
-      messageValue,
-      { 'Content-Type': 'application/json' });
+      message,
+      HttpHeaders);
   }
 
-  _deleteMessage(messageValue) {
+  _deleteMessage(message) {
     return Http.delete('/api/user/delete-custom-announce',
-    messageValue,
-    { 'Content-Type': 'application/json' });
+      message,
+      HttpHeaders);
   }
 }

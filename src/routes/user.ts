@@ -64,8 +64,8 @@ router.post('/add-custom-announce', json(), (req: any, res: Response) => {
 
 router.patch('/patch-custom-announce', json(), (req: any, res: Response) => {
   if (!req.cookies['nmnd_user_access_token']) return res.sendStatus(UNAUTHORIZED);
-  if (!req.body.message) return res.sendStatus(BAD_REQUEST);
-  USER.updateOne({'settings.automessages._id': new Types.ObjectId(req.body._id) }, { $set: { 'settings.automessages.$.message': req.body.message }}, {}, (err: any) => {
+  if (!req.body.message || !req.body.interval) return res.sendStatus(BAD_REQUEST);
+  USER.updateOne({'settings.automessages._id': new Types.ObjectId(req.body._id) }, { $set: { 'settings.automessages.$.message': req.body.message, 'settings.automessages.$.interval': req.body.interval }}, {}, (err: any) => {
     if (err) return res.sendStatus(500);
     res.sendStatus(OK);
   });
@@ -91,6 +91,7 @@ router.get('/commands', (req: any, res: Response) => {
 router.post('/add-custom-command', json(), (req: any, res: Response) => {
   if (!req.cookies['nmnd_user_access_token']) return res.sendStatus(UNAUTHORIZED);
   if (!req.body.command) return res.sendStatus(BAD_REQUEST);
+  console.log(req.body)
   USER.updateOne({'accessToken': req.user.accessToken }, { $push: { 'settings.commands': req.body }}, { upsert: true, setDefaultsOnInsert: true } ,(err: any) => {
     if (err) return res.sendStatus(500);
     res.sendStatus(OK);
@@ -108,7 +109,6 @@ router.delete('/delete-custom-command', json(), (req: any, res: Response) => {
 router.patch('/patch-custom-command', json(), (req: any, res: Response) => {
   if (!req.cookies['nmnd_user_access_token']) return res.sendStatus(UNAUTHORIZED);
   if (!req.body.command) return res.sendStatus(BAD_REQUEST);
-  console.log(req.body.command);
   USER.updateOne({ 'settings.commands._id': new Types.ObjectId(req.body._id) }, { $set: { 'settings.commands.$.command': req.body.command, 'settings.commands.$.response': req.body.response }}, {}, (err: any) => {
     if (err) {
       res.sendStatus(500);

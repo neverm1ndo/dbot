@@ -1,7 +1,6 @@
 import logger from '@shared/Logger';
 import { Client, ChatUserstate } from 'tmi.js';
 import { RNG } from '@shared/rng'
-import { Announcer } from '@shared/bot.announcer';
 import { Chatter } from '@interfaces/chatter';
 import { Media } from '@shared/media';
 import { Schedule } from '@shared/bot.schedule';
@@ -11,7 +10,7 @@ import { Twitch } from '@shared/twitch';
 import { Nuzhdiki } from '@shared/nuzhdiki';
 import { MESSAGE } from '../schemas/message.schema';
 import StartOptions from '../pre-start';
-import { Subscription } from 'rxjs';
+import { Subscription, interval } from 'rxjs';
 
 enum BotStatus {
   SLEEPS,
@@ -30,16 +29,11 @@ export class Bot {
       },
       channels: [process.env.BOT_CHANNEL!]
     });
-  announcers: { [channel: string]: { announcer: Announcer, subscription?: Subscription }} = {};
+  announcers: {[channel: string]: Subscription } = {};
 
-  // public status: BotStatus = BotStatus.SLEEPS; // sleeps by default
   private readonly prefix: string = '!';
-  // schedules: {[channel: string]: Schedule} = {};
 
   constructor() {
-    // this.schedules = {};
-    // this.announcer = new Announcer(900000);
-    // this.spawnSchedules();
     if (process.env.NODE_ENV !== 'development') this.checkEventSubscriptions();
     if (StartOptions.works) this.wakeup(process.env.BOT_CHANNEL!);
   }
@@ -73,25 +67,21 @@ export class Bot {
 
   // TODO: make users own statuses, now its global
   public shutdown(channel: string): void {
-    logger.info(`CHANNEL ${channel} shutdown ${this.announcers[channel]}`);
-    // if (this.status === BotStatus.SLEEPS) return;
-    this.announcers[channel].subscription?.unsubscribe();
-    if (!this.announcers[channel]) return;
-    this.announcers[channel].subscription?.unsubscribe();
+    logger.info(`CHANNEL ${channel} shutdown`);
+    this.announcers[channel].unsubscribe();
     delete this.announcers[channel];
     logger.imp(`Shuttdown in ${channel} channel`);
   }
 
   public wakeup(channel: string): void {
-    // if (this.status === BotStatus.WORKS) return;
-    logger.info(`CHANNEL ${channel} wakeup ${this.announcers[channel]}`);
-    if (this.announcers[channel]) return;
-    this.announcers[channel] = {
-      announcer: new Announcer(this, 6000000, channel),
-    }
-    this.announcers[channel].subscription = this.announcers[channel].announcer.start.subscribe((announce: string) => {
-      this.client.say(channel, announce);
-    });
+    this.announcers[channel] = new Subscription();
+    this.opts.getChannelAutomessages(channel).then((messages) => {
+      messages.forEach((announce) => {
+        const subscription = interval(announce.interval*60000)
+                            .subscribe(() => { this.client.say(channel, announce.message) }, console.error);
+        this.announcers[channel].add(subscription);
+      });
+    }).catch(console.error);
     logger.imp(`Woke up in ${channel} channel`);
   }
 
@@ -180,7 +170,7 @@ export class Bot {
             }
           });
           this.client.say(channel, `Ранг ${channel}: (${message})`);
-        }).catch((err) => logger.err(err));
+        }).catch(logger.err);
         break;
       }
       case 'ролл': {

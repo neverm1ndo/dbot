@@ -1,14 +1,17 @@
 import editFormTemplate from 'pug-loader!./announce-edit-form.tpl.pug';
 
 export class AnnounceListItemEditComponent extends HTMLElement {
-  constructor(value, _id) {
+  constructor(item, _id) {
     super();
     this.classList.add('col-12');
-    this.innerHTML = editFormTemplate(value);
+    this.innerHTML = editFormTemplate(item);
     const saveButton = this.querySelector('#save');
           saveButton.addEventListener('click', () => {
-            const message = this.querySelector('#message').value;
-            this.dispatchEvent(new CustomEvent('save-edited-item', { detail: { value: { message }, _id }}));
+            const [message, interval] = [
+              ['message', String], 
+              ['interval', Number]
+            ].map(([id, DataType]) => new DataType(this.querySelector(`#${id}`).value).valueOf());
+            this.dispatchEvent(new CustomEvent('save-edited-item', { detail: { value: { interval, message }, _id }}));
           });
   }
 }

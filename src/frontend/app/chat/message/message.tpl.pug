@@ -3,7 +3,7 @@ div.card-body(class=firstMsg ? 'first-msg-card': undefined data-timestamp=timest
     span.first-msg Новый пользователь чата
     br
   span.nickname=nickname
-  if (separator) 
+  if (separator)
     span=separator
   span.card-body-msg(class=highlightedMessage ? 'highlighted-message':undefined)
     if botCommand

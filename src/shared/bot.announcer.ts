@@ -2,6 +2,9 @@ import { Observable, timer, from } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { Bot } from './bot.client';
 
+/**
+ * @deprecated больше не используется
+ */
 export class Announcer {
   public start: Observable<string>;
   public delay: number;
