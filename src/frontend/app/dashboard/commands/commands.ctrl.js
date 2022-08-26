@@ -22,13 +22,13 @@ export class CommandsController extends Popout {
             this._commandsList.remove(event.detail.target);
             console.log('Command deleted', event.detail.itemValue);
           })
-          .catch((err) => console.error);
+          .catch(console.error);
     });
     this._commandsList.addEventListener('patch-list-item', (event) => {
       this._patchCommand(event.detail)
           .then(() => {
             console.log('Command patched successfuly');
-          }).catch((err) => console.error);
+          }).catch(console.error);
     });
     this._form = {
       command: this.querySelector('#command-name'),
@@ -43,7 +43,7 @@ export class CommandsController extends Popout {
             this._clearForm();
             autoscroll(this.body);
           })
-          .catch((err) => console.error);
+          .catch(console.error);
     });
     this._getCommands();
   }

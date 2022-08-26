@@ -20,17 +20,17 @@ export class SoundsController extends Popout {
     this._soundsList.addEventListener('play-item-sound', (event) => {
       this._player.play(event.detail);
     });
-    this._soundsList.addEventListener('patch-item', (event) => {
+    this._soundsList.addEventListener('patch-list-item', (event) => {
       this._patchSound(event.detail)
           .then(() => {
             console.log('Sound patched successfuly');
-          }).catch((err) => console.error);
+          }).catch(console.error);
     });
     this._soundsList.addEventListener('remove-item', (event) => {
-      this._deleteSound(event.detail)
+      this._deleteSound(event.detail.item)
           .then(() => {
-            console.log('Sound deleted successfuly');
-          }).catch((err) => console.error);
+            event.detail.target.remove();
+          }).catch(console.error);
     });
     this._form = {
       name: this.querySelector('#command-name'),
@@ -40,12 +40,13 @@ export class SoundsController extends Popout {
     this._form.submit.addEventListener('click', () => {
       if (!this._form.response.value && !this._form.name.value) return;
       this._addSound(this.formValue)
-          .then(() => {
-            this._soundsList.add(this.formValue);
+          .then((res) => res.json())
+          .then((data) => {
+            this._soundsList.add(data);
             this._clearForm();
             autoscroll(this.body);
           })
-          .catch((err) => console.error);
+          .catch(console.error);
     });
     this._player = new Player();
     this._getSounds();
@@ -72,14 +73,14 @@ export class SoundsController extends Popout {
   }
 
   _addSound(soundValue) {
-    return Http.post('/api/user/add-sound', soundValue, HEADERS);
+    return Http.post('/api/user/sound', soundValue, HEADERS);
   }
 
   _patchSound(soundValue) {
-    return Http.patch('/api/user/patch-sound', soundValue, HEADERS);
+    return Http.patch('/api/user/sound', soundValue, HEADERS);
   }
 
   _deleteSound(soundValue) {
-    return Http.patch('/api/user/delete-sound', soundValue, HEADERS);
+    return Http.delete('/api/user/sound', soundValue, HEADERS);
   }
 }

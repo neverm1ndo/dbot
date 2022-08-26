@@ -1,9 +1,10 @@
-import { Router, Request, Response } from 'express';
+import e, { Router, Request, Response } from 'express';
 import logger from '@shared/Logger';
 import { USER } from '../schemas/user.schema';
 import StatusCodes from 'http-status-codes';
 import { json } from 'express';
 import { Types } from 'mongoose';
+import { bot } from '@server';
 
 const { BAD_REQUEST, OK, UNAUTHORIZED} = StatusCodes;
 
@@ -144,28 +145,29 @@ router.get('/sounds', (req: any, res: Response) => {
   });
 });
 
-router.post('/add-sound', json(), (req: any, res: Response) => {
+router.post('/sound', json(), (req: any, res: Response) => {
   if (!req.cookies['nmnd_user_access_token']) return res.sendStatus(UNAUTHORIZED);
-  if (!req.body.command && !req.body.name) return res.sendStatus(BAD_REQUEST);
-  USER.updateOne({'accessToken': req.user.accessToken}, { $push: { 'settings.sounds': req.body }}, { upsert: true, setDefaultsOnInsert: true } ,(err: any) => {
+  if (!req.body.command && !req.body.path) return res.sendStatus(BAD_REQUEST);
+  USER.findOneAndUpdate({ 'accessToken': req.user.accessToken }, { $push: { 'settings.sounds': req.body }}, { upsert: true, new: true } ,(err: any, docs: any) => {
+    if (err) return res.sendStatus(500);
+    res.status(OK).send(docs.settings.sounds.find((elem: any) => elem.command == req.body.command)); // ???
+  });
+});
+
+router.patch('/sound', json(), (req: any, res: Response) => {
+  if (!req.cookies['nmnd_user_access_token']) return res.sendStatus(UNAUTHORIZED);
+  if (!req.body._id) return res.sendStatus(BAD_REQUEST);
+  const { command, path, gain } = req.body;
+  USER.updateOne({'accessToken': req.user.accessToken, 'settings.sounds._id': new Types.ObjectId(req.body._id) }, { $set: { 'settings.sounds.$.command': command, 'settings.sounds.$.path': path, 'settings.sounds.$.gain': gain }}, {}, (err: any) => {
     if (err) return res.sendStatus(500);
     res.sendStatus(OK);
   });
 });
 
-router.patch('/patch-sound', json(), (req: any, res: Response) => {
+router.delete('/sound', json(), (req: any, res: Response) => {
   if (!req.cookies['nmnd_user_access_token']) return res.sendStatus(UNAUTHORIZED);
-  if (!req.body.sounds) return res.sendStatus(BAD_REQUEST);
-  USER.updateOne({'accessToken': req.user.accessToken, 'settings.sounds._id': new Types.ObjectId(req.body._id) }, { $set: { 'settings.sounds.$._id': req.body }}, { upsert: true, setDefaultsOnInsert: true } ,(err: any) => {
-    if (err) return res.sendStatus(500);
-    res.sendStatus(OK);
-  });
-});
-
-router.delete('/delete-sound', json(), (req: any, res: Response) => {
-  if (!req.cookies['nmnd_user_access_token']) return res.sendStatus(UNAUTHORIZED);
-  if (!req.body.sounds) return res.sendStatus(BAD_REQUEST);
-  USER.updateOne({ 'settings.sounds._id': new Types.ObjectId(req.body._id) }, { $pull: { 'settings.sounds': { _id: req.body._id } }}, { upsert: true, setDefaultsOnInsert: true } ,(err: any) => {
+  if (!req.body._id) return res.sendStatus(BAD_REQUEST);
+  USER.updateOne({ 'settings.sounds._id': new Types.ObjectId(req.body._id) }, { $pull: { 'settings.sounds': { _id: req.body._id } }}, {} ,(err: any) => {
     if (err) return res.sendStatus(500);
     res.sendStatus(OK);
   });
