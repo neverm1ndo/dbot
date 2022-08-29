@@ -118,41 +118,52 @@ export class Bot {
     if (!this.isPrevileged(tags) || !this.isSubscriber(tags)) {
       const channelName = channel.slice(1);
       message = message.replace(/ /g, '').toLowerCase();
-      this.opts.getChannelDictionary(channelName).then((dictionary: string[]) => {
-        for (let i = 0; i < dictionary.length; i+=1) {
-          const current = dictionary[i];
-          const form = current.replace(/ /g, '').toLowerCase();
-          if (message.includes(form)) {
-            this.client.ban(channel, tags.username!, 'Banned phrase: ' + current);
-            logger.warn(channelName + ': ' + tags.username + ' banned for reason: ' + current);
-            return;
-          }
-        };
-      }).catch((err) => logger.err(err))
+      this.opts.getChannelDictionary(channelName)
+               .then((dictionary: string[]) => {
+                  for (let i = 0; i < dictionary.length; i+=1) {
+                    const current = dictionary[i];
+                    const form = current.replace(/ /g, '').toLowerCase();
+                    if (!message.includes(form)) return;
+                    this.client.ban(channel, tags.username!, 'Banned phrase: ' + current);
+                    logger.warn(channelName + ': ' + tags.username + ' banned for reason: ' + current);
+                    break;
+                  };
+                })
+                .catch((err) => logger.err(err))
     }
   }
   private readChattersMessage(channel: any, tags: ChatUserstate, command?: string, args?: string[]): void {
     if (!tags.username || !command) return;
         const channelName = channel.slice(1);
     // SOUNDS
-    this.opts.getChannelSounds(channelName).then((sounds: any[]) => {
-      sounds.forEach((sound: { command: string, path: string, gain?: number }) => {
-        if (command === sound.command) {
-          this.media.playSound(channelName, tags, sound);
-          return;
-        }
-      });
-    }).catch((err) => logger.err(err));
+    this.opts.getChannelSounds(channelName)
+             .then((sounds: any[]) => {
+                sounds.forEach((sound: { command: string, path: string, gain?: number }) => {
+                  if (command === sound.command) {
+                    this.media.playSound(channelName, tags, sound);
+                    return;
+                  }
+                });
+              })
+              .catch(logger.err);
     // CUSTOM COMMANDS
     this.opts.getChannelCustomCommands(channelName).then((commands: any[]) => {
+      const replaceMap: {[ rep: string]: any } = {
+        '#[rng]': RNG.randomize(0, 101),
+        '#[nickname]': tags.username,
+        '#[channel]': channelName,
+      };
       commands.forEach((customCommand) => {
         if (command === customCommand.command) {
-          console.log(customCommand);
-          this.client.say(channel, customCommand.response);
+          let message = customCommand.response;
+          for(let rep in replaceMap) {
+            message = message.replace(rep, replaceMap[rep]);
+          }
+          this.client.say(channel, message);
           return;
         }
       });
-    }).catch((err) => logger.err(err));
+    }).catch(logger.err);
 
     // BUILT-IN COMMANDS
     switch (command) {
@@ -173,22 +184,11 @@ export class Bot {
         }).catch(logger.err);
         break;
       }
-      case 'ролл': {
-        this.client.say(channel, `${tags.username} нароллил: ${RNG.randomize(0, 101)} BlessRNG`);
-        break;
-      }
-      case 'хелп': {
-        this.client.say(channel, `OhMyDog Список команд тут: https://apps.nmnd.ru/commands/${channelName}`);
-        break;
-      }
-      case 'help': {
-        this.client.say(channel, `OhMyDog Список команд тут: https://apps.nmnd.ru/commands/${channelName}`);
-        break;
-      }
       case 'нуждики': {
-        Nuzhdiki.getOne().then((path: string) => {
-          this.media.playSound(channelName, tags, { path });
-        });
+        Nuzhdiki.getOne()
+                .then((path: string) => {
+                  this.media.playSound(channelName, tags, { path });
+                });
         break;
       }
       //TODO: make this command optional
@@ -197,14 +197,13 @@ export class Bot {
             let arg = args.join(' ');
             let pos;
             if (arg.includes('|')) [arg, pos] = arg.split('|').map((val) => val.trim());
-            console.log(arg, pos);
             D2PT.getHeroWR(arg, pos).then((msg: string) => {
               this.client.say(channel, msg);
             }).catch((err) => {
               this.client.say(channel, err);
             });
         } else {
-           this.client.say(channel, 'Имя персонажа небыло введено. Правильно - !d2pt invoker');
+           this.client.say(channel, 'Имя персонажа небыло введено. Правильно - !wr invoker');
         }
         break;
       }
