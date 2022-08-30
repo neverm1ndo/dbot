@@ -6,7 +6,10 @@ const router = Router();
 
 router.get('/:username', (req: Request, res: Response) => {
   USER.findOne({'user.login': req.params.username }, (err: any, user: any) => {
-    if (err) return logger.err(err, true);
+    if (err) {
+      logger.err(err, true);
+      return res.redirect('/');
+    }
     res.set("Content-Security-Policy", "default-src *; img-src * 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *")
        .render('commands', {
       sounds: user.settings.sounds,
