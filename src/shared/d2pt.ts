@@ -15,9 +15,12 @@ enum HeroPositions {
 
 let heroes: { [key: string]: { valid: string[] }};
 
-fs.readFile(path.join(__dirname, './../dist/public/d2_heroes.json'))
+fs.readFile(path.join(__dirname, '../../dist/public/d2_heroes.json'))
   .then((file: Buffer) => { 
     heroes = JSON.parse(file.toString());
+    D2PT.getHeroWR('Rubick', 4)
+    .then(console.log)
+    .catch(console.error);
   });
 
   export class D2PT {
@@ -45,7 +48,7 @@ fs.readFile(path.join(__dirname, './../dist/public/d2_heroes.json'))
       }
     }
     return axios.get(this.URL_D2PT + validatedHero).then((body) => {
-      if (pos !== undefined) return D2PT.getHeroStatByPosition(parse(body.data).querySelector('.roles').querySelectorAll('.content-box-lvl-3'), validatedHero as Hero, pos);
+      if (pos !== undefined) return D2PT.getHeroStatByPosition(parse(body.data).querySelector('.roles'), validatedHero as Hero, pos);
       const data  = parse(body.data).querySelector('.hero-header-stats-detailed').rawText.replace(/ +(?= )/g,'');
       const times = data.match(/\d+(?=\sMatches)/)![0];
       const wr    = data.match(/(?<=\s)\d+\.\d+\%(?=\s)/)![0];
@@ -54,27 +57,33 @@ fs.readFile(path.join(__dirname, './../dist/public/d2_heroes.json'))
     });
   }
 
-  private static getHeroStatByPosition(data: HTMLElement[], hero: Hero, pos: HeroPositions | keyof typeof D2PT.positions): Promise<string> {
+  private static getHeroStatByPosition(data: HTMLElement, hero: Hero, pos: HeroPositions | keyof typeof D2PT.positions): Promise<string> {
     return new Promise((resolve, reject) => {
-      const positionInfo: { [position: number]: string } = data.reduce((acc, posContainer: HTMLElement) => {
-        const position: keyof typeof D2PT.positions = posContainer
-                        .querySelector('.header-role-info').rawText
-                        .trim()
-                        .toLowerCase()
-                        .replace(/[\s, \n]/g, '')
-                        .replace('mostplayed', '');
-        return Object.assign(acc,
-          { [D2PT.positions[position]]:
-            `${hero} на позиции ${position.charAt(0).toUpperCase() + position.slice(1)} ${
-            posContainer.querySelector('.header-role-stats').rawText
-                        .replace(/[\n]/g, '')
-                        .trim()
-                        .replace('matches', 'матчей')
-                        .replace('Win Rate', 'Побед')}`
-          });
-      }, {});
-      if (!positionInfo) reject();
-      if (!positionInfo[pos as number]) resolve('Нет информации по данному герою на данной позиции.');
+      let positionInfo: { [position: number]: string } = {};
+      
+      const positions: HTMLElement = data.querySelector('.role-tabs');
+            positions.querySelectorAll('button').forEach((roleButton: HTMLElement) => {
+              
+              const posNumber: number = D2PT.positions[roleButton.textContent.trim().toLowerCase().replace(/\s/, '') as string];
+              
+              positionInfo[posNumber] = data.querySelector(`.${roleButton.id}`)
+                                            .querySelector('.header-role-info').rawText
+                                            .trim()
+                                            .toLowerCase()
+                                            .replace(/[\s, \n]/g, '')
+                                            .replace('mostplayed', '');
+            });
+      
+      for (let position in positionInfo) {
+        let text = (() => {
+          const [_build, matches, percent] = positionInfo[position].match(/(\d+(?:\.\d+)?)/g)!;
+          return `${matches} матчей c ${percent}% побед`;
+        })();
+        positionInfo[position] = `${hero} на позиции ${position} ${text}`
+      }
+      
+      if (!positionInfo) return reject();
+      if (!positionInfo[pos as number]) return resolve('Нет информации по данному герою на данной позиции.');
       resolve(positionInfo[pos as number]);
     });
   }

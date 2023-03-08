@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
 
 export const USER = model('User', new Schema ({
   user: {
@@ -36,6 +36,20 @@ export const USER = model('User', new Schema ({
       {
         command: { type: String },
         response: { type: String }
+      }
+    ]
+  },
+  chat_db: {
+    inc: [
+      {
+        _id: false,
+        id: { type: Types.ObjectId },
+        counters: [
+          {
+            nickname: { type: String },
+            counter: { type: Number },
+          }
+        ]
       }
     ]
   },

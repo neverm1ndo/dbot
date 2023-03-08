@@ -38,6 +38,32 @@ export class Bot {
     if (StartOptions.works) this.wakeup(process.env.BOT_CHANNEL!);
   }
 
+  private messageInterpolation(message: string, channel: string, tags: ChatUserstate) {
+    const prefix: string = '#';
+    const replaceMap: {[ rep: string]: any } = {
+      'rng': RNG.randomize(0, 101),
+      'nickname': tags.username,
+      'channel': channel,
+      'get': async function() {
+
+      }
+    };
+    for (let rep in replaceMap) {
+      const regex = new RegExp(`/${prefix}\[${rep}:?.*?\]/g`);
+      let result: string = '';
+      if (!regex.test(message)) continue;
+      if (typeof replaceMap[rep] == 'function') {
+        const args: RegExpMatchArray | null = message.match(new RegExp(`/?!<=\#\[rng\()([0-9, a-z]*)(?=\)\]/g`));
+        if (args) result = replaceMap[rep](...args);
+      }
+      if (!result) result = replaceMap[rep];
+      new Promise((resolve, reject) => {
+        
+      });
+      message.replace(regex, result);
+    }
+  }
+
   private checkEventSubscriptions(): void {
     const eventsubs = ['stream.online', 'stream.offline', 'channel.follow'];
     Twitch.getAppAccessToken().then((body: any) => {

@@ -71,4 +71,12 @@ export class Schedule {
       });
     });
   }
+  getChannelDb(channel: string, command_id: string): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      USER.findOne({'user.login': channel, }, (err: any, user: any) => {
+        if (err || !user) return reject(err || 'User not found');
+        resolve(user.settings.automessages);
+      });
+    });
+  }
 };
