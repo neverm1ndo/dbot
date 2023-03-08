@@ -18,9 +18,6 @@ let heroes: { [key: string]: { valid: string[] }};
 fs.readFile(path.join(__dirname, '../../dist/public/d2_heroes.json'))
   .then((file: Buffer) => { 
     heroes = JSON.parse(file.toString());
-    D2PT.getHeroWR('Rubick', 4)
-    .then(console.log)
-    .catch(console.error);
   });
 
   export class D2PT {
