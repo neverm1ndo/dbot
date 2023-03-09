@@ -223,11 +223,14 @@ export class Bot {
             let arg = args.join(' ');
             let pos;
             if (arg.includes('|')) [arg, pos] = arg.split('|').map((val) => val.trim());
-            D2PT.getHeroWR(arg, pos).then((msg: string) => {
-              this.client.say(channel, msg);
-            }).catch((err) => {
-              this.client.say(channel, err);
-            });
+            D2PT.getHeroWR(arg, pos)
+                .then((msg: string) => {
+                  console.log(msg)
+                  this.client.say(channel, msg.trim());
+                })
+                .catch((err) => {
+                  this.client.say(channel, err);
+                });
         } else {
            this.client.say(channel, 'Имя персонажа небыло введено. Правильно - !wr invoker');
         }
