@@ -79,7 +79,7 @@ fs.readFile(path.join(__dirname, '../dist/public/d2_heroes.json'))
           const [_build, matches, percent] = positionInfo[position].match(/(\d+(?:\.\d+)?)/g)!;
           return `${matches} матчей c ${percent}% побед.`;
         })();
-        positionInfo[position] = `${hero} на позиции ${positionNames[D2PT.positions[pos]]}: ${text}`
+        positionInfo[position] = `${hero} на позиции ${positionNames[position]}: ${text}`
       }
       
       if (!positionInfo) return reject();
