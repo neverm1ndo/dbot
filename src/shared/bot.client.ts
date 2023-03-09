@@ -11,6 +11,7 @@ import { Nuzhdiki } from '@shared/nuzhdiki';
 import { MESSAGE } from '../schemas/message.schema';
 import StartOptions from '../pre-start';
 import { Subscription, interval } from 'rxjs';
+import { Beer } from './beer';
 
 enum BotStatus {
   SLEEPS,
@@ -30,6 +31,8 @@ export class Bot {
       channels: [process.env.BOT_CHANNEL!]
     });
   announcers: {[channel: string]: Subscription } = {};
+
+  private _beer: Beer = new Beer();
 
   private readonly prefix: string = '!';
 
@@ -97,6 +100,7 @@ export class Bot {
     this.announcers[channel].unsubscribe();
     delete this.announcers[channel];
     logger.imp(`Shuttdown in ${channel} channel`);
+    this._beer.clear();
   }
 
   public wakeup(channel: string): void {
@@ -183,7 +187,9 @@ export class Bot {
         if (command === customCommand.command) {
           let message = customCommand.response;
           for(let rep in replaceMap) {
-            message = message.replace(rep, replaceMap[rep]);
+            const value = replaceMap[rep];
+            if (command === 'пиво' && tags.username) this._beer.add(tags.username, value);
+            message = message.replace(rep, value);
           }
           this.client.say(channel, message);
           return;
@@ -208,6 +214,15 @@ export class Bot {
           });
           this.client.say(channel, `Ранг ${channel}: (${message})`);
         }).catch(logger.err);
+        break;
+      }
+      case 'подпивом': {
+        const most = this._beer.getMostBeer();
+        if (!most) {
+          this.client.say(channel, 'Звание самого пивного на стриме еще никто не получил.')
+          break;
+        }
+        this.client.say(channel, `${most[0]} самый пивной на текущем стриме. Содержание пива в его организме ${most[1]}`);
         break;
       }
       case 'нуждики': {
