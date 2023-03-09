@@ -15,7 +15,7 @@ enum HeroPositions {
 
 let heroes: { [key: string]: { valid: string[] }};
 
-fs.readFile(path.join(__dirname, '../../dist/public/d2_heroes.json'))
+fs.readFile(path.join(__dirname, '../dist/public/d2_heroes.json'))
   .then((file: Buffer) => { 
     heroes = JSON.parse(file.toString());
   });
