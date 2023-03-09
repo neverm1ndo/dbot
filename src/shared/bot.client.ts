@@ -188,7 +188,7 @@ export class Bot {
           let message = customCommand.response;
           for(let rep in replaceMap) {
             const value = replaceMap[rep];
-            if (command === 'пиво' && tags.username) {
+            if (command === 'пиво' && tags.username && typeof value === 'number') {
               console.log(command, tags.username, value);
               this._beer.add(tags.username, value);
             }
