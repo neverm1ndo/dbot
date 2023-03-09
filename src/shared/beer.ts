@@ -11,7 +11,7 @@ export class Beer {
     }
 
     public getMostBeer(): [string, number] | undefined {
-        for (let i = this._inBeer.size; i > 0; i--) {
+        for (let i = 101; i > 0; i--) {
             const most = this._inBeer.get(i);
             if (most) return [most, i];
         }
