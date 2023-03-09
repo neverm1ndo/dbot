@@ -225,7 +225,7 @@ export class Bot {
           this.client.say(channel, 'Звание самого пивного на стриме еще никто не получил.')
           break;
         }
-        this.client.say(channel, `${most[0]} самый пивной на текущем стриме. Содержание пива в его организме ${most[1]}`);
+        this.client.say(channel, `${most[0]} самый пивной на текущем стриме. Содержание пива в его организме ${most[1]}%`);
         break;
       }
       case 'нуждики': {
