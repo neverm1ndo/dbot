@@ -3,6 +3,7 @@ export class Beer {
 
     public add(username: string, percent: number): void {
         this._inBeer.set(percent, username);
+        console.log(this._inBeer.entries());
     }
 
     public clear(): void {
