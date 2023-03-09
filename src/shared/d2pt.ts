@@ -57,12 +57,15 @@ fs.readFile(path.join(__dirname, '../../dist/public/d2_heroes.json'))
   private static getHeroStatByPosition(data: HTMLElement, hero: Hero, pos: HeroPositions | keyof typeof D2PT.positions): Promise<string> {
     return new Promise((resolve, reject) => {
       let positionInfo: { [position: number]: string } = {};
+      let positionNames: { [position: number]: string } = {};
       
       const positions: HTMLElement = data.querySelector('.role-tabs');
             positions.querySelectorAll('button').forEach((roleButton: HTMLElement) => {
+              const posName: string = roleButton.textContent.trim();
+
+              const posNumber: number = D2PT.positions[posName.toLowerCase().replace(/\s/, '') as string];
               
-              const posNumber: number = D2PT.positions[roleButton.textContent.trim().toLowerCase().replace(/\s/, '') as string];
-              
+              positionNames[posNumber] = posName;
               positionInfo[posNumber] = data.querySelector(`.${roleButton.id}`)
                                             .querySelector('.header-role-info').rawText
                                             .trim()
@@ -74,9 +77,9 @@ fs.readFile(path.join(__dirname, '../../dist/public/d2_heroes.json'))
       for (let position in positionInfo) {
         let text = (() => {
           const [_build, matches, percent] = positionInfo[position].match(/(\d+(?:\.\d+)?)/g)!;
-          return `${matches} матчей c ${percent}% побед`;
+          return `${matches} матчей c ${percent}% побед.`;
         })();
-        positionInfo[position] = `${hero} на позиции ${position} ${text}`
+        positionInfo[position] = `${hero} на позиции ${positionNames[D2PT.positions[pos]]}: ${text}`
       }
       
       if (!positionInfo) return reject();
