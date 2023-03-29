@@ -1,9 +1,8 @@
 export class Beer {
-    private _inBeer: Map<number, string> = new Map();
+    private _inBeer: Map<string, number> = new Map();
 
     public add(username: string, percent: number): void {
-        this._inBeer.set(percent, username);
-        console.log(this._inBeer.entries());
+        this._inBeer.set(username, percent);
     }
 
     public clear(): void {
@@ -11,10 +10,15 @@ export class Beer {
     }
 
     public getMostBeer(): [string, number] | undefined {
-        for (let i = 101; i > 0; i--) {
-            const most = this._inBeer.get(i);
-            if (most) return [most, i];
+        if (this._inBeer.size === 0) return undefined;
+        
+        let most;
+        
+        for (let [chatter, percent] of this._inBeer.entries()) {
+            if (most === undefined || (most[1] as number > percent)) {
+                most = [chatter, percent];
+            }
         }
-        return undefined;
+        return most as [string, number];
     }
 }
