@@ -24,7 +24,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, '../dist/public'),
     publicPath: '/',
-    filename: 'scripts/[name].[chunkhash].js',
+    filename: 'scripts/[name].js',
     chunkFilename: '[id].[chunkhash].js'
   },
   plugins: [
@@ -32,6 +32,7 @@ module.exports = {
       pretty: true, // formatting HTML, useful for development mode
       js: {
         // output filename of extracted JS file from source script
+        sourceMap: false,
         filename: 'scripts/[name].js',
       },
       css: {
