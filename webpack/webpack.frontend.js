@@ -32,7 +32,7 @@ module.exports = {
       pretty: true, // formatting HTML, useful for development mode
       js: {
         // output filename of extracted JS file from source script
-        filename: 'scripts/[name].[contenthash:8].js',
+        filename: 'scripts/[name].js',
       },
       css: {
         // output filename of extracted CSS file from source style
@@ -43,9 +43,8 @@ module.exports = {
   module: {
     rules: [
       {
-        issuer: /\.(js|ts)$/,
         test: /\.pug$/,
-        loader: PugPlugin.loader,
+        loader: '@webdiscus/pug-loader',
         options: {
           method: 'compile', // compile Pug into template function
         },
