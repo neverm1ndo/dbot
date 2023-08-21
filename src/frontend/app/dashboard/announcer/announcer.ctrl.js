@@ -1,8 +1,8 @@
 import Http from '@shared/http';
 import { Popout } from '../popout';
 import { AnnounceListItemEditComponent } from './announce-list.component';
-import template from 'pug-loader!./announcer.tpl.pug';
-import itemTemplate from 'pug-loader!./announce.tpl.pug';
+import template from './announcer.tpl.pug';
+import itemTemplate from './announce.tpl.pug';
 import { autoscroll } from '@shared/scroller';
 
 const HttpHeaders = { 'Content-Type': 'application/json' };

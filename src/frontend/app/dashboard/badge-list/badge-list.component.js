@@ -1,4 +1,4 @@
-import badgeListItemTpl from 'pug-loader!./badge-list-item.tpl.pug';
+import badgeListItemTpl from './badge-list-item.tpl.pug';
 import { ListComponent } from '@app/dashboard/list/list.component';
 
 export class BadgeListItemComponent extends HTMLElement {

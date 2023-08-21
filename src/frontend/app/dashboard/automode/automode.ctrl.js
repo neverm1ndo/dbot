@@ -1,6 +1,6 @@
 import Http from '@shared/http';
 import { Popout } from '../popout';
-import template from 'pug-loader!./automode.tpl.pug';
+import template from './automode.tpl.pug';
 import { BadgeListComponent } from '@app/dashboard/badge-list/badge-list.component';
 
 export class AutomodeController extends Popout {

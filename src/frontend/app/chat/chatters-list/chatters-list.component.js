@@ -1,4 +1,4 @@
-import template from 'pug-loader!./chatters-list.tpl.pug';
+import template from './chatters-list.tpl.pug';
 
 import { ChatAlert } from '@chat/alert/chat.alert';
 import { MessageControlButton } from '@chat/message/chat.message-control';

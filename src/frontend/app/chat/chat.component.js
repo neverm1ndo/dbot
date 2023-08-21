@@ -1,5 +1,5 @@
-import template from 'pug-loader!./chat.tpl.pug';
-import techAlert from 'pug-loader!./alert/tech.alert.tpl.pug';
+import template from './chat.tpl.pug';
+import techAlert from './alert/tech.alert.tpl.pug';
 import styles from './chat.scss';
 
 import Collapse from 'bootstrap/js/dist/collapse';

@@ -1,4 +1,4 @@
-import soundsListItemTemplate from 'pug-loader!./sound.tpl.pug';
+import soundsListItemTemplate from './sound.tpl.pug';
 import { ListComponent } from '@app/dashboard/list/list.component';
 import { CommandListItemEditComponent } from '@app/dashboard/commands/commands-list.component';
 

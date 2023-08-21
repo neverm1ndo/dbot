@@ -1,4 +1,4 @@
-import editFormTemplate from 'pug-loader!./command-edit-form.tpl.pug';
+import editFormTemplate from './command-edit-form.tpl.pug';
 
 export class CommandListItemEditComponent extends HTMLElement {
   constructor(value, _id) {

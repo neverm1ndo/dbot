@@ -1,4 +1,4 @@
-import emptyList from 'pug-loader!./empty-list.tpl.pug';
+import emptyList from './empty-list.tpl.pug';
 
 export class ListComponent extends HTMLElement {
   constructor() {

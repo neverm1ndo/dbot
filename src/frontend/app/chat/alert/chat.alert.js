@@ -1,4 +1,4 @@
-import template from 'pug-loader!./alert.tpl.pug';
+import template from './alert.tpl.pug';
 import { MessageControlButton } from '@chat/message/chat.message-control';
 
 export class ChatAlert extends HTMLElement {

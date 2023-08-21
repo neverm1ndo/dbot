@@ -1,6 +1,6 @@
 import Http from '@shared/http';
 import { Popout } from '@app/dashboard/popout';
-import template from 'pug-loader!./mods.tpl.pug';
+import template from './mods.tpl.pug';
 
 export class Mods extends Popout {
   constructor(icon) {

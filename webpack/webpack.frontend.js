@@ -1,8 +1,9 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackPugPlugin = require('html-webpack-pug-plugin');
+// const HtmlWebpackPugPlugin = require('html-webpack-pug-plugin');
+// const PugPlugin = require('pug-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
+// const CopyPlugin = require("copy-webpack-plugin");
 // const WorkboxPlugin = require('workbox-webpack-plugin');
 
 module.exports = {
@@ -70,10 +71,14 @@ module.exports = {
     //   skipWaiting: true,
     //   chunks: ['dashboard']
     // }),
-    new HtmlWebpackPugPlugin()
+    // new PugPlugin()
   ],
   module: {
     rules: [
+      {
+        test: /\.pug$/,
+        loader: '@webdiscus/pug-loader',
+      },
       {
         test: /\.css|scss$/i,
         use: [

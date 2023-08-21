@@ -1,4 +1,4 @@
-import template from 'pug-loader!./message.tpl.pug';
+import template from './message.tpl.pug';
 import { timestamp, haveLinks, linkify } from '@chat/utils';
 import { YTFrame } from '@chat/chat.ytframe';
 import { ChatMessageBadge } from '@chat/chat.badge';

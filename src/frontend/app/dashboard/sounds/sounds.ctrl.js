@@ -1,4 +1,4 @@
-import template from 'pug-loader!./sounds.tpl.pug';
+import template from './sounds.tpl.pug';
 import Http from '@shared/http';
 import { Popout } from '../popout';
 import { Player } from './player';

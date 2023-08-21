@@ -1,4 +1,4 @@
-import template from 'pug-loader!./popout.tpl.pug';
+import template from './popout.tpl.pug';
 
 export class Popout extends HTMLElement {
   constructor(options) {

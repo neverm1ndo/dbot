@@ -1,5 +1,5 @@
 import Collapse from 'bootstrap/js/dist/collapse';
-import template from 'pug-loader!./speaker.pug';
+import template from './speaker.pug';
 import './speaker.scss';
 import { Player } from './speaker.js';
 import { socketService } from '@chat/chat';

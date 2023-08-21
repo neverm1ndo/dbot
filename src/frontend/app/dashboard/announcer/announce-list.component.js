@@ -1,4 +1,4 @@
-import editFormTemplate from 'pug-loader!./announce-edit-form.tpl.pug';
+import editFormTemplate from './announce-edit-form.tpl.pug';
 
 export class AnnounceListItemEditComponent extends HTMLElement {
   constructor(item, _id) {

@@ -1,7 +1,7 @@
 import Http from '@shared/http';
 import { Popout } from '../popout';
-import template from 'pug-loader!./commands.tpl.pug';
-import itemTemplate from 'pug-loader!./custom-command.tpl.pug';
+import template from './commands.tpl.pug';
+import itemTemplate from './custom-command.tpl.pug';
 import { autoscroll } from '@shared/scroller';
 import { CommandListItemEditComponent } from './commands-list.component';
 
