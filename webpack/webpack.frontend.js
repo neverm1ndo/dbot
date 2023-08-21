@@ -1,10 +1,5 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-// const HtmlWebpackPugPlugin = require('html-webpack-pug-plugin');
-// const PugPlugin = require('pug-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-// const CopyPlugin = require("copy-webpack-plugin");
-// const WorkboxPlugin = require('workbox-webpack-plugin');
+const PugPlugin = require('pug-plugin');
 
 module.exports = {
   context: path.resolve(__dirname, '../src/frontend/app'),
@@ -29,60 +24,36 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, '../dist/public'),
     publicPath: '/',
-    filename: 'scripts/[name].js',
+    filename: 'scripts/[name].[chunkhash].js',
     chunkFilename: '[id].[chunkhash].js'
   },
   plugins: [
-    new MiniCssExtractPlugin(),
-    new HtmlWebpackPlugin({
-      template: './chat/chat.pug',
-      filename: '../views/chat.pug',
-      minify: false,
-      chunks: ['chat', 'polyfills']
+    new PugPlugin({
+      pretty: true, // formatting HTML, useful for development mode
+      js: {
+        // output filename of extracted JS file from source script
+        filename: 'scripts/[name].[contenthash:8].js',
+      },
+      css: {
+        // output filename of extracted CSS file from source style
+        filename: '[name].[contenthash:8].css',
+      },
     }),
-    new HtmlWebpackPlugin({
-      template: './index.pug',
-      filename: '../views/index.pug',
-      minify: false,
-      chunks: ['index']
-    }),
-    new HtmlWebpackPlugin({
-      template: './dashboard/dashboard.pug',
-      filename: '../views/dashboard.pug',
-      minify: false,
-      chunks: ['dashboard', 'polyfills']
-    }),
-    new HtmlWebpackPlugin({
-      template: './speaker/speaker.pug',
-      filename: '../views/speaker.pug',
-      minify: false,
-      chunks: ['speaker']
-    }),
-    new HtmlWebpackPlugin({
-      template: './commands/commands.pug',
-      filename: '../views/commands.pug',
-      minify: false,
-      chunks: ['commands']
-    }),
-    // new WorkboxPlugin.GenerateSW({
-    // // these options encourage the ServiceWorkers to get in there fast
-    // // and not allow any straggling "old" SWs to hang around
-    //   clientsClaim: true,
-    //   skipWaiting: true,
-    //   chunks: ['dashboard']
-    // }),
-    // new PugPlugin()
   ],
   module: {
     rules: [
       {
+        issuer: /\.(js|ts)$/,
         test: /\.pug$/,
-        loader: '@webdiscus/pug-loader',
+        loader: PugPlugin.loader,
+        options: {
+          method: 'compile', // compile Pug into template function
+        },
       },
       {
         test: /\.css|scss$/i,
         use: [
-          MiniCssExtractPlugin.loader,
+          // MiniCssExtractPlugin.loader,
           { loader: 'css-loader', options: { url: true, sourceMap: true }},
           { loader: 'sass-loader' }
         ],
