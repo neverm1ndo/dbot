@@ -6,12 +6,17 @@ module.exports = {
   target: 'web',
   entry: {
     index: './index',
-    chat: './chat/chat.app',
+    chat: ['./chat/chat.app'],
+    chat: './chat/chat.scss',
     speaker: './speaker/speaker',
     dashboard: './dashboard/dashboard',
+    dashboard: './chat/chat.scss',
     commands: './commands/commands',
     polyfills: './polyfills.js',
-    bg: './shared/bg.js'
+    bg: './shared/bg.js',
+    // dashboardcss: './dashboard/dashboard.scss',
+    index: './style.css',
+    // commandscss: './commands/commands.scss'
   },
   resolve: {
     alias: {
@@ -32,12 +37,11 @@ module.exports = {
       pretty: true, // formatting HTML, useful for development mode
       js: {
         // output filename of extracted JS file from source script
-        sourceMap: false,
         filename: 'scripts/[name].js',
       },
       css: {
         // output filename of extracted CSS file from source style
-        filename: '[name].[contenthash:8].css',
+        filename: '[name].css',
       },
     }),
   ],
@@ -45,18 +49,14 @@ module.exports = {
     rules: [
       {
         test: /\.pug$/,
-        loader: '@webdiscus/pug-loader',
+        loader: PugPlugin.loader,
         options: {
           method: 'compile', // compile Pug into template function
         },
       },
       {
-        test: /\.css|scss$/i,
-        use: [
-          // MiniCssExtractPlugin.loader,
-          { loader: 'css-loader', options: { url: true }},
-          { loader: 'sass-loader' }
-        ],
+        test: /\.(css|sass|scss)$/,
+        use: ['css-loader', 'sass-loader'],
       },
       {
         test: /\.(png)$/,

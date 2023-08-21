@@ -1,6 +1,5 @@
 import template from './chat.tpl.pug';
 import techAlert from './alert/tech.alert.tpl.pug';
-import styles from './chat.scss';
 
 import Collapse from 'bootstrap/js/dist/collapse';
 import { socketService, pubsubService, twitchApiService, omdApiService, bttv, client } from '@chat/chat';
